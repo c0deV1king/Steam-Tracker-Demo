@@ -1,92 +1,77 @@
 import './styles.css'
 import { useState, useEffect } from 'react';
 
-
+// Grabbing my stored api key from .env NOTE: vite requires "VITE_" in front of variables stored in .env
 const API_KEY = import.meta.env.VITE_STEAM_API_KEY;
-// Template Literal, a nicer way to write strings and concatenation
-const URL = `http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=230410&key=${API_KEY}&steamid=76561198119786249`
-
-console.log('testing')
-
 
 export default function App() {
-  function GrabPlayerAchievements() {
-    // having [] inside of useState, will allow it to render as an array. Initially empty.
-    const [achievements, setAchievements] = useState([])
-    // getting a response and data from the API && converting it into
-    // a json
-    useEffect(() => {
-      const fetchWarframe = async () => {
-        const res = await fetch(URL);
-        const data = await res.json()
-        console.log(data)
-        const achArray = Object.values(data.playerstats.achievements) // converting the objects in the array to be an array themselves
-        setAchievements(achArray) // updating the data
+  // use states to store and update data
+  const [games, setGames] = useState([]);
+  const [allAchievements, setAllAchievements] = useState({});
 
-        console.log(achievements)
+  // API call to fetch the games in my steam account
+  // ** Learn more about the politics of useEffect, async, await. **
+  useEffect(() => {
+    const fetchGames = async () => {
+      const res = await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json`);
+      const data = await res.json();
+      // if no data, it returns an empty array "|| []"
+      setGames(data.response.games || []);
+    };
 
-        // grabbing the playerstats object from the data and accessing
-        // its array (which is the achievements)
-        // const playerStats = data.playerstats;
-        // const achievements = playerStats.achievements;
-
-        //const achievementNames = achievements.slice(0, 2) // trying to filter out all the object data except the name
-
-        //console.log(achievementNames)
-
-        // Using the "filter()" method to filter out a specific 
-        // value from the array and logging the objects that fit
-        // that criteria
-        // const achievedAchievements = achievements.filter(
-        //  achievement => achievement.achieved === 1
-        //);
-        // console.log('Earned Achievements: ', achievedAchievements);
+    fetchGames();
+  }, []);
+  // API call to grab all my achievements for all games
+  useEffect(() => {
+    const fetchAchievementsForAllGames = async () => {
+      const achievements = {};
+      // for of loop, this is going over the array of objects to check each games appid and calls another fetch request for each appid
+      // it then returns the separate achievement api call
+      for (const game of games) {
+        const res = await fetch(`http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${game.appid}&key=${API_KEY}&steamid=76561198119786249`);
+        const data = await res.json();
+        achievements[game.appid] = data.playerstats.achievements || [];
       }
-      fetchWarframe();
-    }, []);
-    console.log(typeof achievements);
-    console.log(Array.isArray(achievements))
 
+      setAllAchievements(achievements);
+    };
 
-    // Explanation for the shortform if else.
-    // it takes in a condition followed by a question mark (?)
-    // and then the first expression is what fires if its true
-    // second is if its false. These are separated by a colon (:)
-    // SYNTAX:
-    // condition ? true expression : false expression
-    return (
-      <>
-        <button className="btn btn-outline btn-accent">Accent</button>
-        <div className="overflow-x-auto">
-          <table className="table">
-            {/* head */}
-            <thead>
-              <tr>
-                <th>Achievement</th>
-                <th>Achieved?</th>
-                <th>Date Unlocked</th>
-              </tr>
-            </thead>
-            <tbody>
-              {achievements.map((achievement) => (
-                <tr key={achievement.apiname}>
-                  <td>{achievement.apiname}</td>
-                  <td>{achievement.achieved ? 'Yes' : 'No'}</td>
-                  <td>{achievement.unlocktime !== 0
-                    ? new Date(achievement.unlocktime * 1000).toLocaleString()
-                    : ' '}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    if (games.length > 0) {
+      fetchAchievementsForAllGames();
+    }
+  }, [games]);
 
-      </>
-    )
-  }
   return (
-  <GrabPlayerAchievements />
-)
+    <>
+      <div className="overflow-x-auto">
+        <table className="table table-xs">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Game Name</th>
+              <th>Achievements Earned</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(allAchievements).map(([appid, achievements], index) => { // Creates a new array with the required info for the page
+              // Calculate the number of achievements earned
+              const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
+              // And the total amount of achievements in the game
+              const totalAchievements = achievements.length;
+  
+              const gameName = `Game ID: ${appid}`;
+              // Put it all together in a table
+              return (
+                <tr key={appid}>
+                  <th>{index + 1}</th>
+                  <td>{gameName}</td>
+                  <td>{earnedAchievements} / {totalAchievements}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
 }
-
