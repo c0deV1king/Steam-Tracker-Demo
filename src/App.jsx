@@ -13,10 +13,37 @@ export default function App() {
   // ** Learn more about the politics of useEffect, async, await. **
   useEffect(() => {
     const fetchGames = async () => {
-      const res = await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json`);
+      // Check if cached data exists and is less than 24 hours old
+      const cachedGames = localStorage.getItem('cachedGames');
+      const cacheTimestamp = localStorage.getItem('cacheTimestamp');
+
+      if (cachedGames && cacheTimestamp) {
+        const now = new Date().getTime();
+        if (now - parseInt(cacheTimestamp) < 24 * 60 * 60 * 1000) {
+          setGames(JSON.parse(cachedGames));
+          return;
+        }
+      }
+
+      // If no valid cache, fetch from API
+      const res = await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json&include_played_free_games=1`);
       const data = await res.json();
-      // if no data, it returns an empty array "|| []"
-      setGames(data.response.games || []);
+      const gamesWithPlaytime = data.response.games || [];
+
+      const gamesWithDetails = await Promise.all(gamesWithPlaytime.map(async (game) => {
+        const detailsRes = await fetch(`http://store.steampowered.com/api/appdetails?appids=${game.appid}`);
+        const detailsData = await detailsRes.json();
+        return {
+          ...game,
+          name: detailsData[game.appid].success ? detailsData[game.appid].data.name : `Game ID: ${game.appid}`
+        };
+      }));
+
+      // Cache the results
+      localStorage.setItem('cachedGames', JSON.stringify(gamesWithDetails));
+      localStorage.setItem('cacheTimestamp', new Date().getTime().toString());
+
+      setGames(gamesWithDetails);
     };
 
     fetchGames();
@@ -53,25 +80,29 @@ export default function App() {
             </tr>
           </thead>
           <tbody>
-            {Object.entries(allAchievements).map(([appid, achievements], index) => { // Creates a new array with the required info for the page
-              // Calculate the number of achievements earned
-              const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
-              // And the total amount of achievements in the game
-              const totalAchievements = achievements.length;
-  
-              const gameName = `Game ID: ${appid}`;
-              // Put it all together in a table
-              return (
-                <tr key={appid}>
+            {games
+              .filter(game => game.playtime_forever > 0)
+              .map(game => {
+                const achievements = allAchievements[game.appid] || [];
+                const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
+                const totalAchievements = achievements.length;
+                return {
+                  ...game,
+                  earnedAchievements,
+                  totalAchievements
+                };
+              })
+              .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
+              .map((game, index) => (
+                <tr key={game.appid}>
                   <th>{index + 1}</th>
-                  <td>{gameName}</td>
-                  <td>{earnedAchievements} / {totalAchievements}</td>
+                  <td>{game.name}</td>
+                  <td>{game.totalAchievements > 0 ? `${game.earnedAchievements} / ${game.totalAchievements}` : 'No achievements'}</td>
                 </tr>
-              );
-            })}
+              ))}
           </tbody>
         </table>
       </div>
     </>
-  );
-}
+  )
+};
