@@ -9,6 +9,9 @@ export default function App() {
   const [games, setGames] = useState([]);
   const [allAchievements, setAllAchievements] = useState({});
 
+
+
+
   // API call to fetch the games in my steam account
   // ** Learn more about the politics of useEffect, async, await. **
   useEffect(() => {
@@ -17,7 +20,7 @@ export default function App() {
       // and sets the data to setGames
       const cachedGames = localStorage.getItem('cachedGames');
       const cacheTimestampGames = localStorage.getItem('cacheTimestampGames');
-
+  
       if (cachedGames && cacheTimestampGames) {
         const now = new Date().getTime();
         if (now - parseInt(cacheTimestampGames) < 24 * 60 * 60 * 1000) {
@@ -25,7 +28,7 @@ export default function App() {
           return;
         }
       }
-
+  
       // If no valid cache, fetch from API
       const res = await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json&include_played_free_games=1`);
       const data = await res.json();
@@ -35,7 +38,7 @@ export default function App() {
       // Map is used to iterate over all games in the array
       // Transforms it into a new array of promises, each promise represents an asyncronous operation 
       // to fetch additional details for the game
-
+  
       // await waits for the fetch request to complete and for the response to be available
       const gamesWithDetails = await Promise.all(gamesWithPlaytime.map(async (game) => {
         try {
@@ -63,14 +66,14 @@ export default function App() {
           };
         }
       }));
-
+  
       // Cache the results
       localStorage.setItem('cachedGames', JSON.stringify(gamesWithDetails));
       localStorage.setItem('cacheTimestampGames', new Date().getTime().toString());
-
+  
       setGames(gamesWithDetails);
     };
-
+  
     fetchGames();
   }, []);
   // API call to grab all my achievements for all games
