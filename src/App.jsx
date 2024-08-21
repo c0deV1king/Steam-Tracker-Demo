@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useSteamData } from './useSteamData';
 
 export default function App() {
-  const { games, allAchievements } = useSteamData();
+  const { games, allAchievements, handleLoadMore } = useSteamData();
   // need to link up my loading spinner to when the user is loading api data
   return (
     <>
@@ -66,6 +66,7 @@ export default function App() {
           </tbody>
         </table>
       </div>
+      <button className="btn btn-info" onClick={handleLoadMore}>Info</button>
     </>
   )
 };

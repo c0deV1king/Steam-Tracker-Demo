@@ -8,8 +8,7 @@ export const useSteamData = () => {
   // use states to store and update data
   const [games, setGames] = useState([]);
   const [allAchievements, setAllAchievements] = useState({});
-
-
+  const [gamesToDisplay, setGamesToDisplay] = useState([0]);
 
 
   // API call to fetch the games in my steam account
@@ -33,12 +32,14 @@ export const useSteamData = () => {
       const res = await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json&include_played_free_games=1`);
       const data = await res.json();
       const gamesWithPlaytime = data.response.games || [];
-      const cutGames = gamesWithPlaytime.slice(0, 20);
+      const cutGames = gamesWithPlaytime.slice(gamesToDisplay, gamesToDisplay + 20);
+      
       // Promise.all is a method that takes an array of promises and waits for all of them to resolve and
       // returns a single promise
       // Map is used to iterate over all games in the array
       // Transforms it into a new array of promises, each promise represents an asyncronous operation 
       // to fetch additional details for the game
+
 
       // await waits for the fetch request to complete and for the response to be available
       const gamesWithDetails = await Promise.all(cutGames.map(async (game) => {
@@ -67,16 +68,20 @@ export const useSteamData = () => {
           };
         }
       }));
-
       // Cache the results
       localStorage.setItem('cachedGames', JSON.stringify(gamesWithDetails));
       localStorage.setItem('cacheTimestampGames', new Date().getTime().toString());
-
-      setGames(cutGames);
+      setGamesToDisplay(cutGames);
+      setGames(gamesToDisplay);
     };
-
     fetchGames();
   }, []);
+
+  const handleLoadMore = () => {
+    console.log("Load more games button clicked");
+    setGamesToDisplay(gamesToDisplay + 20);
+  };
+
   // API call to grab all my achievements for all games
   useEffect(() => {
     const fetchAchievementsForAllGames = async () => {
@@ -119,5 +124,5 @@ export const useSteamData = () => {
 
   }, [games]);
 
-  return { games, allAchievements };
+  return { games, allAchievements, handleLoadMore };
 };
