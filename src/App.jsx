@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useSteamData } from './useSteamData';
 
 export default function App() {
-  const { games, allAchievements, handleLoadMore } = useSteamData();
+  const { gamesToDisplay, allAchievements, handleLoadMore } = useSteamData();
   // need to link up my loading spinner to when the user is loading api data
   return (
     <>
@@ -37,13 +37,13 @@ export default function App() {
         <table className="table table-xs">
           <thead>
             <tr>
-              <th>#</th>
+              <th> </th>
               <th>Game Name</th>
               <th>Achievements Earned</th>
             </tr>
           </thead>
           <tbody>
-            {games
+            {gamesToDisplay
               .filter(game => game.playtime_forever > 0)
               .map(game => {
                 const achievements = allAchievements[game.appid] || [];
@@ -58,7 +58,13 @@ export default function App() {
               .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
               .map((game, index) => (
                 <tr key={game.appid}>
-                  <th>{index + 1}</th>
+                  <td className="avatar">
+                    <div className="mask mask-square rounded-md h-12 w-12">
+                      <img
+                        src={game.img_icon_url}
+                        alt="Avatar Tailwind CSS Component" />
+                    </div>
+                  </td>
                   <td>{game.name}</td>
                   <td>{game.totalAchievements > 0 ? `${game.earnedAchievements} / ${game.totalAchievements}` : 'No achievements'}</td>
                 </tr>
