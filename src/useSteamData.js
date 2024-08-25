@@ -164,6 +164,6 @@ export const useSteamData = () => {
     }
 
 
-  }, [games]);
+  }, []);
   return { gamesToDisplay, allAchievements, handleLoadMore }; // returning the arrays and functions to be used on import to another component
 };

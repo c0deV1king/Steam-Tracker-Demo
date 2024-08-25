@@ -7,3 +7,9 @@ html {
     margin: 0;
     font-family: "Inter", sans-serif;
 }
+
+body {
+    background-image: url("/src/img/bg.png");
+    background-size: 480px 270px;
+    background-repeat: repeat;
+}
