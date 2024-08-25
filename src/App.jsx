@@ -43,7 +43,7 @@ export default function App() {
         <div className='contaier mx-auto bg-base-200 sm:w-[75%] lg:w-[50%] border-2 border-base-100'>
 
           <div className='flex flex-col container mx-auto justify-center items-center'>
-            <img className="m-2" src='https://cdn.akamai.steamstatic.com/steamcommunity/public/images/items/1716740/ef31b1cbdcf001305edbbab4d6fc42968825955a.gif' width="256" height="256" />
+            <img className="m-2" src='https://cdn.akamai.steamstatic.com/steamcommunity/public/images/items/1716740/ef31b1cbdcf001305edbbab4d6fc42968825955a.gif' width="256" height="256" alt='profile image' />
             <h2 className='text-4xl'>Brita water filter</h2>
             <button className="btn btn-accent h-5 min-h-0 m-2 mb-3">Sync Profile</button>
           </div>
@@ -54,7 +54,7 @@ export default function App() {
             <table className="table table-sm w-[95%]">
               <thead>
                 <tr>
-                  <th> </th>
+                  <th>.</th>
                   <th>Game Name</th>
                   <th>Achievements Earned</th>
                 </tr>

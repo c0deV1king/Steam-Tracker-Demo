@@ -33,26 +33,54 @@ export const useSteamData = () => {
     localStorage.setItem('cacheTimestampAchievements', new Date().getTime().toString());
   };
 
-
-
+  async function getGamesWithDetails(gamesWithPlaytime) {
+    const promiseArray = gamesWithPlaytime.map(async (game) => {
+      try {
+        const detailsRes = await fetch(`http://store.steampowered.com/api/appdetails?appids=${game.appid}`);
+        const detailsText = await detailsRes.text();
+        const detailsData = JSON.parse(detailsText);
+       
+        if (detailsData && detailsData[game.appid] && detailsData[game.appid].success) {
+          return {
+            ...game,
+            name: detailsData[game.appid].data.name
+          };
+        } else {
+          console.warn(`Unable to fetch details for game ${game.appid}:`, detailsText);
+          return {
+            ...game,
+            name: `Game ID: ${game.appid}`
+          };
+        }
+      } catch (e) {
+        console.error(`Error fetching or parsing details for game ${game.appid}:`, e);
+        return {
+          ...game,
+          name: `Game ID: ${game.appid}`
+        };
+      }
+    });
+  
+    return Promise.all(promiseArray);
+  }
   // API call to fetch the games in my steam account
   // ** Learn more about the politics of useEffect, async, await. **
   useEffect(() => {
     const fetchGames = async () => {
       // Check if cached data exists and is less than 24 hours old
       // and sets the data to setGames
-      const cachedGames = localStorage.getItem('cachedGames');
-      const cacheTimestampGames = localStorage.getItem('cacheTimestampGames');
+      // const cachedGames = localStorage.getItem('cachedGames');
+      // const cacheTimestampGames = localStorage.getItem('cacheTimestampGames');
 
-      if (cachedGames && cacheTimestampGames) {
-        const now = new Date().getTime();
-        if (now - parseInt(cacheTimestampGames) < 24 * 60 * 60 * 1000) {
-          const parsedGames = JSON.parse(cachedGames);
-          setGames(parsedGames);
-          setGamesToDisplay(parsedGames.slice(0, 20));
-          return;
-        }
-      }
+      // if (cachedGames && cacheTimestampGames) {
+      //   const now = new Date().getTime();
+      //   if (now - parseInt(cacheTimestampGames) < 24 * 60 * 60 * 1000) {
+      //     const parsedGames = JSON.parse(cachedGames);
+      //     setGames(parsedGames);
+      //     setGamesToDisplay(parsedGames.slice(0, 20));
+      //     return;
+      //   }
+      // }
 
       // If no valid cache, fetch from API
       const res = await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json&include_played_free_games=1`);
@@ -64,37 +92,14 @@ export const useSteamData = () => {
       // Map is used to iterate over all games in the array
       // Transforms it into a new array of promises, each promise represents an asyncronous operation 
       // to fetch additional details for the game
-
+      const firstTwenty = gamesWithPlaytime.slice(0, 20);
+      const gamesWithDetails  = await getGamesWithDetails (firstTwenty);
 
       // await waits for the fetch request to complete and for the response to be available
-      const gamesWithDetails = await Promise.all(gamesWithPlaytime.map(async (game) => { // map over the gamesWithPlaytime array
-        try {
-          const detailsRes = await fetch(`http://store.steampowered.com/api/appdetails?appids=${game.appid}`);
-          const detailsText = await detailsRes.text(); // get the text from the response
-          const detailsData = JSON.parse(detailsText); // convert the text to JSON
-          console.log(detailsText);
-          if (detailsData && detailsData[game.appid] && detailsData[game.appid].success) { // if the data exists and is successful
-            return { // return the game with the name from the data
-              ...game,
-              name: detailsData[game.appid].data.name // set the name of the game to the name from the data
-            };
-          } else {
-            console.warn(`Unable to fetch details for game ${game.appid}:`, detailsText);
-            return {
-              ...game,
-              name: `Game ID: ${game.appid}` // if the data is not successful, set the name to the gameid instead
-            };
-          }
-        } catch (e) {
-          console.error(`Error fetching or parsing details for game ${game.appid}:`, e);
-          return {
-            ...game,
-            name: `Game ID: ${game.appid}`
-          };
-        }
-      }));
       setGames(gamesWithDetails);
-      setGamesToDisplay(gamesWithDetails.slice(0, 20));
+      setGamesToDisplay(gamesWithDetails);
+      console.log(gamesWithDetails)
+      
       // Cache the results
       localStorage.setItem('cachedGames', JSON.stringify(gamesWithDetails));
       localStorage.setItem('cacheTimestampGames', new Date().getTime().toString());
@@ -104,6 +109,9 @@ export const useSteamData = () => {
     };
     fetchGames();
   }, []);
+
+
+ 
 
   useEffect(() => {
     const gamesWithoutAchievements = gamesToDisplay.filter(game => !allAchievements[game.appid]);
