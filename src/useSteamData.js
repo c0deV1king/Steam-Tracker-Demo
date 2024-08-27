@@ -34,19 +34,44 @@ export const useSteamData = () => {
   };
 
   async function getGamesWithDetails(gamesWithPlaytime) {
-      // Check if gamesWithPlaytime is an array
-  if (!Array.isArray(gamesWithPlaytime)) {
-    console.error('Expected gamesWithPlaytime to be an array, but got:', typeof gamesWithPlaytime, gamesWithPlaytime);
-    return [];
-  }
+    console.log("getGamesWithDetails called with: ", gamesWithPlaytime);
+
+    // Check if gamesWithPlaytime is an array
+    if (!Array.isArray(gamesWithPlaytime)) {
+      console.error('Expected gamesWithPlaytime to be an array, but got:', typeof gamesWithPlaytime, gamesWithPlaytime);
+      return [];
+    }
+
+    // Check for duplicate appids in gamesWithPlaytime
+    // const appidCounts = gamesWithPlaytime.reduce((acc, game) => {
+    //   acc[game.appid] = (acc[game.appid] || 0) + 1;
+    //   return acc;
+    // }, {});
+    // console.log("Appid counts: ", appidCounts);
+
+    const processedAppIds = new Set();
 
     const promiseArray = gamesWithPlaytime.map(async (game) => {
+      console.log(`Processing game with appid: ${game.appid}`);
+
+      if (processedAppIds.has(game.appid)) {
+        console.log(`Already processed game with appid: ${game.appid}`);
+        return {
+          ...game,
+          name: `Game ID: ${game.appid}`
+        };
+      }
+
+      processedAppIds.add(game.appid);
+      console.log(`Fetching details for game with appid: ${game.appid}`);
+
       try {
         const detailsRes = await fetch(`http://store.steampowered.com/api/appdetails?appids=${game.appid}`);
         const detailsText = await detailsRes.text();
         const detailsData = JSON.parse(detailsText);
-       
+
         if (detailsData && detailsData[game.appid] && detailsData[game.appid].success) {
+          console.log(`Successfully fetched details for game with appid: ${game.appid}`);
           return {
             ...game,
             name: detailsData[game.appid].data.name
@@ -66,13 +91,15 @@ export const useSteamData = () => {
         };
       }
     });
-  
+
     return Promise.all(promiseArray);
   }
   // API call to fetch the games in my steam account
   // ** Learn more about the politics of useEffect, async, await. **
   useEffect(() => {
+    console.log("useEffect trigged on line 99");
     const fetchGames = async () => {
+      console.log("fetchGames function called")
       // Check if cached data exists and is less than 24 hours old
       // and sets the data to setGames
       //  const cachedGames = localStorage.getItem('cachedGames');
@@ -94,25 +121,27 @@ export const useSteamData = () => {
       const res = await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json&include_played_free_games=1`);
       const data = await res.json();
       const gamesWithPlaytime = data.response.games || [];
-      
-    const allGamesList = data.response.games || [];
-    setGames(allGamesList); // Set all games
 
-    const firstTwenty = allGamesList.slice(0, 20);
-    const gamesWithDetails = await getGamesWithDetails(firstTwenty);
-    setGamesToDisplay(gamesWithDetails);
+      const allGamesList = data.response.games || [];
+      setGames(allGamesList); // Set all games
 
-    // Cache the results
-    localStorage.setItem('cachedGames', JSON.stringify(allGamesList));
-    localStorage.setItem('cacheTimestampGames', new Date().getTime().toString());
+      const firstTwenty = allGamesList.slice(0, 20);
+      console.log("calling getGamesWithDetails with firstTwenty");
+      const gamesWithDetails = await getGamesWithDetails(firstTwenty);
+      console.log("recieved gamesWithDetails: ", gamesWithDetails);
+      setGamesToDisplay(gamesWithDetails);
 
-    await fetchAchievementsForGames(gamesWithDetails);
+      // Cache the results
+      localStorage.setItem('cachedGames', JSON.stringify(allGamesList));
+      localStorage.setItem('cacheTimestampGames', new Date().getTime().toString());
+
+      await fetchAchievementsForGames(gamesWithDetails);
     };
     fetchGames();
   }, []);
 
 
- 
+
 
   useEffect(() => {
     const gamesWithoutAchievements = gamesToDisplay.filter(game => !allAchievements[game.appid]);
@@ -124,19 +153,19 @@ export const useSteamData = () => {
   const handleLoadMore = async () => {
     console.log("Total games:", games.length);
     console.log("Load more games button clicked");
-    
+
     const currentLength = gamesToDisplay.length;
     const newGames = games.slice(currentLength, currentLength + 20);
-    
+
     // Fetch details for the new games
     const newGamesWithDetails = await getGamesWithDetails(newGames);
     console.log("New games with details:", JSON.stringify(newGamesWithDetails));
-    
+
     setGamesToDisplay(prevGames => [...prevGames, ...newGamesWithDetails]);
-  
+
     // Filter out games that already have achievements cached
     const gamesWithoutAchievements = newGamesWithDetails.filter(game => !allAchievements[game.appid]);
-  
+
     if (gamesWithoutAchievements.length > 0) {
       await fetchAchievementsForGames(gamesWithoutAchievements);
     }
