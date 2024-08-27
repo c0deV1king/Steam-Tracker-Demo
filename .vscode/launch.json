@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Launch Firefox",
+        "type": "firefox",
+        "request": "launch",
+        "reAttach": true,
+        "url": "http://localhost:5173", // Replace with your app's URL
+        "webRoot": "${workspaceFolder}",
+        "firefoxExecutable": "C:/Program Files/Mozilla Firefox/firefox.exe" // Path to your Firefox executable
+      }
+    ]
+  }
