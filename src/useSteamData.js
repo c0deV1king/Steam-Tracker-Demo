@@ -75,18 +75,20 @@ export const useSteamData = () => {
     const fetchGames = async () => {
       // Check if cached data exists and is less than 24 hours old
       // and sets the data to setGames
-      // const cachedGames = localStorage.getItem('cachedGames');
-      // const cacheTimestampGames = localStorage.getItem('cacheTimestampGames');
+      //  const cachedGames = localStorage.getItem('cachedGames');
+      //  const cacheTimestampGames = localStorage.getItem('cacheTimestampGames');
 
-      // if (cachedGames && cacheTimestampGames) {
-      //   const now = new Date().getTime();
-      //   if (now - parseInt(cacheTimestampGames) < 24 * 60 * 60 * 1000) {
-      //     const parsedGames = JSON.parse(cachedGames);
-      //     setGames(parsedGames);
-      //     setGamesToDisplay(parsedGames.slice(0, 20));
-      //     return;
-      //   }
-      // }
+      //  if (cachedGames && cacheTimestampGames) {
+      //    const now = new Date().getTime();
+      //    if (now - parseInt(cacheTimestampGames) < 24 * 60 * 60 * 1000) {
+      //      const parsedGames = JSON.parse(cachedGames);
+      //      setGames(parsedGames);
+      //      setGamesToDisplay(parsedGames.slice(0, 20));
+      //      console.log("Cached games:", parsedGames);
+      //      return;
+      //    }
+      //  }
+
 
       // If no valid cache, fetch from API
       const res = await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json&include_played_free_games=1`);
@@ -100,7 +102,7 @@ export const useSteamData = () => {
     const gamesWithDetails = await getGamesWithDetails(firstTwenty);
     setGamesToDisplay(gamesWithDetails);
 
-    // Cache the results (you might want to cache allGamesList instead)
+    // Cache the results
     localStorage.setItem('cachedGames', JSON.stringify(allGamesList));
     localStorage.setItem('cacheTimestampGames', new Date().getTime().toString());
 
@@ -171,5 +173,5 @@ export const useSteamData = () => {
 
 
   }, []);
-  return { gamesToDisplay, allAchievements, handleLoadMore }; // returning the arrays and functions to be used on import to another component
+  return { games, gamesToDisplay, allAchievements, handleLoadMore }; // returning the arrays and functions to be used on import to another component
 };
