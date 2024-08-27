@@ -1,8 +1,10 @@
-# React + Vite
+## Steam Achievement Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The goal for this project is to make a tracking webapp that will showcase your achievements and show you cool stats based on them and your profile. <br>
 
-Currently, two official plugins are available:
+It will make use of the Steam Web API. <br>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+What id like to include:
+- A dashboard to show an overview of your profile
+- Different tabs to show more of your games and achievements
+- A stats tab that takes your information and displays cool stats based on it
