@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react';
 import { useSteamData } from './useSteamData';
 
 export default function App() {
-  const { gamesToDisplay, allAchievements, handleLoadMore } = useSteamData();
+  const { profileData, gamesToDisplay, allAchievements, handleLoadMore } = useSteamData();
   // need to link up my loading spinner to when the user is loading api data
   return (
     <>
       <div className=''>
         <div className='container mx-auto bg-transparent h-15 flex justify-center items-center'>
-        <h1 className="container mx-auto text-center text-4xl"><b>STEAM</b>TRACKER</h1>
+          <h1 className="container mx-auto text-center text-4xl"><b>STEAM</b>TRACKER</h1>
         </div>
 
         <div className='container mx-auto bg-black lg:w-[50%] sm:w-[90%] h-[300px]'>
@@ -41,13 +41,13 @@ export default function App() {
         </div>
 
         <div className='contaier mx-auto bg-base-200 sm:w-[75%] lg:w-[50%] border-2 border-base-100'>
-
-          <div className='flex flex-col container mx-auto justify-center items-center'>
-            <img className="m-2" src='https://cdn.akamai.steamstatic.com/steamcommunity/public/images/items/1716740/ef31b1cbdcf001305edbbab4d6fc42968825955a.gif' width="256" height="256" alt='profile image' />
-            <h2 className='text-4xl'>Brita water filter</h2>
-            <button className="btn btn-accent h-5 min-h-0 m-2 mb-3">Sync Profile</button>
-          </div>
-
+          {profileData && (
+              <div className='flex flex-col container mx-auto justify-center items-center'>
+                <img className="m-2" src={profileData.avatarfull} width="256" height="256" alt='profile image' />
+                <h2 className='text-4xl'>{profileData.personaname}</h2>
+                <a href={profileData.profileurl} target="_blank" rel="noopener noreferrer"><button className="btn btn-accent h-5 min-h-0 m-2 mb-3">Steam</button></a>
+              </div>
+            )}
           <div className="divider divider-base-100"></div>
 
           <div className="overflow-x-auto flex justify-center items-center">
