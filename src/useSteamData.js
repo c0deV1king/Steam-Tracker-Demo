@@ -10,6 +10,24 @@ export const useSteamData = () => {
   const [allAchievements, setAllAchievements] = useState({});
   const [gamesToDisplay, setGamesToDisplay] = useState([]);
   const [profileData, setProfileData] = useState({});
+  const [playtime, setPlaytime] = useState({});
+  const [gamesPlayed, setGamesPlayed] = useState({});
+  //const [perfectGames, setPerfectGames] = useState({});
+  // const [recentGames, setRecentGames] = useState([]);
+
+  // useEffect(() => {
+  //   const fetchRecentGames = async () => {
+  //     try {
+  //       const res = await fetch(`http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json`);
+  //       const data = await res.json();
+  //       setPlaytime(data.response.games[0]);
+  //       console.log("Recent games data:", data.response.games[0]);
+  //     } catch (error) {
+  //       console.error('Error fetching recent games data:' , error);
+  //     }
+  //   };
+  //   fetchPlaytime();
+  // }, []);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -50,7 +68,7 @@ const fetchAchievementsForGames = async (gamesToFetch) => { // new function to f
 };
 
 async function getGamesWithDetails(gamesWithPlaytime) {
-  console.log("getGamesWithDetails called with: ", gamesWithPlaytime);
+  //console.log("getGamesWithDetails called with: ", gamesWithPlaytime);
 
   // Check if gamesWithPlaytime is an array
   if (!Array.isArray(gamesWithPlaytime)) {
@@ -68,7 +86,7 @@ async function getGamesWithDetails(gamesWithPlaytime) {
   const processedAppIds = new Set();
 
   const promiseArray = gamesWithPlaytime.map(async (game) => {
-    console.log(`Processing game with appid: ${game.appid}`);
+    //console.log(`Processing game with appid: ${game.appid}`);
 
     if (processedAppIds.has(game.appid)) {
       console.log(`Already processed game with appid: ${game.appid}`);
@@ -79,7 +97,7 @@ async function getGamesWithDetails(gamesWithPlaytime) {
     }
 
     processedAppIds.add(game.appid);
-    console.log(`Fetching details for game with appid: ${game.appid}`);
+    //console.log(`Fetching details for game with appid: ${game.appid}`);
 
     try {
       const detailsRes = await fetch(`http://store.steampowered.com/api/appdetails?appids=${game.appid}`);
@@ -87,7 +105,7 @@ async function getGamesWithDetails(gamesWithPlaytime) {
       const detailsData = JSON.parse(detailsText);
 
       if (detailsData && detailsData[game.appid] && detailsData[game.appid].success) {
-        console.log(`Successfully fetched details for game with appid: ${game.appid}`);
+        //console.log(`Successfully fetched details for game with appid: ${game.appid}`);
         return {
           ...game,
           name: detailsData[game.appid].data.name
@@ -137,6 +155,16 @@ useEffect(() => {
     const res = await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json&include_played_free_games=1`);
     const data = await res.json();
     const gamesWithPlaytime = data.response.games || [];
+
+    // Calculate total playtime
+    const totalPlaytime = Math.round(gamesWithPlaytime.reduce((acc, game) => acc + game.playtime_forever, 0) / 60);
+    setPlaytime(totalPlaytime);
+    console.log("Total playtime:", totalPlaytime);
+
+    // Calculate total games played
+    const totalGamesPlayed = gamesWithPlaytime.filter(game => game.playtime_forever > 0).length;
+    console.log("Total games played:", totalGamesPlayed);
+    setGamesPlayed(totalGamesPlayed);
 
     const allGamesList = data.response.games || [];
     setGames(allGamesList); // Set all games
@@ -216,7 +244,7 @@ useEffect(() => {
     fetchAchievementsForAllGames();
   }
 
-
 }, []);
-return { games, gamesToDisplay, allAchievements, profileData, handleLoadMore }; // returning the arrays and functions to be used on import to another component
+
+return { games, gamesToDisplay, allAchievements, profileData, playtime, gamesPlayed, handleLoadMore }; // returning the arrays and functions to be used on import to another component
 };
