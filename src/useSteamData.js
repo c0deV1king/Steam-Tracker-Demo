@@ -12,6 +12,7 @@ export const useSteamData = () => {
   const [profileData, setProfileData] = useState({});
   const [playtime, setPlaytime] = useState({});
   const [gamesPlayed, setGamesPlayed] = useState({});
+  const [gamePictures, setGamePictures] = useState({});
   //const [perfectGames, setPerfectGames] = useState({});
   // const [recentGames, setRecentGames] = useState([]);
 
@@ -84,6 +85,7 @@ async function getGamesWithDetails(gamesWithPlaytime) {
   // console.log("Appid counts: ", appidCounts);
 
   const processedAppIds = new Set();
+  const gamePicturesTemp = {};
 
   const promiseArray = gamesWithPlaytime.map(async (game) => {
     //console.log(`Processing game with appid: ${game.appid}`);
@@ -103,6 +105,9 @@ async function getGamesWithDetails(gamesWithPlaytime) {
       const detailsRes = await fetch(`http://store.steampowered.com/api/appdetails?appids=${game.appid}`);
       const detailsText = await detailsRes.text();
       const detailsData = JSON.parse(detailsText);
+      console.log("Details data:", detailsData);
+      const gamePicture = detailsData[game.appid].data.header_image;
+      gamePicturesTemp[game.appid] = gamePicture;
 
       if (detailsData && detailsData[game.appid] && detailsData[game.appid].success) {
         //console.log(`Successfully fetched details for game with appid: ${game.appid}`);
@@ -125,7 +130,7 @@ async function getGamesWithDetails(gamesWithPlaytime) {
       };
     }
   });
-
+  setGamePictures(gamePicturesTemp);
   return Promise.all(promiseArray);
 }
 // API call to fetch the games in my steam account
@@ -246,5 +251,5 @@ useEffect(() => {
 
 }, []);
 
-return { games, gamesToDisplay, allAchievements, profileData, playtime, gamesPlayed, handleLoadMore }; // returning the arrays and functions to be used on import to another component
+return { games, gamesToDisplay, allAchievements, profileData, playtime, gamesPlayed, gamePictures, handleLoadMore }; // returning the arrays and functions to be used on import to another component
 };

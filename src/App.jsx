@@ -2,7 +2,7 @@ import './styles.css'
 import { useSteamData } from './useSteamData';
 
 export default function App() {
-  const { profileData, gamesToDisplay, allAchievements, playtime, gamesPlayed, handleLoadMore } = useSteamData();
+  const { profileData, gamesToDisplay, allAchievements, playtime, gamesPlayed, gamePictures, handleLoadMore } = useSteamData();
   // need to link up my loading spinner to when the user is loading api data
   return (
     <>
@@ -14,7 +14,7 @@ export default function App() {
         <div className='container mx-auto bg-black lg:w-[50%] sm:w-[90%] h-[300px]'>
           {/* banner */}
         </div>
-        {playtime && gamesPlayed &&(
+        {playtime && gamesPlayed && (
           <div className='flex flex-col container mx-auto justify-center items-center m-5'>
             <div className="stats stats-vertical lg:stats-horizontal bg-transparent">
               <div className="stat">
@@ -73,11 +73,11 @@ export default function App() {
                   })
                   .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
                   .map((game, index) => (
-                    <tr key={game.appid}>
+                    <tr key={game.appid} >
                       <td className="avatar">
-                        <div className="mask mask-square rounded-md h-16 w-16">
+                        <div className="mask rounded-md h-[107.5px] w-[230px]">
                           <img
-                            src="/src/img/wow.png"
+                            src={gamePictures[game.appid]}
                             alt="Avatar Tailwind CSS Component" />
                         </div>
                       </td>
@@ -93,7 +93,7 @@ export default function App() {
           </div>
 
         </div>
-      </div>
+      </div >
     </>
   )
 };
