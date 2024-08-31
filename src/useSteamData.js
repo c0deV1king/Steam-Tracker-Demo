@@ -68,6 +68,8 @@ const fetchAchievementsForGames = async (gamesToFetch) => { // new function to f
   localStorage.setItem('cacheTimestampAchievements', new Date().getTime().toString());
 };
 
+
+
 async function getGamesWithDetails(gamesWithPlaytime) {
   //console.log("getGamesWithDetails called with: ", gamesWithPlaytime);
 
@@ -85,7 +87,7 @@ async function getGamesWithDetails(gamesWithPlaytime) {
   // console.log("Appid counts: ", appidCounts);
 
   const processedAppIds = new Set();
-  const gamePicturesTemp = {};
+  const gamePicturesTemp = {...gamePictures};
 
   const promiseArray = gamesWithPlaytime.map(async (game) => {
     //console.log(`Processing game with appid: ${game.appid}`);
@@ -100,6 +102,13 @@ async function getGamesWithDetails(gamesWithPlaytime) {
 
     processedAppIds.add(game.appid);
     //console.log(`Fetching details for game with appid: ${game.appid}`);
+
+    if (gamePicturesTemp[game.appid]) {
+      return {
+        ...game,
+        name: `Game ID: ${game.appid}`
+      };
+    }
 
     try {
       const detailsRes = await fetch(`http://store.steampowered.com/api/appdetails?appids=${game.appid}`);

@@ -78,7 +78,7 @@ export default function App() {
                         <div className="mask rounded-md h-[107.5px] w-[230px]">
                           <img
                             src={gamePictures[game.appid]}
-                            alt="Avatar Tailwind CSS Component" />
+                            alt="Game image"/>
                         </div>
                       </td>
                       <td>{game.name}</td>
