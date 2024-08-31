@@ -14,21 +14,23 @@ export const useSteamData = () => {
   const [gamesPlayed, setGamesPlayed] = useState({});
   const [gamePictures, setGamePictures] = useState({});
   //const [perfectGames, setPerfectGames] = useState({});
-  // const [recentGames, setRecentGames] = useState([]);
+  const [recentGames, setRecentGames] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchRecentGames = async () => {
-  //     try {
-  //       const res = await fetch(`http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json`);
-  //       const data = await res.json();
-  //       setPlaytime(data.response.games[0]);
-  //       console.log("Recent games data:", data.response.games[0]);
-  //     } catch (error) {
-  //       console.error('Error fetching recent games data:' , error);
-  //     }
-  //   };
-  //   fetchPlaytime();
-  // }, []);
+  // Fetch recent games
+  useEffect(() => {
+    const fetchRecentGames = async () => {
+      try {
+        const res = await fetch(`http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json`);
+        const data = await res.json();
+        const recentGamesData = data.response.games || [];
+        const gamesWithDetails = await getGamesWithDetails(recentGamesData);
+        setRecentGames(gamesWithDetails);
+      } catch (error) {
+        console.error('Error fetching recent games data:', error);
+      }
+    };
+    fetchRecentGames();
+  }, []);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -71,27 +73,15 @@ const fetchAchievementsForGames = async (gamesToFetch) => { // new function to f
 
 
 async function getGamesWithDetails(gamesWithPlaytime) {
-  //console.log("getGamesWithDetails called with: ", gamesWithPlaytime);
-
-  // Check if gamesWithPlaytime is an array
   if (!Array.isArray(gamesWithPlaytime)) {
     console.error('Expected gamesWithPlaytime to be an array, but got:', typeof gamesWithPlaytime, gamesWithPlaytime);
     return [];
   }
 
-  // Check for duplicate appids in gamesWithPlaytime
-  // const appidCounts = gamesWithPlaytime.reduce((acc, game) => {
-  //   acc[game.appid] = (acc[game.appid] || 0) + 1;
-  //   return acc;
-  // }, {});
-  // console.log("Appid counts: ", appidCounts);
-
   const processedAppIds = new Set();
   const gamePicturesTemp = {...gamePictures};
 
   const promiseArray = gamesWithPlaytime.map(async (game) => {
-    //console.log(`Processing game with appid: ${game.appid}`);
-
     if (processedAppIds.has(game.appid)) {
       console.log(`Already processed game with appid: ${game.appid}`);
       return {
@@ -101,12 +91,11 @@ async function getGamesWithDetails(gamesWithPlaytime) {
     }
 
     processedAppIds.add(game.appid);
-    //console.log(`Fetching details for game with appid: ${game.appid}`);
 
     if (gamePicturesTemp[game.appid]) {
       return {
         ...game,
-        name: `Game ID: ${game.appid}`
+        name: game.name || `Game ID: ${game.appid}`
       };
     }
 
@@ -114,34 +103,36 @@ async function getGamesWithDetails(gamesWithPlaytime) {
       const detailsRes = await fetch(`http://store.steampowered.com/api/appdetails?appids=${game.appid}`);
       const detailsText = await detailsRes.text();
       const detailsData = JSON.parse(detailsText);
-      console.log("Details data:", detailsData);
-      const gamePicture = detailsData[game.appid].data.header_image;
-      gamePicturesTemp[game.appid] = gamePicture;
 
       if (detailsData && detailsData[game.appid] && detailsData[game.appid].success) {
-        //console.log(`Successfully fetched details for game with appid: ${game.appid}`);
-        return {
-          ...game,
-          name: detailsData[game.appid].data.name
-        };
-      } else {
-        console.warn(`Unable to fetch details for game ${game.appid}:`, detailsText);
-        return {
-          ...game,
-          name: `Game ID: ${game.appid}`
-        };
+        const gameData = detailsData[game.appid].data;
+        if (gameData) {
+          gamePicturesTemp[game.appid] = gameData.header_image;
+          return {
+            ...game,
+            name: gameData.name
+          };
+        }
       }
+      
+      console.warn(`Unable to fetch details for game ${game.appid}:`, detailsText);
+      return {
+        ...game,
+        name: game.name || `Game ID: ${game.appid}`
+      };
     } catch (e) {
       console.error(`Error fetching or parsing details for game ${game.appid}:`, e);
       return {
         ...game,
-        name: `Game ID: ${game.appid}`
+        name: game.name || `Game ID: ${game.appid}`
       };
     }
   });
+
   setGamePictures(gamePicturesTemp);
   return Promise.all(promiseArray);
 }
+
 // API call to fetch the games in my steam account
 // ** Learn more about the politics of useEffect, async, await. **
 useEffect(() => {
@@ -199,7 +190,16 @@ useEffect(() => {
 }, []);
 
 
-
+  // Update achievements for recent games
+  useEffect(() => {
+    const updateRecentGamesAchievements = async () => {
+      if (recentGames.length > 0) {
+        await fetchAchievementsForGames(recentGames);
+        setRecentGames([...recentGames]); // Trigger re-render
+      }
+    };
+    updateRecentGamesAchievements();
+  }, [recentGames]);
 
 useEffect(() => {
   const gamesWithoutAchievements = gamesToDisplay.filter(game => !allAchievements[game.appid]);
@@ -260,5 +260,5 @@ useEffect(() => {
 
 }, []);
 
-return { games, gamesToDisplay, allAchievements, profileData, playtime, gamesPlayed, gamePictures, handleLoadMore }; // returning the arrays and functions to be used on import to another component
+return { games, gamesToDisplay, allAchievements, profileData, playtime, gamesPlayed, gamePictures, recentGames, handleLoadMore }; // returning the arrays and functions to be used on import to another component
 };

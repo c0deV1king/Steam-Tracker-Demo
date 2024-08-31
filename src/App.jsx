@@ -1,8 +1,15 @@
 import './styles.css'
+import { useState } from 'react';
 import { useSteamData } from './useSteamData';
 
 export default function App() {
-  const { profileData, gamesToDisplay, allAchievements, playtime, gamesPlayed, gamePictures, handleLoadMore } = useSteamData();
+  const { profileData, gamesToDisplay, allAchievements, playtime, gamesPlayed, gamePictures, recentGames, handleLoadMore } = useSteamData();
+  const [activeTab, setActiveTab] = useState('Overview');
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
+
   // need to link up my loading spinner to when the user is loading api data
   return (
     <>
@@ -47,50 +54,117 @@ export default function App() {
               <a href={profileData.profileurl} target="_blank" rel="noopener noreferrer"><button className="btn btn-accent h-5 min-h-0 m-2 mb-3">Steam</button></a>
             </div>
           )}
-          <div className="divider divider-base-100"></div>
+
+
+
+          <div role="tablist" className="tabs tabs-lifted">
+            <a role="tab" className={`tab ${activeTab === 'Overview' ? 'tab-active' : ''}`} onClick={() => handleTabChange('Overview')}>Overview</a>
+            <a role="tab" className={`tab ${activeTab === 'Games' ? 'tab-active' : ''}`} onClick={() => handleTabChange('Games')}>Games</a>
+            <a role="tab" className={`tab ${activeTab === 'Achievements' ? 'tab-active' : ''}`} onClick={() => handleTabChange('Achievements')}>Achievements</a>
+            <a role="tab" className={`tab ${activeTab === 'Stats' ? 'tab-active' : ''}`} onClick={() => handleTabChange('Stats')}>Stats</a>
+          </div>
 
           <div className="overflow-x-auto flex justify-center items-center">
-            <table className="table table-sm w-[95%]">
-              <thead>
-                <tr>
-                  <th>.</th>
-                  <th>Game Name</th>
-                  <th>Achievements Earned</th>
-                </tr>
-              </thead>
-              <tbody className="bg-primary bg-opacity-5">
-                {gamesToDisplay
-                  .filter(game => game.playtime_forever > 0)
-                  .map(game => {
-                    const achievements = allAchievements[game.appid] || [];
-                    const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
-                    const totalAchievements = achievements.length;
-                    return {
-                      ...game,
-                      earnedAchievements,
-                      totalAchievements
-                    };
-                  })
-                  .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
-                  .map((game, index) => (
-                    <tr key={game.appid} >
-                      <td className="avatar">
-                        <div className="mask rounded-md h-[107.5px] w-[230px]">
-                          <img
-                            src={gamePictures[game.appid]}
-                            alt="Game image"/>
-                        </div>
-                      </td>
-                      <td>{game.name}</td>
-                      <td>{game.totalAchievements > 0 ? `${game.earnedAchievements} / ${game.totalAchievements}` : 'No achievements'}</td>
+
+            {activeTab === 'Overview' && (
+  <div className="container mx-auto w-[50%]">
+  <table className="table table-sm w-[95%]">
+    <thead>
+      <tr>
+        <th>.</th>
+        <th>Game Name</th>
+        <th>Achievements Earned</th>
+      </tr>
+    </thead>
+    <tbody className="bg-primary bg-opacity-5">
+      {recentGames.map((game) => {
+        const achievements = allAchievements[game.appid] || [];
+        const earnedAchievements = achievements.filter((achievement) => achievement.achieved).length;
+        const totalAchievements = achievements.length;
+        return (
+          <tr key={game.appid}>
+            <td className="avatar">
+              <div className="mask rounded-md h-[107.5px] w-[230px]">
+                {gamePictures[game.appid] ? (
+                  <img src={gamePictures[game.appid]} alt={`${game.name || 'Game'} image`} />
+                ) : (
+                  <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Image</div>
+                )}
+              </div>
+            </td>
+            <td>{game.name || `Game ID: ${game.appid}`}</td>
+            <td>
+              {totalAchievements > 0
+                ? `${earnedAchievements} / ${totalAchievements}`
+                : 'No achievements'}
+            </td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+</div>
+)}
+
+            {activeTab === 'Games' && (
+              <div>
+                <table className="table table-sm w-[95%]">
+                  <thead>
+                    <tr>
+                      <th>.</th>
+                      <th>Game Name</th>
+                      <th>Achievements Earned</th>
                     </tr>
-                  ))}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody className="bg-primary bg-opacity-5">
+                    {gamesToDisplay
+                      .filter(game => game.playtime_forever > 0)
+                      .map(game => {
+                        const achievements = allAchievements[game.appid] || [];
+                        const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
+                        const totalAchievements = achievements.length;
+                        return {
+                          ...game,
+                          earnedAchievements,
+                          totalAchievements
+                        };
+                      })
+                      .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
+                      .map((game, index) => (
+                        <tr key={game.appid} >
+                          <td className="avatar">
+                            <div className="mask rounded-md h-[107.5px] w-[230px]">
+                              <img
+                                src={gamePictures[game.appid]}
+                                alt="Game image" />
+                            </div>
+                          </td>
+                          <td>{game.name}</td>
+                          <td>{game.totalAchievements > 0 ? `${game.earnedAchievements} / ${game.totalAchievements}` : 'No achievements'}</td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+                <div className="flex justify-center items-center">
+                  <button className="btn btn-info min-h-0 h-8 m-5" onClick={handleLoadMore}>More games</button>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'Achievements' && (
+              <div className="container mx-auto">
+                {/* Achievements content */}
+              </div>
+            )}
+
+            {activeTab === 'Stats' && (
+              <div className="container mx-auto">
+                {/* Stats content */}
+              </div>
+            )}
+
           </div>
-          <div className="flex justify-center items-center">
-            <button className="btn btn-info min-h-0 h-8 m-5" onClick={handleLoadMore}>More games</button>
-          </div>
+
 
         </div>
       </div >
