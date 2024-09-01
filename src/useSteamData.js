@@ -194,12 +194,13 @@ useEffect(() => {
   useEffect(() => {
     const updateRecentGamesAchievements = async () => {
       if (recentGames.length > 0) {
-        await fetchAchievementsForGames(recentGames);
-        setRecentGames([...recentGames]); // Trigger re-render
+        const recentGamesWithDetails = await getGamesWithDetails(recentGames);
+        await fetchAchievementsForGames(recentGamesWithDetails);
+        setRecentGames([...recentGamesWithDetails]);
       }
     };
     updateRecentGamesAchievements();
-  }, [recentGames]);
+  }, []);
 
 useEffect(() => {
   const gamesWithoutAchievements = gamesToDisplay.filter(game => !allAchievements[game.appid]);
