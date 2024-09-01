@@ -15,6 +15,17 @@ export const useSteamData = () => {
   const [gamePictures, setGamePictures] = useState({});
   //const [perfectGames, setPerfectGames] = useState({});
   const [recentGames, setRecentGames] = useState([]);
+  const [overviewGames, setOverviewGames] = useState([]);
+
+
+  // Fix bugs, set up the overview tab to display only what is needed on refresh. Update the state when the user switches tabs to the games tab
+  // add a loading state to any calls. (bonus for adding a little minigame while the user waits)
+
+  //psudocode
+  // get overview games and then set overviewGames the state using setOverviewGames
+  // loop through overviewGames and send a request to get the details for each game and append it to a new array
+  // use setOverviewGames to overwrite the overviewGames state with the new array
+  // Make sure the table in overview tab is using overviewGames
 
   // Fetch recent games
   useEffect(() => {
@@ -103,6 +114,7 @@ async function getGamesWithDetails(gamesWithPlaytime) {
       const detailsRes = await fetch(`http://store.steampowered.com/api/appdetails?appids=${game.appid}`);
       const detailsText = await detailsRes.text();
       const detailsData = JSON.parse(detailsText);
+      console.log("detailsData:", detailsData);
 
       if (detailsData && detailsData[game.appid] && detailsData[game.appid].success) {
         const gameData = detailsData[game.appid].data;
