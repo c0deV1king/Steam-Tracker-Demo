@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useSteamData } from './useSteamData';
 
 export default function App() {
-  const { profileData, gamesToDisplay, allAchievements, playtime, gamesPlayed, gamePictures, recentGames, handleLoadMore } = useSteamData();
+  const { profileData, gamesToDisplay, allAchievements, playtime, gamesPlayed, gamePictures, overviewGames, recentGames, handleLoadMore } = useSteamData();
   const [activeTab, setActiveTab] = useState('Overview');
 
   const handleTabChange = (tab) => {
@@ -67,44 +67,39 @@ export default function App() {
           <div className="overflow-x-auto flex justify-center items-center">
 
             {activeTab === 'Overview' && (
-  <div className="container mx-auto w-[50%]">
-  <table className="table table-sm w-[95%]">
-    <thead>
-      <tr>
-        <th>.</th>
-        <th>Game Name</th>
-        <th>Achievements Earned</th>
-      </tr>
-    </thead>
-    <tbody className="bg-primary bg-opacity-5">
-      {recentGames.map((game) => {
-        const achievements = allAchievements[game.appid] || [];
-        const earnedAchievements = achievements.filter((achievement) => achievement.achieved).length;
-        const totalAchievements = achievements.length;
-        return (
-          <tr key={game.appid}>
-            <td className="avatar">
-              <div className="mask rounded-md h-[107.5px] w-[230px]">
-                {gamePictures[game.appid] ? (
-                  <img src={gamePictures[game.appid]} alt={`${game.name || 'Game'} image`} />
-                ) : (
-                  <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Image</div>
-                )}
+              <div className="container mx-auto w-[50%]">
+                <table className="table table-sm w-[95%]">
+                  <thead>
+                    <tr>
+                      <th>.</th>
+                      <th>Game Name</th>
+                      <th>Achievements Earned</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-primary bg-opacity-5">
+                    {Array.isArray(overviewGames) && overviewGames.length > 0 ? overviewGames.map((game) => (
+                      <tr key={game.appid}>
+                        <td className="avatar">
+                          <div className="mask rounded-md h-[107.5px] w-[230px]">
+                            {game.image ? (
+                              <img src={game.image} alt={`${game.name || 'Game'} image`} />
+                            ) : (
+                              <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Image</div>
+                            )}
+                          </div>
+                        </td>
+                        <td>{game.name || `Game ID: ${game.appid}`}</td>
+                        <td>
+                          {game.achievements && game.achievements.length > 0
+                            ? `${game.achievements.filter(a => a.achieved).length} / ${game.achievements.length}`
+                            : 'No achievements'}
+                        </td>
+                      </tr>
+                    )) : <tr><td colSpan="3" className="text-center">No games to display</td></tr>}
+                  </tbody>
+                </table>
               </div>
-            </td>
-            <td>{game.name || `Game ID: ${game.appid}`}</td>
-            <td>
-              {totalAchievements > 0
-                ? `${earnedAchievements} / ${totalAchievements}`
-                : 'No achievements'}
-            </td>
-          </tr>
-        );
-      })}
-    </tbody>
-  </table>
-</div>
-)}
+            )}
 
             {activeTab === 'Games' && (
               <div>
@@ -140,7 +135,13 @@ export default function App() {
                             </div>
                           </td>
                           <td>{game.name}</td>
-                          <td>{game.totalAchievements > 0 ? `${game.earnedAchievements} / ${game.totalAchievements}` : 'No achievements'}</td>
+                          <td>
+                            {allAchievements[game.appid] && allAchievements[game.appid].length > 0 ? (
+                              `${allAchievements[game.appid].filter(a => a.achieved).length} / ${allAchievements[game.appid].length}`
+                            ) : (
+                              'No achievements'
+                            )}
+                          </td>
                         </tr>
                       ))}
                   </tbody>
