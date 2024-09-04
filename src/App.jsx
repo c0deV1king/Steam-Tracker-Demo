@@ -1,6 +1,9 @@
 import './styles.css'
 import { useState } from 'react';
 import { useSteamData } from './useSteamData';
+import TimeClock from './img/clock-history.svg?react';
+import ControllerSVG from './img/controller.svg?react';
+import GithubSVG from './img/github.svg?react';
 
 export default function App() {
   const { profileData, gamesToDisplay, allAchievements, playtime, gamesPlayed, gamePictures, overviewGames, recentGames, handleLoadMore } = useSteamData();
@@ -14,38 +17,33 @@ export default function App() {
   return (
     <>
       <div className=''>
-        <div className='container mx-auto bg-transparent h-15 flex justify-center items-center'>
+        <div className='container mx-auto bg-transparent h-15 w-[50%] flex justify-center items-center'>
           <h1 className="container mx-auto text-center text-4xl"><b>STEAM</b>TRACKER</h1>
+          {playtime && gamesPlayed && (
+            <div className='flex flex-col container mx-auto justify-center items-center m-5'>
+              <div className="stats stats-vertical lg:stats-horizontal bg-transparent">
+                <div className="stat flex justify-center items-center">
+                  <div className="stat-title text-center">
+                    <ControllerSVG className='w-6 h-6 fill-accent' />
+                  </div>
+                  <div className="stat-value text-center text-info">{typeof gamesPlayed === 'number' ? gamesPlayed : 'N/A'}</div>
+                </div>
+
+                <div className="stat flex justify-center items-center">
+                  <div className="stat-title text-center">
+                    <TimeClock className='w-6 h-6 fill-accent' />
+                  </div>
+                  <div className="stat-value text-center text-info">{typeof playtime === 'number' ? playtime : 'N/A'}</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className='container mx-auto bg-black lg:w-[50%] sm:w-[90%] h-[300px]'>
           {/* banner */}
         </div>
-        {playtime && gamesPlayed && (
-          <div className='flex flex-col container mx-auto justify-center items-center m-5'>
-            <div className="stats stats-vertical lg:stats-horizontal bg-transparent">
-              <div className="stat">
-                <div className="stat-title text-center">Games played:</div>
-                <div className="stat-value text-center text-info">{typeof gamesPlayed === 'number' ? gamesPlayed : 'N/A'}</div>
-              </div>
 
-              <div className="stat">
-                <div className="stat-title text-center">Hours played:</div>
-                <div className="stat-value text-center text-info">{typeof playtime === 'number' ? playtime : 'N/A'}</div>
-              </div>
-
-              <div className="stat">
-                <div className="stat-title text-center">Perfects:</div>
-                <div className="stat-value text-center text-info">N/A</div>
-              </div>
-
-              <div className="stat">
-                <div className="stat-title text-center">Achievements earned:</div>
-                <div className="stat-value text-center text-info">N/A</div>
-              </div>
-            </div>
-          </div>
-        )}
         <div className='contaier mx-auto bg-base-200 sm:w-[75%] lg:w-[50%] border-2 border-base-100'>
           {profileData && (
             <div className='flex flex-col container mx-auto justify-center items-center'>
@@ -169,6 +167,18 @@ export default function App() {
 
         </div>
       </div >
+
+      <footer className="footer footer-center bg-primary text-primary-content p-10">
+        <aside>
+          <a href="https://github.com/c0dev1king" target="_blank" rel="noopener noreferrer"><GithubSVG className='github-logo w-[64px] h-[64px] fill-black' /></a>
+          <p className="font-bold">
+            Created with love by c0dev1king
+            <br />
+
+          </p>
+          <p>SteamTracker is not an official Steam product. The Steam name, logo, and related trademarks are trademarks of Valve Corporation. Valve Corporation is not affiliated with SteamTracker.</p>
+        </aside>
+      </footer>
     </>
   )
 };

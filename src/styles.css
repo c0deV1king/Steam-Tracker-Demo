@@ -13,3 +13,11 @@ body {
     background-size: 480px 270px;
     background-repeat: repeat;
 }
+
+.github-logo {
+    transition: transform 0.3s ease-in-out;
+}
+
+.github-logo:hover {
+    transform: scale(1.1) rotate(-45deg);
+}
