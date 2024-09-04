@@ -148,7 +148,6 @@ export const useSteamData = () => {
     });
 
     console.log("gamePicturesTemp:", gamePicturesTemp);
-    setOverviewGames(gamePicturesTemp);
     setGamePictures(gamePicturesTemp);
     return Promise.all(promiseArray);
   }
