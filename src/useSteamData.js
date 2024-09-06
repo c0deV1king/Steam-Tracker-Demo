@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
 
+// Plans to add to the app:
+// A game page for each individual game that shows additional details for that game, including the achievements, achievement images ect. (allow user to click on the game from any tab, games or overview)
+// Trophy Case
+// Get recent achievements for the overview tab (requires full sync)
+
 // Grabbing my stored api key from .env NOTE: vite requires "VITE_" in front of variables stored in .env
 const API_KEY = import.meta.env.VITE_STEAM_API_KEY;
 
@@ -17,16 +22,12 @@ export const useSteamData = () => {
   const [recentGames, setRecentGames] = useState([]);
   const [overviewGames, setOverviewGames] = useState([]);
   const [allGames, setAllGames] = useState([]);
+  const [mostRecentGame, setMostRecentGame] = useState(null);
 
 
   // Fix bugs, set up the overview tab to display only what is needed on refresh. Update the state when the user switches tabs to the games tab
   // add a loading state to any calls. (bonus for adding a little minigame while the user waits)
 
-  //psudocode
-  // get overview games and then set overviewGames the state using setOverviewGames
-  // loop through overviewGames and send a request to get the details for each game and append it to a new array
-  // use setOverviewGames to overwrite the overviewGames state with the new array
-  // Make sure the table in overview tab is using overviewGames
 
   // Fetch recent games
   useEffect(() => {
@@ -41,10 +42,31 @@ export const useSteamData = () => {
         console.log("Games with details:", gamesWithDetails); // Debug log
         const gamesWithAchievements = await fetchAchievementsForGames(gamesWithDetails);
         console.log("Games with achievements:", gamesWithAchievements); // Debug log
+
+        if (recentGamesData.length > 0) {
+          const mostRecent = recentGamesData[0];
+
+          const detailsRes = await fetch(`https://store.steampowered.com/api/appdetails?appids=${mostRecent.appid}`);
+          const detailsData = await detailsRes.json();
+          const gameDetails = detailsData[mostRecent.appid].data;
+
+          const screenshots = gameDetails.screenshots || [];
+          const randomScreenshot = screenshots.length > 0 
+            ? screenshots[Math.floor(Math.random() * screenshots.length)].path_full 
+            : null;
+
+
+          setMostRecentGame({
+            ...mostRecent,
+            name: mostRecent.name,
+            image: randomScreenshot || `https://cdn.cloudflare.steamstatic.com/steam/apps/${mostRecent.appid}/header.jpg`
+          });
+        }
         setOverviewGames(gamesWithAchievements);
       } catch (error) {
         console.error('Error fetching overview games data:', error);
         setOverviewGames([]);
+        setMostRecentGame(null);
       }
     };
     fetchOverviewGames();
@@ -298,5 +320,17 @@ export const useSteamData = () => {
 
   }, []);
 
-  return { games, gamesToDisplay, allAchievements, profileData, playtime, gamesPlayed, gamePictures, overviewGames, recentGames, handleLoadMore }; // returning the arrays and functions to be used on import to another component
+  return {
+    games,
+    gamesToDisplay,
+    allAchievements,
+    profileData,
+    playtime,
+    gamesPlayed,
+    gamePictures,
+    overviewGames,
+    recentGames,
+    handleLoadMore,
+    mostRecentGame
+  }; // returning the arrays and functions to be used on import to another component
 };

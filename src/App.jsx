@@ -4,9 +4,22 @@ import { useSteamData } from './useSteamData';
 import TimeClock from './img/clock-history.svg?react';
 import ControllerSVG from './img/controller.svg?react';
 import GithubSVG from './img/github.svg?react';
+import SyncSVG from './img/arrow-repeat.svg?react';
 
 export default function App() {
-  const { profileData, gamesToDisplay, allAchievements, playtime, gamesPlayed, gamePictures, overviewGames, recentGames, handleLoadMore } = useSteamData();
+  const {
+    profileData,
+    gamesToDisplay,
+    allAchievements,
+    playtime,
+    gamesPlayed,
+    gamePictures,
+    overviewGames,
+    recentGames,
+    handleLoadMore,
+    mostRecentGame
+  } = useSteamData();
+
   const [activeTab, setActiveTab] = useState('Overview');
 
   const handleTabChange = (tab) => {
@@ -39,9 +52,15 @@ export default function App() {
             </div>
           )}
         </div>
-
-        <div className='container mx-auto bg-black lg:w-[50%] sm:w-[90%] h-[300px]'>
-          {/* banner */}
+        <div className='header'>
+          {mostRecentGame && mostRecentGame.image && (
+          <div className='container mx-auto bg-black lg:w-[50%] sm:w-[90%] h-[300px] relative'>
+            {/* banner */}
+            <img src={mostRecentGame.image} alt={mostRecentGame.name} className='object-cover w-full h-full' />
+            <p className='text-accent absolute bottom-0 left-0 p-2 w-full
+            [text-shadow:_-1px_-1px_0_#000,_1px_-1px_0_#000,_-1px_1px_0_#000,_1px_1px_0_#000]'>{mostRecentGame.name}</p>
+          </div>
+          )}
         </div>
 
         <div className='contaier mx-auto bg-base-200 sm:w-[75%] lg:w-[50%] border-2 border-base-100'>
@@ -49,7 +68,10 @@ export default function App() {
             <div className='flex flex-col container mx-auto justify-center items-center'>
               <img className="m-2" src={profileData.avatarfull} width="256" height="256" alt='profile image' />
               <h2 className='text-4xl'>{profileData.personaname}</h2>
-              <a href={profileData.profileurl} target="_blank" rel="noopener noreferrer"><button className="btn btn-accent h-5 min-h-0 m-2 mb-3">Steam</button></a>
+              <div className='flex flex-row justify-center items-center'>
+                <a href={profileData.profileurl} target="_blank" rel="noopener noreferrer"><button className="btn btn-accent h-5 min-h-0 m-2 mb-3">Steam</button></a>
+                <a href="#"><button className="btn btn-accent h-5 min-h-0 m-2 mb-3"><SyncSVG className='w-4 h-4 fill-black' />Sync all data</button></a>
+              </div>
             </div>
           )}
 
@@ -69,7 +91,7 @@ export default function App() {
                 <table className="table table-sm w-[95%]">
                   <thead>
                     <tr>
-                      <th>.</th>
+                      <th> </th>
                       <th>Game Name</th>
                       <th>Achievements Earned</th>
                     </tr>
@@ -104,7 +126,7 @@ export default function App() {
                 <table className="table table-sm w-[95%]">
                   <thead>
                     <tr>
-                      <th>.</th>
+                      <th> </th>
                       <th>Game Name</th>
                       <th>Achievements Earned</th>
                     </tr>
