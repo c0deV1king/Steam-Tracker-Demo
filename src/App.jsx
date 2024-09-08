@@ -54,12 +54,12 @@ export default function App() {
         </div>
         <div className='header'>
           {mostRecentGame && mostRecentGame.image && (
-          <div className='container mx-auto bg-black lg:w-[50%] sm:w-[90%] h-[300px] relative'>
-            {/* banner */}
-            <img src={mostRecentGame.image} alt={mostRecentGame.name} className='object-cover w-full h-full' />
-            <p className='text-accent absolute bottom-0 left-0 p-2 w-full
+            <div className='container mx-auto bg-black lg:w-[50%] sm:w-[90%] h-[300px] relative'>
+              {/* banner */}
+              <img src={mostRecentGame.image} alt={mostRecentGame.name} className='object-cover w-full h-full' />
+              <p className='text-accent absolute bottom-0 left-0 p-2 w-full
             [text-shadow:_-1px_-1px_0_#000,_1px_-1px_0_#000,_-1px_1px_0_#000,_1px_1px_0_#000]'>{mostRecentGame.name}</p>
-          </div>
+            </div>
           )}
         </div>
 
@@ -84,40 +84,70 @@ export default function App() {
             <a role="tab" className={`tab ${activeTab === 'Stats' ? 'tab-active' : ''}`} onClick={() => handleTabChange('Stats')}>Stats</a>
           </div>
 
-          <div className="overflow-x-auto flex justify-center items-center">
+          <div className="overflow-x-auto flex flex-row justify-center items-center">
 
             {activeTab === 'Overview' && (
-              <div className="container mx-auto w-[50%]">
-                <table className="table table-sm w-[95%]">
-                  <thead>
-                    <tr>
-                      <th> </th>
-                      <th>Game Name</th>
-                      <th>Achievements Earned</th>
+              <div>
+
+                <div className='flex flex-row justify-evenly items-center mt-5'>
+                  <p>Recent Games</p>
+                  <p>Recent Achievements</p>
+                </div>
+
+                <div className="container mx-auto w-full flex flex-row justify-between items-start gap-4 p-4">
+              <table className="table table-sm w-[48%]">
+                <thead>
+                  <tr>
+                    <th className="w-1/3"> </th>
+                    <th className="w-1/2">Game Name</th>
+                    <th className="w-1/6">Achievements</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-primary bg-opacity-5">
+                  {Array.isArray(overviewGames) && overviewGames.length > 0 ? overviewGames.slice(0, 5).map((game) => (
+                    <tr key={game.appid}>
+                      <td className="w-1/3">
+                        <div className="aspect-[460/215] w-full overflow-hidden">
+                          {game.image ? (
+                            <img src={game.image} alt={`${game.name || 'Game'} image`} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Image</div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="w-1/2">{game.name || `Game ID: ${game.appid}`}</td>
+                      <td className="w-1/6 text-center">
+                        {game.achievements && game.achievements.length > 0
+                          ? `${game.achievements.filter(a => a.achieved).length} / ${game.achievements.length}`
+                          : 'N/A'}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="bg-primary bg-opacity-5">
-                    {Array.isArray(overviewGames) && overviewGames.length > 0 ? overviewGames.map((game) => (
-                      <tr key={game.appid}>
-                        <td className="avatar">
-                          <div className="mask rounded-md h-[107.5px] w-[230px]">
-                            {game.image ? (
-                              <img src={game.image} alt={`${game.name || 'Game'} image`} />
-                            ) : (
-                              <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Image</div>
-                            )}
+                  )) : <tr><td colSpan="3" className="text-center">No games to display</td></tr>}
+                </tbody>
+              </table>
+
+                  <table className="table table-sm w-[48%]">
+                    <thead>
+                      <tr>
+                        <th> </th>
+                        <th>Achievement</th>
+                        <th>Date Earned</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-primary bg-opacity-5">
+                      <tr key="#">
+                        <td className="w-1/3">
+                          <div className="w-full h-20 overflow-hidden">
+                            <img src="#" className="w-full h-full object-cover" />
+                            <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Image</div>
                           </div>
                         </td>
-                        <td>{game.name || `Game ID: ${game.appid}`}</td>
-                        <td>
-                          {game.achievements && game.achievements.length > 0
-                            ? `${game.achievements.filter(a => a.achieved).length} / ${game.achievements.length}`
-                            : 'No achievements'}
-                        </td>
+                        <td className='w-1/3'> ###</td>
+                        <td className='w-1/3'> ###</td>
                       </tr>
-                    )) : <tr><td colSpan="3" className="text-center">No games to display</td></tr>}
-                  </tbody>
-                </table>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
