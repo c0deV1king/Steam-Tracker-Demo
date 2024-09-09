@@ -201,21 +201,24 @@ export const useSteamData = () => {
     console.log("useEffect trigged on line 99");
     const fetchGames = async () => {
       console.log("fetchGames function called")
-      // Check if cached data exists and is less than 24 hours old
-      // and sets the data to setGames
-      //  const cachedGames = localStorage.getItem('cachedGames');
-      //  const cacheTimestampGames = localStorage.getItem('cacheTimestampGames');
 
-      //  if (cachedGames && cacheTimestampGames) {
-      //    const now = new Date().getTime();
-      //    if (now - parseInt(cacheTimestampGames) < 24 * 60 * 60 * 1000) {
-      //      const parsedGames = JSON.parse(cachedGames);
-      //      setGames(parsedGames);
-      //      setGamesToDisplay(parsedGames.slice(0, 20));
-      //      console.log("Cached games:", parsedGames);
-      //      return;
-      //    }
-      //  }
+      // // fetch games in preparation for fetching the rest of the data
+      // const newGamesData = await fetchGames();
+      // const cachedGames = localStorage.getItem('cachedGames');
+
+      // // compare the new games data to the cached games data
+      // const gamesToFetch = newGamesData.filter(newGame => {
+      //   const cachedGame = cachedGames.find(game => game.appid === newGame.appid);
+      //   return !cachedGame || cachedGame.playtime_forever !== newGame.playtime_forever;
+      // });
+
+      // for (const game of gamesToFetch) {
+      // const details = await fetchGamesWithDetails(game.appid);
+      // const achievements = await fetchAchievementsForGames(game.appid);
+
+      // }
+
+      // localStorage.setItem('cachedGames', JSON.stringify(newGamesData));
 
 
       // If no valid cache, fetch from API
