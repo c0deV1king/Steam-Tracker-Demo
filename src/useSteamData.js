@@ -202,6 +202,29 @@ export const useSteamData = () => {
     const fetchGames = async () => {
       console.log("fetchGames function called")
 
+      const cachedGames = localStorage.getItem('cachedGames');
+      const cacheTimestamp = localStorage.getItem('cacheTimestampGames');
+      const now = new Date().getTime();
+
+      // NOTE: this if statement is what is causing the high api call count. If removed the app goes back to normal.
+      if (cachedGames && cacheTimestamp && now - parseInt(cacheTimestamp) < 24 * 60 * 60 * 1000) {
+        const parsedGames = JSON.parse(cachedGames);
+        setGames(parsedGames);
+
+        
+              // Set other states based on cached data
+      const totalPlaytime = Math.round(parsedGames.reduce((acc, game) => acc + game.playtime_forever, 0) / 60);
+      setPlaytime(totalPlaytime);
+      
+      const totalGamesPlayed = parsedGames.filter(game => game.playtime_forever > 0).length;
+      setGamesPlayed(totalGamesPlayed);
+
+      const firstTwenty = parsedGames.slice(0, 20);
+      const gamesWithDetails = await getGamesWithDetails(firstTwenty);
+      setGamesToDisplay(gamesWithDetails);
+
+      console.log("Loaded games from cache");
+      }
       // // fetch games in preparation for fetching the rest of the data
       // const newGamesData = await fetchGames();
       // const cachedGames = localStorage.getItem('cachedGames');
@@ -248,6 +271,8 @@ export const useSteamData = () => {
       // Cache the results
       localStorage.setItem('cachedGames', JSON.stringify(allGamesList));
       localStorage.setItem('cacheTimestampGames', new Date().getTime().toString());
+
+      console.log("Cached Games: ", localStorage.getItem('cachedGames'));
 
       await fetchAchievementsForGames(gamesWithDetails);
     };
