@@ -8,6 +8,9 @@ import { useState, useEffect } from 'react';
 // Grabbing my stored api key from .env NOTE: vite requires "VITE_" in front of variables stored in .env
 const API_KEY = import.meta.env.VITE_STEAM_API_KEY;
 
+// highest impact first when deciding what to build/fix next
+// create a bio in app (who i am and the project)
+// video explaining the app
 
 export const useSteamData = () => {
   // use states to store and update data
