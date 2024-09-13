@@ -74,31 +74,34 @@ export const useSteamData = () => {
         console.log("Recent games API response:", data);
         const recentGamesData = data.response.games || [];
         console.log("Recent games data:", recentGamesData);
-        const gamesWithDetails = await getOverviewGamesWithDetails(recentGamesData);
+        
+        const gamesWithDetails = await Promise.all(recentGamesData.map(async (game) => {
+          const detailsRes = await fetch(`https://store.steampowered.com/api/appdetails?appids=${game.appid}`);
+          const detailsData = await detailsRes.json();
+          const gameDetails = detailsData[game.appid].data;
+          return {
+            ...game,
+            name: gameDetails.name,
+            image: gameDetails.header_image,
+            screenshots: gameDetails.screenshots || []
+          };
+        }));
+
         console.log("Games with details:", gamesWithDetails);
         const gamesWithAchievements = await fetchAchievementsForGames(gamesWithDetails, 'cachedOverviewAchievements');
         console.log("Games with achievements:", gamesWithAchievements);
 
         let mostRecentGameData = null;
 
-        if (recentGamesData.length > 0) {
-          console.log("Recent games data length is greater than 0, fetching details");
-          const mostRecent = recentGamesData[0];
-
-          const detailsRes = await fetch(`https://store.steampowered.com/api/appdetails?appids=${mostRecent.appid}`);
-          const detailsData = await detailsRes.json();
-          const gameDetails = detailsData[mostRecent.appid].data;
-
-          const screenshots = gameDetails.screenshots || [];
-          const randomScreenshot = screenshots.length > 0
-            ? screenshots[Math.floor(Math.random() * screenshots.length)].path_full
+        if (gamesWithDetails.length > 0) {
+          mostRecentGameData = gamesWithDetails[0];
+          const randomScreenshot = mostRecentGameData.screenshots.length > 0
+            ? mostRecentGameData.screenshots[Math.floor(Math.random() * mostRecentGameData.screenshots.length)].path_full
             : null;
-
+          
           mostRecentGameData = {
-            ...mostRecent,
-            name: mostRecent.name,
-            image: randomScreenshot || `https://cdn.cloudflare.steamstatic.com/steam/apps/${mostRecent.appid}/header.jpg`,
-            screenshots: screenshots // Store all screenshots
+            ...mostRecentGameData,
+            image: randomScreenshot || mostRecentGameData.image
           };
 
           setMostRecentGame(mostRecentGameData);
@@ -120,9 +123,6 @@ export const useSteamData = () => {
         localStorage.setItem('cacheTimestampOverviewGames', new Date().getTime().toString());
 
         console.log("Recent games cached: ", localStorage.getItem('cachedOverviewGames'));
-
-        console.log("gamesWithAchievements before setting state: ", gamesWithAchievements);
-
 
       } catch (error) {
         console.error('Error fetching overview games data:', error);
@@ -197,7 +197,6 @@ export const useSteamData = () => {
 
 
   async function getGamesWithDetails(gamesWithPlaytime) {
-
     const cachedGameDetails = localStorage.getItem('cachedGameDetails');
     const cacheTimestampGameDetails = localStorage.getItem('cacheTimestampGameDetails');
     const now = new Date().getTime();
@@ -206,10 +205,6 @@ export const useSteamData = () => {
     if (cachedGameDetails && cacheTimestampGameDetails && now - parseInt(cacheTimestampGameDetails) < 24 * 60 * 60 * 1000) {
       console.log("Loaded game details from cache");
       cachedDetails = JSON.parse(cachedGameDetails);
-    }
-    if (!Array.isArray(gamesWithPlaytime)) {
-      console.error('Expected gamesWithPlaytime to be an array, but got:', typeof gamesWithPlaytime, gamesWithPlaytime);
-      return [];
     }
 
     const processedAppIds = new Set();
@@ -231,7 +226,8 @@ export const useSteamData = () => {
         gamePicturesTemp[game.appid] = cachedDetails[game.appid].header_image;
         return {
           ...game,
-          name: cachedDetails[game.appid].name
+          name: cachedDetails[game.appid].name,
+          header_image: cachedDetails[game.appid].header_image
         };
       }
 
@@ -251,7 +247,8 @@ export const useSteamData = () => {
             };
             return {
               ...game,
-              name: gameData.name
+              name: gameData.name,
+              header_image: gameData.header_image
             };
           }
         }
@@ -303,7 +300,7 @@ export const useSteamData = () => {
   // API call to fetch the games in my steam account
   // ** Learn more about the politics of useEffect, async, await. **
   useEffect(() => {
-    console.log("useEffect trigged on line 99");
+    console.log("useEffect triggered for fetching games");
     const fetchGames = async () => {
       console.log("Fetching games");
 
@@ -337,6 +334,8 @@ export const useSteamData = () => {
 
       const firstTwenty = allGamesList.slice(0, 20);
       const gamesWithDetails = await getGamesWithDetails(firstTwenty);
+
+      setGamesToDisplay(gamesWithDetails);
 
       // Fetch or load cached achievements
       const cachedAchievements = localStorage.getItem('cachedGamesAchievements');
