@@ -46,7 +46,22 @@ export const useSteamData = () => {
       if (cachedOverviewGames && cacheTimestampOverviewGames && now - parseInt(cacheTimestampOverviewGames) < 24 * 60 * 60 * 1000) {
         console.log("Loading recent games from cache");
         const parsedOverviewGames = JSON.parse(cachedOverviewGames);
-        setOverviewGames(parsedOverviewGames);
+        setOverviewGames(parsedOverviewGames.games);
+        
+        // Randomize screenshot for most recent game
+        if (parsedOverviewGames.mostRecentGame && parsedOverviewGames.mostRecentGame.screenshots) {
+          const screenshots = parsedOverviewGames.mostRecentGame.screenshots;
+          const randomScreenshot = screenshots.length > 0
+            ? screenshots[Math.floor(Math.random() * screenshots.length)].path_full
+            : null;
+          setMostRecentGame({
+            ...parsedOverviewGames.mostRecentGame,
+            image: randomScreenshot || parsedOverviewGames.mostRecentGame.image
+          });
+        } else {
+          setMostRecentGame(parsedOverviewGames.mostRecentGame);
+        }
+        
         console.log("Loaded recent games from cache");
         return;
       }
@@ -56,13 +71,15 @@ export const useSteamData = () => {
       try {
         const res = await fetch(`http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json`);
         const data = await res.json();
-        console.log("Recent games API response:", data); // Debug log
+        console.log("Recent games API response:", data);
         const recentGamesData = data.response.games || [];
-        console.log("Recent games data:", recentGamesData); // Debug log
+        console.log("Recent games data:", recentGamesData);
         const gamesWithDetails = await getOverviewGamesWithDetails(recentGamesData);
-        console.log("Games with details:", gamesWithDetails); // Debug log
+        console.log("Games with details:", gamesWithDetails);
         const gamesWithAchievements = await fetchAchievementsForGames(gamesWithDetails, 'cachedOverviewAchievements');
-        console.log("Games with achievements:", gamesWithAchievements); // Debug log
+        console.log("Games with achievements:", gamesWithAchievements);
+
+        let mostRecentGameData = null;
 
         if (recentGamesData.length > 0) {
           console.log("Recent games data length is greater than 0, fetching details");
@@ -77,13 +94,16 @@ export const useSteamData = () => {
             ? screenshots[Math.floor(Math.random() * screenshots.length)].path_full
             : null;
 
-
-          setMostRecentGame({
+          mostRecentGameData = {
             ...mostRecent,
             name: mostRecent.name,
-            image: randomScreenshot || `https://cdn.cloudflare.steamstatic.com/steam/apps/${mostRecent.appid}/header.jpg`
-          });
+            image: randomScreenshot || `https://cdn.cloudflare.steamstatic.com/steam/apps/${mostRecent.appid}/header.jpg`,
+            screenshots: screenshots // Store all screenshots
+          };
+
+          setMostRecentGame(mostRecentGameData);
         }
+
         setOverviewGames(gamesWithAchievements);
         setOverviewAchievements(gamesWithAchievements.reduce((acc, game) => {
           acc[game.appid] = game.achievements;
@@ -93,7 +113,10 @@ export const useSteamData = () => {
         console.log("Setting overview games to: ", gamesWithAchievements);
 
         // Cache the results
-        localStorage.setItem('cachedOverviewGames', JSON.stringify(gamesWithAchievements));
+        localStorage.setItem('cachedOverviewGames', JSON.stringify({
+          games: gamesWithAchievements,
+          mostRecentGame: mostRecentGameData
+        }));
         localStorage.setItem('cacheTimestampOverviewGames', new Date().getTime().toString());
 
         console.log("Recent games cached: ", localStorage.getItem('cachedOverviewGames'));
@@ -246,7 +269,7 @@ export const useSteamData = () => {
         };
       }
     });
-  
+
     const results = await Promise.all(promiseArray);
 
     localStorage.setItem('cachedGameDetails', JSON.stringify(cachedDetails));
@@ -259,187 +282,187 @@ export const useSteamData = () => {
 
 
 
-const getOverviewGamesWithDetails = async (games) => {
-  return Promise.all(games.map(async (game) => {
-    try {
-      const detailsRes = await fetch(`https://store.steampowered.com/api/appdetails?appids=${game.appid}`);
-      const detailsData = await detailsRes.json();
-      const gameDetails = detailsData[game.appid].data;
-      return {
-        ...game,
-        name: gameDetails.name,
-        image: gameDetails.header_image
-      };
-    } catch (error) {
-      console.error(`Error fetching details for game ${game.appid}:`, error);
-      return game;
-    }
-  }));
-};
-
-// API call to fetch the games in my steam account
-// ** Learn more about the politics of useEffect, async, await. **
-useEffect(() => {
-  console.log("useEffect trigged on line 99");
-  const fetchGames = async () => {
-    console.log("Fetching games");
-
-    const cachedGames = localStorage.getItem('cachedGames');
-    const cacheTimestamp = localStorage.getItem('cacheTimestampGames');
-    const now = new Date().getTime();
-
-    let allGamesList = [];
-
-    if (cachedGames && cacheTimestamp && now - parseInt(cacheTimestamp) < 24 * 60 * 60 * 1000) {
-      allGamesList = JSON.parse(cachedGames);
-      setGames(allGamesList);
-      console.log("Loaded games from cache");
-    } else {
-      // Fetch games from API
-      const res = await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json&include_played_free_games=1`);
-      const data = await res.json();
-      allGamesList = data.response.games || [];
-      setGames(allGamesList);
-
-      // Cache the results
-      localStorage.setItem('cachedGames', JSON.stringify(allGamesList));
-      localStorage.setItem('cacheTimestampGames', now.toString());
-    }
-
-    // Calculate total playtime and games played
-    const totalPlaytime = Math.round(allGamesList.reduce((acc, game) => acc + game.playtime_forever, 0) / 60);
-    setPlaytime(totalPlaytime);
-    const totalGamesPlayed = allGamesList.filter(game => game.playtime_forever > 0).length;
-    setGamesPlayed(totalGamesPlayed);
-
-    const firstTwenty = allGamesList.slice(0, 20);
-    const gamesWithDetails = await getGamesWithDetails(firstTwenty);
-
-    // Fetch or load cached achievements
-    const cachedAchievements = localStorage.getItem('cachedGamesAchievements');
-    const cacheTimestampAchievements = localStorage.getItem('cacheTimestampGamesAchievements');
-
-    let achievementsObj = {};
-
-    if (cachedAchievements && cacheTimestampAchievements && now - parseInt(cacheTimestampAchievements) < 24 * 60 * 60 * 1000) {
-      achievementsObj = JSON.parse(cachedAchievements);
-      console.log("Loaded achievements from cache");
-    } else {
-      const gamesWithAchievements = await fetchAchievementsForGames(gamesWithDetails, 'cachedGamesAchievements');
-      achievementsObj = gamesWithAchievements.reduce((acc, game) => {
-        acc[game.appid] = game.achievements;
-        return acc;
-      }, {});
-
-      // Cache the achievements
-      localStorage.setItem('cachedGamesAchievements', JSON.stringify(achievementsObj));
-      localStorage.setItem('cacheTimestampGamesAchievements', now.toString());
-    }
-
-    setAllAchievements(achievementsObj);
-
-    const gamesWithAchievements = gamesWithDetails.map(game => ({
-      ...game,
-      achievements: achievementsObj[game.appid] || []
-    }));
-
-    setGamesToDisplay(gamesWithAchievements);
-  };
-
-  fetchGames();
-}, []);
-
-
-// Update achievements for recent games
-useEffect(() => {
-  const updateRecentGamesAchievements = async () => {
-    if (recentGames.length > 0) {
-      const recentGamesWithDetails = await getGamesWithDetails(recentGames);
-      await fetchAchievementsForGames(recentGamesWithDetails);
-      setRecentGames([...recentGamesWithDetails]);
-    }
-  };
-  updateRecentGamesAchievements();
-}, []);
-
-useEffect(() => {
-  const gamesWithoutAchievements = gamesToDisplay.filter(game => !allAchievements[game.appid]);
-  if (gamesWithoutAchievements.length > 0) {
-    fetchAchievementsForGames(gamesWithoutAchievements);
-  }
-}, []);
-
-const handleLoadMore = async () => {
-  console.log("Loading more games");
-
-  const currentLength = gamesToDisplay.length;
-  const newGames = games.slice(currentLength, currentLength + 20);
-
-  console.log("New games to load:", newGames);
-
-  const newGamesWithDetails = await getGamesWithDetails(newGames);
-
-  console.log("New games with details:", newGamesWithDetails);
-
-  // Fetch achievements for new games
-  const newGamesWithAchievements = await fetchAchievementsForGames(newGamesWithDetails, 'cachedGamesAchievements');
-
-  console.log("New games with achievements:", newGamesWithAchievements);
-
-  setGamesToDisplay(prevGames => {
-    const updatedGames = [...prevGames, ...newGamesWithAchievements];
-    console.log("Updated gamesToDisplay:", updatedGames);
-    return updatedGames;
-  });
-
-  // No need to update allAchievements separately as it's now handled in fetchAchievementsForGames
-};
-
-// API call to grab all my achievements for all games
-useEffect(() => {
-  const fetchAchievementsForAllGames = async () => {
-    console.log("fetchAchievementsForAllGames called")
-    // Check if cached data exists and is less than 24 hours old
-    // and sets the data to setGames
-    const cachedAchievements = localStorage.getItem('cachedAllAchievements');
-    const cacheTimestampAchievements = localStorage.getItem('cacheTimestampAllAchievements');
-
-    if (cachedAchievements && cacheTimestampAchievements) {
-      console.log("cachedAchievements and cacheTimestampAchievements found")
-      const now = new Date().getTime();
-      if (now - parseInt(cacheTimestampAchievements) < 24 * 60 * 60 * 1000) {
-        setAllAchievements(JSON.parse(cachedAchievements));
-        console.log("allAchievements set to cachedAchievements")
-        return;
+  const getOverviewGamesWithDetails = async (games) => {
+    return Promise.all(games.map(async (game) => {
+      try {
+        const detailsRes = await fetch(`https://store.steampowered.com/api/appdetails?appids=${game.appid}`);
+        const detailsData = await detailsRes.json();
+        const gameDetails = detailsData[game.appid].data;
+        return {
+          ...game,
+          name: gameDetails.name,
+          image: gameDetails.header_image
+        };
+      } catch (error) {
+        console.error(`Error fetching details for game ${game.appid}:`, error);
+        return game;
       }
-    }
-    const achievements = await fetchAchievementsForGames(games);
-    setAllAchievements(achievements);
-    console.log("allAchievements set to fetched achievements")
-    // Cache the results
-    localStorage.setItem('cachedAllAchievements', JSON.stringify(achievements));
-    localStorage.setItem('cacheTimestampAllAchievements', new Date().getTime().toString());
+    }));
   };
 
+  // API call to fetch the games in my steam account
+  // ** Learn more about the politics of useEffect, async, await. **
+  useEffect(() => {
+    console.log("useEffect trigged on line 99");
+    const fetchGames = async () => {
+      console.log("Fetching games");
 
-  if (games.length > 0) {
-    fetchAchievementsForAllGames();
-  }
+      const cachedGames = localStorage.getItem('cachedGames');
+      const cacheTimestamp = localStorage.getItem('cacheTimestampGames');
+      const now = new Date().getTime();
 
-}, []);
+      let allGamesList = [];
 
-return {
-  games,
-  gamesToDisplay,
-  allAchievements,
-  profileData,
-  playtime,
-  gamesPlayed,
-  gamePictures,
-  overviewGames,
-  recentGames,
-  handleLoadMore,
-  mostRecentGame,
-  overviewAchievements
-}; // returning the arrays and functions to be used on import to another component
+      if (cachedGames && cacheTimestamp && now - parseInt(cacheTimestamp) < 24 * 60 * 60 * 1000) {
+        allGamesList = JSON.parse(cachedGames);
+        setGames(allGamesList);
+        console.log("Loaded games from cache");
+      } else {
+        // Fetch games from API
+        const res = await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json&include_played_free_games=1`);
+        const data = await res.json();
+        allGamesList = data.response.games || [];
+        setGames(allGamesList);
+
+        // Cache the results
+        localStorage.setItem('cachedGames', JSON.stringify(allGamesList));
+        localStorage.setItem('cacheTimestampGames', now.toString());
+      }
+
+      // Calculate total playtime and games played
+      const totalPlaytime = Math.round(allGamesList.reduce((acc, game) => acc + game.playtime_forever, 0) / 60);
+      setPlaytime(totalPlaytime);
+      const totalGamesPlayed = allGamesList.filter(game => game.playtime_forever > 0).length;
+      setGamesPlayed(totalGamesPlayed);
+
+      const firstTwenty = allGamesList.slice(0, 20);
+      const gamesWithDetails = await getGamesWithDetails(firstTwenty);
+
+      // Fetch or load cached achievements
+      const cachedAchievements = localStorage.getItem('cachedGamesAchievements');
+      const cacheTimestampAchievements = localStorage.getItem('cacheTimestampGamesAchievements');
+
+      let achievementsObj = {};
+
+      if (cachedAchievements && cacheTimestampAchievements && now - parseInt(cacheTimestampAchievements) < 24 * 60 * 60 * 1000) {
+        achievementsObj = JSON.parse(cachedAchievements);
+        console.log("Loaded achievements from cache");
+      } else {
+        const gamesWithAchievements = await fetchAchievementsForGames(gamesWithDetails, 'cachedGamesAchievements');
+        achievementsObj = gamesWithAchievements.reduce((acc, game) => {
+          acc[game.appid] = game.achievements;
+          return acc;
+        }, {});
+
+        // Cache the achievements
+        localStorage.setItem('cachedGamesAchievements', JSON.stringify(achievementsObj));
+        localStorage.setItem('cacheTimestampGamesAchievements', now.toString());
+      }
+
+      setAllAchievements(achievementsObj);
+
+      const gamesWithAchievements = gamesWithDetails.map(game => ({
+        ...game,
+        achievements: achievementsObj[game.appid] || []
+      }));
+
+      setGamesToDisplay(gamesWithAchievements);
+    };
+
+    fetchGames();
+  }, []);
+
+
+  // Update achievements for recent games
+  useEffect(() => {
+    const updateRecentGamesAchievements = async () => {
+      if (recentGames.length > 0) {
+        const recentGamesWithDetails = await getGamesWithDetails(recentGames);
+        await fetchAchievementsForGames(recentGamesWithDetails);
+        setRecentGames([...recentGamesWithDetails]);
+      }
+    };
+    updateRecentGamesAchievements();
+  }, []);
+
+  useEffect(() => {
+    const gamesWithoutAchievements = gamesToDisplay.filter(game => !allAchievements[game.appid]);
+    if (gamesWithoutAchievements.length > 0) {
+      fetchAchievementsForGames(gamesWithoutAchievements);
+    }
+  }, []);
+
+  const handleLoadMore = async () => {
+    console.log("Loading more games");
+
+    const currentLength = gamesToDisplay.length;
+    const newGames = games.slice(currentLength, currentLength + 20);
+
+    console.log("New games to load:", newGames);
+
+    const newGamesWithDetails = await getGamesWithDetails(newGames);
+
+    console.log("New games with details:", newGamesWithDetails);
+
+    // Fetch achievements for new games
+    const newGamesWithAchievements = await fetchAchievementsForGames(newGamesWithDetails, 'cachedGamesAchievements');
+
+    console.log("New games with achievements:", newGamesWithAchievements);
+
+    setGamesToDisplay(prevGames => {
+      const updatedGames = [...prevGames, ...newGamesWithAchievements];
+      console.log("Updated gamesToDisplay:", updatedGames);
+      return updatedGames;
+    });
+
+    // No need to update allAchievements separately as it's now handled in fetchAchievementsForGames
+  };
+
+  // API call to grab all my achievements for all games
+  useEffect(() => {
+    const fetchAchievementsForAllGames = async () => {
+      console.log("fetchAchievementsForAllGames called")
+      // Check if cached data exists and is less than 24 hours old
+      // and sets the data to setGames
+      const cachedAchievements = localStorage.getItem('cachedAllAchievements');
+      const cacheTimestampAchievements = localStorage.getItem('cacheTimestampAllAchievements');
+
+      if (cachedAchievements && cacheTimestampAchievements) {
+        console.log("cachedAchievements and cacheTimestampAchievements found")
+        const now = new Date().getTime();
+        if (now - parseInt(cacheTimestampAchievements) < 24 * 60 * 60 * 1000) {
+          setAllAchievements(JSON.parse(cachedAchievements));
+          console.log("allAchievements set to cachedAchievements")
+          return;
+        }
+      }
+      const achievements = await fetchAchievementsForGames(games);
+      setAllAchievements(achievements);
+      console.log("allAchievements set to fetched achievements")
+      // Cache the results
+      localStorage.setItem('cachedAllAchievements', JSON.stringify(achievements));
+      localStorage.setItem('cacheTimestampAllAchievements', new Date().getTime().toString());
+    };
+
+
+    if (games.length > 0) {
+      fetchAchievementsForAllGames();
+    }
+
+  }, []);
+
+  return {
+    games,
+    gamesToDisplay,
+    allAchievements,
+    profileData,
+    playtime,
+    gamesPlayed,
+    gamePictures,
+    overviewGames,
+    recentGames,
+    handleLoadMore,
+    mostRecentGame,
+    overviewAchievements
+  }; // returning the arrays and functions to be used on import to another component
 };
