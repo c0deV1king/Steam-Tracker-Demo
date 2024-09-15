@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
 
+// focus architecture, undetrstanding that is the most important in problem solving and can work through it better.
+// learning to help users/community is the best way to learn. learning to learn < learning to create things for others and the benifit of the project.
+// it will get frustrating, but push through it becuse it'll get better.
+// learn to embrace ai and that its here to stay. work with it, not against it. (Unless your an artist)
+
 // Plans to add to the app:
 // A game page for each individual game that shows additional details for that game, including the achievements, achievement images ect. (allow user to click on the game from any tab, games or overview)
 // Trophy Case
@@ -413,8 +418,6 @@ export const useSteamData = () => {
       console.log("Updated gamesToDisplay:", updatedGames);
       return updatedGames;
     });
-
-    // No need to update allAchievements separately as it's now handled in fetchAchievementsForGames
   };
 
   // API call to grab all my achievements for all games
