@@ -1,6 +1,6 @@
 import './styles.css'
 import { useState } from 'react';
-import { useSteamData } from './useSteamData';
+import { useSteamData } from './hooks/useSteamData';
 import TimeClock from './img/clock-history.svg?react';
 import ControllerSVG from './img/controller.svg?react';
 import GithubSVG from './img/github.svg?react';
