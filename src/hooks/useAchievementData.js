@@ -1,6 +1,7 @@
-const [allAchievements, setAllAchievements] = useState({});
+export const useAchievementData = () => {
 
-
+  const [allAchievements, setAllAchievements] = useState({});
+  
   // API call to grab all my achievements for all games
   useEffect(() => {
     const fetchAchievementsForAllGames = async () => {
@@ -33,3 +34,4 @@ const [allAchievements, setAllAchievements] = useState({});
     }
 
   }, []);
+};
