@@ -10,18 +10,20 @@ export default function App() {
   const {
     profileData,
     gamesToDisplay,
-    allAchievements,
+    allAchievements,  // Add this line
     playtime,
     gamesPlayed,
     gamePictures,
     overviewGames,
     recentGames,
     handleLoadMore,
-    mostRecentGame
+    mostRecentGame,
+    syncAllData,
+    isSyncing,
+    isFullySynced
   } = useSteamData();
 
   console.log("App received gamesToDisplay:", gamesToDisplay);
-  console.log("App received allAchievements:", allAchievements);
 
   const [activeTab, setActiveTab] = useState('Overview');
 
@@ -72,8 +74,17 @@ export default function App() {
               <img className="m-2" src={profileData.avatarfull} width="256" height="256" alt='profile image' />
               <h2 className='text-4xl'>{profileData.personaname}</h2>
               <div className='flex flex-row justify-center items-center'>
-                <a href={profileData.profileurl} target="_blank" rel="noopener noreferrer"><button className="btn btn-accent h-5 min-h-0 m-2 mb-3">Steam</button></a>
-                <a href="#"><button className="btn btn-accent h-5 min-h-0 m-2 mb-3"><SyncSVG className='w-4 h-4 fill-black' />Sync all data</button></a>
+                <a href={profileData.profileurl} target="_blank" rel="noopener noreferrer">
+                  <button className="btn btn-accent h-5 min-h-0 m-2 mb-3">Steam</button>
+                </a>
+                <button 
+                  className="btn btn-accent h-5 min-h-0 m-2 mb-3" 
+                  onClick={syncAllData} 
+                  disabled={isSyncing || isFullySynced}
+                >
+                  <SyncSVG className='w-4 h-4 fill-black' />
+                  {isSyncing ? 'Syncing...' : isFullySynced ? 'Fully Synced' : 'Sync all data'}
+                </button>
               </div>
             </div>
           )}
@@ -170,7 +181,7 @@ export default function App() {
                       .filter(game => game.playtime_forever > 0)
                       .map(game => {
                         console.log("Processing game:", game);
-                        const achievements = game.achievements || [];
+                        const achievements = (allAchievements && allAchievements[game.appid]) || [];
                         console.log("Game achievements:", achievements);
                         const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
                         const totalAchievements = achievements.length;
@@ -203,7 +214,13 @@ export default function App() {
                   </tbody>
                 </table>
                 <div className="flex justify-center items-center">
-                  <button className="btn btn-info min-h-0 h-8 m-5" onClick={handleLoadMore}>More games</button>
+                  <button 
+                    className="btn btn-info min-h-0 h-8 m-5" 
+                    onClick={handleLoadMore}
+                    disabled={isSyncing}
+                  >
+                    {isFullySynced ? 'Load More' : 'Load More'}
+                  </button>
                 </div>
               </div>
             )}

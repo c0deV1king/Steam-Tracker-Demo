@@ -6,6 +6,8 @@ const API_KEY = import.meta.env.VITE_STEAM_API_KEY;
 
 // NOTES FOR MYSELF
 
+// bio/app showcase: have a popup when the user first opens the app and authenticates and has a showcase video of the app, along with a bio about me.
+
 // focus architecture, undetrstanding that is the most important in problem solving and can work through it better.
 // learning to help users/community is the best way to learn. learning to learn < learning to create things for others and the benifit of the project.
 // it will get frustrating, but push through it becuse it'll get better.
@@ -32,6 +34,7 @@ export const useSteamData = () => {
   const { 
     games,
     gamesToDisplay,
+    allAchievements,  // Add this line
     playtime,
     gamesPlayed,
     gamePictures,
@@ -39,11 +42,14 @@ export const useSteamData = () => {
     recentGames,
     handleLoadMore,
     mostRecentGame,
+    isSyncing,
+    isFullySynced
   } = useGamesData(API_KEY) || {};
 
   return {
     games,
     gamesToDisplay,
+    allAchievements,  // Add this line
     playtime,
     gamesPlayed,
     gamePictures,
@@ -51,6 +57,8 @@ export const useSteamData = () => {
     recentGames,
     handleLoadMore,
     mostRecentGame,
-    profileData
+    profileData,
+    isSyncing,
+    isFullySynced
   }; // returning the arrays and functions to be used on import to another component
 };

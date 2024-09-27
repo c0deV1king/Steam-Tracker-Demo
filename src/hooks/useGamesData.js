@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchAchievementsForGames } from '../utils/fetchAchievementsForGames';
 
 export const useGamesData = (API_KEY) => {
@@ -13,9 +13,8 @@ export const useGamesData = (API_KEY) => {
     const [gamePictures, setGamePictures] = useState({});
     const [overviewGames, setOverviewGames] = useState([]);
     const [overviewAchievements, setOverviewAchievements] = useState({});
-
-
-
+    const [isSyncing, setIsSyncing] = useState(false);
+    const [isFullySynced, setIsFullySynced] = useState(false);
 
     // Fetch recent games
     useEffect(() => {
@@ -315,11 +314,44 @@ export const useGamesData = (API_KEY) => {
 
         console.log("New games with achievements:", newGamesWithAchievements);
 
+        // Update allAchievements state
+        setAllAchievements(prevAchievements => {
+            const updatedAchievements = { ...prevAchievements };
+            newGamesWithAchievements.forEach(game => {
+                updatedAchievements[game.appid] = game.achievements || [];
+            });
+            return updatedAchievements;
+        });
+
         setGamesToDisplay(prevGames => {
             const updatedGames = [...prevGames, ...newGamesWithAchievements];
             console.log("Updated gamesToDisplay:", updatedGames);
             return updatedGames;
         });
+
+        // Update the games array with the new detailed data
+        setGames(prevGames => {
+            const updatedGames = [...prevGames];
+            newGamesWithAchievements.forEach(game => {
+                const index = updatedGames.findIndex(g => g.appid === game.appid);
+                if (index !== -1) {
+                    updatedGames[index] = game;
+                }
+            });
+            return updatedGames;
+        });
+
+        // Update cache
+        const now = new Date().getTime();
+        localStorage.setItem('cachedGames', JSON.stringify(games));
+        localStorage.setItem('cacheTimestampGames', now.toString());
+
+        const cachedAchievements = JSON.parse(localStorage.getItem('cachedGamesAchievements') || '{}');
+        newGamesWithAchievements.forEach(game => {
+            cachedAchievements[game.appid] = game.achievements || [];
+        });
+        localStorage.setItem('cachedGamesAchievements', JSON.stringify(cachedAchievements));
+        localStorage.setItem('cacheTimestampGamesAchievements', now.toString());
     };
 
       // Update achievements for recent games
@@ -337,12 +369,15 @@ export const useGamesData = (API_KEY) => {
     return {
         games,
         gamesToDisplay,
+        allAchievements,  // Add this line
         playtime,
         gamesPlayed,
         gamePictures,
         overviewGames,
         recentGames,
         handleLoadMore,
-        mostRecentGame
+        mostRecentGame,
+        isSyncing,
+        isFullySynced
     };
 };
