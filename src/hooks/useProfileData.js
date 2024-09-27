@@ -1,5 +1,8 @@
+import { useEffect, useState } from "react";
 export const useProfileData = (API_KEY) => {
+
     const [profileData, setProfileData] = useState({});
+
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
@@ -14,4 +17,8 @@ export const useProfileData = (API_KEY) => {
         };
         fetchProfileData();
     }, []);
+
+    return {
+        profileData
+    };
 }

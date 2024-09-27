@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { useGamesData } from './useGamesData'
+import { useProfileData } from './useProfileData'
 
 // Grabbing my stored api key from .env NOTE: vite requires "VITE_" in front of variables stored in .env
 const API_KEY = import.meta.env.VITE_STEAM_API_KEY;
@@ -24,6 +24,11 @@ const API_KEY = import.meta.env.VITE_STEAM_API_KEY;
 
 
 export const useSteamData = () => {
+
+  const {
+    profileData
+  } = useProfileData(API_KEY) || {};
+
   const { 
     games,
     gamesToDisplay,
@@ -33,8 +38,8 @@ export const useSteamData = () => {
     overviewGames,
     recentGames,
     handleLoadMore,
-    mostRecentGame
-  } = useGamesData(API_KEY);
+    mostRecentGame,
+  } = useGamesData(API_KEY) || {};
 
   return {
     games,
@@ -46,5 +51,6 @@ export const useSteamData = () => {
     recentGames,
     handleLoadMore,
     mostRecentGame,
+    profileData
   }; // returning the arrays and functions to be used on import to another component
 };
