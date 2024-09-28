@@ -23,6 +23,8 @@ export default function App() {
     isFullySynced
   } = useSteamData();
 
+  console.log("syncAllData in App:", syncAllData); // Add this line
+
   console.log("App received gamesToDisplay:", gamesToDisplay);
 
   const [activeTab, setActiveTab] = useState('Overview');
@@ -79,7 +81,14 @@ export default function App() {
                 </a>
                 <button 
                   className="btn btn-accent h-5 min-h-0 m-2 mb-3" 
-                  onClick={syncAllData} 
+                  onClick={() => {
+                    console.log("Sync button clicked"); // Add this line
+                    if (syncAllData) {
+                      syncAllData();
+                    } else {
+                      console.error("syncAllData is undefined");
+                    }
+                  }} 
                   disabled={isSyncing || isFullySynced}
                 >
                   <SyncSVG className='w-4 h-4 fill-black' />

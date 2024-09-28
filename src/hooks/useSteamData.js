@@ -43,7 +43,8 @@ export const useSteamData = () => {
     handleLoadMore,
     mostRecentGame,
     isSyncing,
-    isFullySynced
+    isFullySynced,
+    syncAllData
   } = useGamesData(API_KEY) || {};
 
   return {
@@ -59,6 +60,7 @@ export const useSteamData = () => {
     mostRecentGame,
     profileData,
     isSyncing,
-    isFullySynced
+    isFullySynced,
+    syncAllData
   }; // returning the arrays and functions to be used on import to another component
 };
