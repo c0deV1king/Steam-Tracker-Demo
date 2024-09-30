@@ -179,19 +179,16 @@ export default function App() {
                 <table className="table table-sm w-[95%]">
                   <thead>
                     <tr>
-                      <th> </th>
+                      <th> </th>
                       <th>Game Name</th>
                       <th>Achievements Earned</th>
                     </tr>
                   </thead>
                   <tbody className="bg-primary bg-opacity-5">
-                    {console.log("gamesToDisplay in render:", gamesToDisplay)}
                     {gamesToDisplay
                       .filter(game => game.playtime_forever > 0)
                       .map(game => {
-                        console.log("Processing game:", game);
                         const achievements = (allAchievements && allAchievements[game.appid]) || [];
-                        console.log("Game achievements:", achievements);
                         const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
                         const totalAchievements = achievements.length;
                         return {

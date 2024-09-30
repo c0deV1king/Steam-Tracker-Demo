@@ -1,3 +1,5 @@
+import { delayedFetch } from './rateLimitingAPI';
+
 const API_KEY = import.meta.env.VITE_STEAM_API_KEY;
 export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAchievements') => {
     console.log(`Fetching achievements for games (${cacheKey}):`, games);
@@ -20,7 +22,7 @@ export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAc
       }
 
       try {
-        const res = await fetch(`http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${game.appid}&key=${API_KEY}&steamid=76561198119786249`);
+        const res = await delayedFetch(`http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${game.appid}&key=${API_KEY}&steamid=76561198119786249`);
         const data = await res.json();
 
         if (data.playerstats && data.playerstats.achievements) {

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchAchievementsForGames } from '../utils/fetchAchievementsForGames';
+import { delayedFetch } from '../utils/rateLimitingAPI';
 
 export const useGamesData = (API_KEY) => {
 
@@ -208,47 +209,85 @@ export const useGamesData = (API_KEY) => {
     }, []);
 
     const getGamesWithDetails = async (games) => {
-        return Promise.all(games.map(async (game) => {
+        console.log("getGamesWithDetails called")
+        const cachedDetails = JSON.parse(localStorage.getItem('cachedGameDetails') || '{}');
+        const now = new Date().getTime();
+
+        const gamesNeedingDetails = games.filter(game => 
+            !cachedDetails[game.appid] || now - cachedDetails[game.appid].timestamp >= 24 * 60 * 60 * 1000
+        );
+
+        if (gamesNeedingDetails.length === 0) {
+            console.log("All game details found in cache");
+            return games.map(game => ({
+                ...game,
+                ...(cachedDetails[game.appid] ? cachedDetails[game.appid].data : {})
+            }));
+        }
+
+        const newDetails = [];
+        for (const game of gamesNeedingDetails) {
             try {
-                const detailsRes = await fetch(`https://store.steampowered.com/api/appdetails?appids=${game.appid}`);
+                const detailsRes = await delayedFetch(`https://store.steampowered.com/api/appdetails?appids=${game.appid}`);
+                console.log(`Details requested for game ${game.appid}`);
                 const detailsData = await detailsRes.json();
+                
                 if (detailsData[game.appid].success) {
                     const gameDetails = detailsData[game.appid].data;
-                    return {
-                        ...game,
-                        name: gameDetails.name,
-                        image: gameDetails.header_image
-                    };
+                    newDetails.push({
+                        appid: game.appid,
+                        data: {
+                            name: gameDetails.name,
+                            image: gameDetails.header_image
+                        },
+                        timestamp: now
+                    });
                 } else {
                     console.log(`No details found for game ${game.appid}`);
-                    return game;
                 }
             } catch (error) {
                 console.error(`Error fetching details for game ${game.appid}:`, error);
-                return game;
             }
-        }));
-    };
+        }
 
-
-
-    const getOverviewGamesWithDetails = async (games) => {
-        return Promise.all(games.map(async (game) => {
-            try {
-                const detailsRes = await fetch(`https://store.steampowered.com/api/appdetails?appids=${game.appid}`);
-                const detailsData = await detailsRes.json();
-                const gameDetails = detailsData[game.appid].data;
-                return {
-                    ...game,
-                    name: gameDetails.name,
-                    image: gameDetails.header_image
+        // Update cache with new details
+        const updatedCache = {...cachedDetails};
+        newDetails.forEach(detail => {
+            if (detail) {
+                updatedCache[detail.appid] = {
+                    data: detail.data,
+                    timestamp: detail.timestamp
                 };
-            } catch (error) {
-                console.error(`Error fetching details for game ${game.appid}:`, error);
-                return game;
             }
+        });
+        localStorage.setItem('cachedGameDetails', JSON.stringify(updatedCache));
+
+        // Merge new details with existing games
+        return games.map(game => ({
+            ...game,
+            ...(updatedCache[game.appid] ? updatedCache[game.appid].data : {})
         }));
     };
+
+
+
+    // const getOverviewGamesWithDetails = async (games) => {
+    //     return Promise.all(games.map(async (game) => {
+    //         try {
+    //             const detailsRes = await fetch(`https://store.steampowered.com/api/appdetails?appids=${game.appid}`);
+    //             const detailsData = await detailsRes.json();
+    //             const gameDetails = detailsData[game.appid].data;
+    //             return {
+    //                 ...game,
+    //                 name: gameDetails.name,
+    //                 image: gameDetails.header_image
+    //             };
+    //         } catch (error) {
+    //             console.error(`Error fetching details for game ${game.appid}:`, error);
+    //             return game;
+    //         }
+    //     }));
+    // };
 
     useEffect(() => {
         const gamesWithoutAchievements = gamesToDisplay.filter(game => !allAchievements[game.appid]);
@@ -258,10 +297,14 @@ export const useGamesData = (API_KEY) => {
     }, []);
 
     const handleLoadMore = useCallback(async () => {
+        
+        console.log('handleLoadMore called', new Date().toISOString());
+
         const currentLength = gamesToDisplay.length;
         const newGames = games.slice(currentLength, currentLength + 20);
         
         const gamesWithDetails = await getGamesWithDetails(newGames);
+        console.log("Awaiting games with details")
         
         // Check if we have cached achievements
         const cachedAllAchievements = localStorage.getItem('cachedAllAchievements');
@@ -334,7 +377,7 @@ export const useGamesData = (API_KEY) => {
 
     try {
         // Fetch all owned games
-        const res = await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json&include_played_free_games=1`);
+        const res = await delayedFetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_KEY}&steamid=76561198119786249&format=json&include_played_free_games=1`);
         const data = await res.json();
         const allGames = data.response.games || [];
 
