@@ -79,8 +79,8 @@ export default function App() {
                 <a href={profileData.profileurl} target="_blank" rel="noopener noreferrer">
                   <button className="btn btn-accent h-5 min-h-0 m-2 mb-3">Steam</button>
                 </a>
-                <button 
-                  className="btn btn-accent h-5 min-h-0 m-2 mb-3" 
+                <button
+                  className="btn btn-accent h-5 min-h-0 m-2 mb-3"
                   onClick={() => {
                     console.log("Sync button clicked"); // Add this line
                     if (syncAllData) {
@@ -88,7 +88,7 @@ export default function App() {
                     } else {
                       console.error("syncAllData is undefined");
                     }
-                  }} 
+                  }}
                   disabled={isSyncing || isFullySynced}
                 >
                   <SyncSVG className='w-4 h-4 fill-black' />
@@ -220,8 +220,8 @@ export default function App() {
                   </tbody>
                 </table>
                 <div className="flex justify-center items-center">
-                  <button 
-                    className="btn btn-info min-h-0 h-8 m-5" 
+                  <button
+                    className="btn btn-info min-h-0 h-8 m-5"
                     onClick={handleLoadMore}
                     disabled={isSyncing}
                   >
@@ -232,8 +232,50 @@ export default function App() {
             )}
 
             {activeTab === 'Achievements' && (
-              <div className="container mx-auto">
-                {/* Achievements content */}
+              <div>
+                <table className="table table-lg w-[95%]">
+                  <thead>
+                    <tr>
+                      <th> </th>
+                      <th>Achievement</th>
+                      <th>Time Earned</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-primary bg-opacity-5">
+                    {gamesToDisplay
+                      .filter(game => game.playtime_forever > 0)
+                      .map(game => {
+                        const achievements = (allAchievements && allAchievements[game.appid]) || [];
+                        const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
+                        const totalAchievements = achievements.length;
+                        return {
+                          ...game,
+                          earnedAchievements,
+                          totalAchievements
+                        };
+                      })
+                      .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
+                      .map((game, index) => (
+                        <tr key={game.appid} >
+                          <td className="avatar">
+                            <div className="mask rounded-md h-[50px] w-[50px]">
+                              <img
+                                src={gamePictures[game.appid]}
+                                alt="Game image" />
+                            </div>
+                          </td>
+                          <td>{game.name}</td>
+                          <td>
+                            {game.totalAchievements > 0 ? (
+                              `${game.earnedAchievements} / ${game.totalAchievements}`
+                            ) : (
+                              'No achievements'
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
               </div>
             )}
 

@@ -1,6 +1,6 @@
 export const randomDelay = () => {
-    const min = 400;
-    const max = 1500;
+    const min = 75;
+    const max = 300;
     return Math.floor(Math.random() * (max - min + 1) + min);
   };
   
