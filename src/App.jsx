@@ -1,5 +1,5 @@
 import './styles.css'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSteamData } from './hooks/useSteamData';
 import TimeClock from './img/clock-history.svg?react';
 import ControllerSVG from './img/controller.svg?react';
@@ -20,8 +20,13 @@ export default function App() {
     mostRecentGame,
     syncAllData,
     isSyncing,
-    isFullySynced
+    isFullySynced,
+    testSchema
   } = useSteamData();
+
+useEffect(() => {
+    window.testSchema = testSchema;
+  }, [testSchema]);
 
   console.log("syncAllData in App:", syncAllData); // Add this line
 
@@ -258,7 +263,7 @@ export default function App() {
                       .map((game, index) => (
                         <tr key={game.appid} >
                           <td className="avatar">
-                            <div className="mask rounded-md h-[50px] w-[50px]">
+                            <div className="square-full h-[50px] w-[50px]">
                               <img
                                 src={gamePictures[game.appid]}
                                 alt="Game image" />

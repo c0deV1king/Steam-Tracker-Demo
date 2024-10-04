@@ -117,6 +117,17 @@ export const useGamesData = (API_KEY) => {
         fetchOverviewGames();
     }, []);
 
+    const testSchema = useCallback(async () => {
+        console.log("testSchema called")
+        try {
+            const res = await fetch(`https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=${API_KEY}&appid=230410`);
+            const data = await res.json();
+            console.log("testSchema data:", data);
+        } catch (error) {
+            console.error("Error in testSchema:", error);
+        }
+    }, [API_KEY]);
+
 
     useEffect(() => {
         console.log("useEffect triggered for fetching games");
@@ -438,6 +449,7 @@ export const useGamesData = (API_KEY) => {
         mostRecentGame,
         isSyncing,
         isFullySynced,
-        syncAllData
+        syncAllData,
+        testSchema
     };
 };

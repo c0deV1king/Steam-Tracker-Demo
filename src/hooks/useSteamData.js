@@ -42,6 +42,7 @@ export const useSteamData = () => {
     recentGames,
     handleLoadMore,
     mostRecentGame,
+    testSchema,
     isSyncing,
     isFullySynced,
     syncAllData
@@ -58,6 +59,7 @@ export const useSteamData = () => {
     recentGames,
     handleLoadMore,
     mostRecentGame,
+    testSchema,
     profileData,
     isSyncing,
     isFullySynced,
