@@ -22,15 +22,36 @@ export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAc
       }
 
       try {
-        const res = await delayedFetch(`http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${game.appid}&key=${API_KEY}&steamid=76561198119786249`);
-        const data = await res.json();
+        const [earnedRes, infoRes] = await Promise.all([
+          delayedFetch(`http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${game.appid}&key=${API_KEY}&steamid=76561198119786249`),
+          delayedFetch(`http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v0002/?appid=${game.appid}&key=${API_KEY}`)
+        ]);
 
-        if (data.playerstats && data.playerstats.achievements) {
-          achievementsObj[game.appid] = data.playerstats.achievements;
-          console.log(`Fetched achievements for game ${game.appid}:`, data.playerstats.achievements);
-          return { ...game, achievements: data.playerstats.achievements };
+        const earnedData = await earnedRes.json();
+        const infoData = await infoRes.json();
+
+        if (earnedData.playerstats && earnedData.playerstats.achievements && infoData.game && infoData.game.availableGameStats && infoData.game.availableGameStats.achievements) {
+          const combinedAchievements = earnedData.playerstats.achievements.map(achievement => {
+            const achievementInfo = infoData.game.availableGameStats.achievements.find(
+              a => achievement.apiname === a.name
+            );
+
+            return {
+              apiname: achievement.apiname,
+              name: achievementInfo ? achievementInfo.name : achievement.apiname,
+              displayName: achievementInfo ? achievementInfo.displayName : '',
+              description: achievementInfo ? achievementInfo.description : '',
+              icon: achievementInfo ? achievementInfo.icon : '',
+              achieved: achievement.achieved,
+              unlockTime: achievement.unlocktime
+            };
+          });
+
+          achievementsObj[game.appid] = combinedAchievements;
+          console.log(`Fetched achievements for game ${game.appid}:`, combinedAchievements);
+          return { ...game, achievements: combinedAchievements };
         } else {
-          console.log(`No achievements found for game ${game.appid}`);
+          console.log(`No achievements data available for game ${game.appid}`);
           return { ...game, achievements: [] };
         }
       } catch (error) {

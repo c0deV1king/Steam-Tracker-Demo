@@ -1,5 +1,5 @@
 import './styles.css'
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSteamData } from './hooks/useSteamData';
 import TimeClock from './img/clock-history.svg?react';
 import ControllerSVG from './img/controller.svg?react';
@@ -24,7 +24,10 @@ export default function App() {
     testSchema
   } = useSteamData();
 
-useEffect(() => {
+  console.log("App: allAchievements:", allAchievements);
+  console.log("App: gamesToDisplay:", gamesToDisplay);
+
+  useEffect(() => {
     window.testSchema = testSchema;
   }, [testSchema]);
 
@@ -37,6 +40,37 @@ useEffect(() => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
+
+  const sortedAchievements = useMemo(() => {
+    console.log("Calculating sortedAchievements");
+    console.log("allAchievements:", allAchievements);
+    
+    const allAchievementsList = [];
+    Object.entries(allAchievements).forEach(([appId, achievements]) => {
+      console.log(`Processing appId: ${appId}, achievements:`, achievements);
+      if (Array.isArray(achievements)) {
+        achievements.forEach(achievement => {
+          if (achievement.achieved) {
+            allAchievementsList.push({
+              ...achievement,
+              appId,
+              gameName: gamesToDisplay.find(game => game.appid.toString() === appId)?.name || 'Unknown Game'
+            });
+          }
+        });
+      } else {
+        console.warn(`Achievements for appId ${appId} is not an array:`, achievements);
+      }
+    });
+    console.log("Final allAchievementsList:", allAchievementsList);
+    return allAchievementsList.sort((a, b) => b.unlockTime - a.unlockTime);
+  }, [allAchievements, gamesToDisplay]);
+
+  console.log("sortedAchievements:", sortedAchievements);
+
+  useEffect(() => {
+    console.log("allAchievements updated:", allAchievements);
+  }, [allAchievements]);
 
   // need to link up my loading spinner to when the user is loading api data
   return (
@@ -241,44 +275,38 @@ useEffect(() => {
                 <table className="table table-lg w-[95%]">
                   <thead>
                     <tr>
-                      <th> </th>
+                      <th> </th>
                       <th>Achievement</th>
-                      <th>Time Earned</th>
+                      <th>Description</th>
+                      <th>Unlocked</th>
                     </tr>
                   </thead>
                   <tbody className="bg-primary bg-opacity-5">
-                    {gamesToDisplay
-                      .filter(game => game.playtime_forever > 0)
-                      .map(game => {
-                        const achievements = (allAchievements && allAchievements[game.appid]) || [];
-                        const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
-                        const totalAchievements = achievements.length;
-                        return {
-                          ...game,
-                          earnedAchievements,
-                          totalAchievements
-                        };
-                      })
-                      .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
-                      .map((game, index) => (
-                        <tr key={game.appid} >
+                    {sortedAchievements.length > 0 ? (
+                      sortedAchievements.map((achievement, index) => (
+                        <tr key={`${achievement.appId}-${achievement.apiname}`}>
                           <td className="avatar">
                             <div className="square-full h-[50px] w-[50px]">
-                              <img
-                                src={gamePictures[game.appid]}
-                                alt="Game image" />
+                              {achievement.icon ? (
+                                <img
+                                  src={achievement.icon}
+                                  alt={achievement.displayName || achievement.name || 'Achievement icon'}
+                                />
+                              ) : (
+                                <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Icon</div>
+                              )}
                             </div>
                           </td>
-                          <td>{game.name}</td>
-                          <td>
-                            {game.totalAchievements > 0 ? (
-                              `${game.earnedAchievements} / ${game.totalAchievements}`
-                            ) : (
-                              'No achievements'
-                            )}
-                          </td>
+                          <td>{achievement.displayName || achievement.name || 'Unknown Achievement'}</td>
+                          <td>{achievement.description || 'No description available'}</td>
+                          <td>{achievement.unlockTime ? new Date(achievement.unlockTime * 1000).toLocaleString() : 'Unknown'}</td>
                         </tr>
-                      ))}
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="text-center">No achievements to display</td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

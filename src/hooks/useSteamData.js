@@ -34,7 +34,7 @@ export const useSteamData = () => {
   const { 
     games,
     gamesToDisplay,
-    allAchievements,  // Add this line
+    allAchievements,
     playtime,
     gamesPlayed,
     gamePictures,
@@ -51,7 +51,7 @@ export const useSteamData = () => {
   return {
     games,
     gamesToDisplay,
-    allAchievements,  // Add this line
+    allAchievements,
     playtime,
     gamesPlayed,
     gamePictures,

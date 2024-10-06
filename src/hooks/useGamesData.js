@@ -193,7 +193,7 @@ export const useGamesData = (API_KEY) => {
 
             if (cachedAchievements && cacheTimestampAchievements && now - parseInt(cacheTimestampAchievements) < 24 * 60 * 60 * 1000) {
                 achievementsObj = JSON.parse(cachedAchievements);
-                console.log("Loaded achievements from cache");
+                console.log("Loaded achievements from cache:", achievementsObj);
             } else {
                 const gamesWithAchievements = await fetchAchievementsForGames(gamesWithDetails, 'cachedGamesAchievements');
                 achievementsObj = gamesWithAchievements.reduce((acc, game) => {
@@ -206,6 +206,7 @@ export const useGamesData = (API_KEY) => {
                 localStorage.setItem('cacheTimestampGamesAchievements', now.toString());
             }
 
+            console.log("Setting allAchievements:", achievementsObj);
             setAllAchievements(achievementsObj);
 
             const gamesWithAchievements = gamesWithDetails.map(game => ({
@@ -420,6 +421,8 @@ export const useGamesData = (API_KEY) => {
             acc[game.appid] = game.achievements;
             return acc;
         }, {});
+        setAllAchievements(achievementsObj);
+        console.log("Updated allAchievements:", achievementsObj);
         localStorage.setItem('cachedAllAchievements', JSON.stringify(achievementsObj));
         localStorage.setItem('cacheTimestampAllAchievements', new Date().getTime().toString());
 
