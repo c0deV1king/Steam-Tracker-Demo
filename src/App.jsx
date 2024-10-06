@@ -44,7 +44,7 @@ export default function App() {
   const sortedAchievements = useMemo(() => {
     console.log("Calculating sortedAchievements");
     console.log("allAchievements:", allAchievements);
-    
+
     const allAchievementsList = [];
     Object.entries(allAchievements).forEach(([appId, achievements]) => {
       console.log(`Processing appId: ${appId}, achievements:`, achievements);
@@ -112,7 +112,7 @@ export default function App() {
         <div className='contaier mx-auto bg-base-200 sm:w-[75%] lg:w-[50%] border-2 border-base-100'>
           {profileData && (
             <div className='flex flex-col container mx-auto justify-center items-center'>
-              <img className="m-2" src={profileData.avatarfull} width="256" height="256" alt='profile image' />
+              <img className="rounded-xl m-2" src={profileData.avatarfull} width="256" height="256" alt='profile image' />
               <h2 className='text-4xl'>{profileData.personaname}</h2>
               <div className='flex flex-row justify-center items-center'>
                 <a href={profileData.profileurl} target="_blank" rel="noopener noreferrer">
@@ -121,7 +121,7 @@ export default function App() {
                 <button
                   className="btn btn-accent h-5 min-h-0 m-2 mb-3"
                   onClick={() => {
-                    console.log("Sync button clicked"); // Add this line
+                    console.log("Sync button clicked");
                     if (syncAllData) {
                       syncAllData();
                     } else {
@@ -271,7 +271,20 @@ export default function App() {
             )}
 
             {activeTab === 'Achievements' && (
-              <div>
+              <div className='flex flex-col justify-center items-center m-5'>
+                <label className="input input-bordered flex items-center gap-2 w-[50%]">
+                  <input type="text" className="grow" placeholder="Search" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    fill="currentColor"
+                    className="h-4 w-4 opacity-70">
+                    <path
+                      fillRule="evenodd"
+                      d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                      clipRule="evenodd" />
+                  </svg>
+                </label>
                 <table className="table table-lg w-[95%]">
                   <thead>
                     <tr>
@@ -286,7 +299,7 @@ export default function App() {
                       sortedAchievements.map((achievement, index) => (
                         <tr key={`${achievement.appId}-${achievement.apiname}`}>
                           <td className="avatar">
-                            <div className="square-full h-[50px] w-[50px]">
+                            <div className="rounded-xl h-[64px] w-[64px]">
                               {achievement.icon ? (
                                 <img
                                   src={achievement.icon}
