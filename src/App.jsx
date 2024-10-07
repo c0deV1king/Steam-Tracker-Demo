@@ -5,6 +5,7 @@ import TimeClock from './img/clock-history.svg?react';
 import ControllerSVG from './img/controller.svg?react';
 import GithubSVG from './img/github.svg?react';
 import SyncSVG from './img/arrow-repeat.svg?react';
+import InfoSVG from './img/info-square.svg?react';
 
 export default function App() {
   const {
@@ -106,6 +107,31 @@ export default function App() {
               </div>
             </div>
           )}
+          <button className="btn btn-accent h-8 min-h-0 m-2 mb-3" onClick={() => document.getElementById('my_modal_5').showModal()}>
+            <InfoSVG className='w-4 h-4 fill-black' />
+            About Me
+          </button>
+
+          <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">Hello!</h3>
+              <p className="py-4">
+                Welcome to SteamTracker! My name is Austin, or c0dev1king, I am a aspiring software developer and this is one of my projects.
+                SteamTracker will track your games, achievements, recent games, recent achievements and a bunch of cool statistics based on
+                the data. After all that is implemented, there will be more features being developed such as an achievement suggestions, trophy case,
+                and a leaderboard based on a points system developed for the app itself. <br />
+                This app is made with React.js + JavaScript and TailwindCSS currently. <br />
+                Thanks for checking out my project! 
+              </p>
+              <div className="modal-action">
+                <form method="dialog">
+                  {/* if there is a button in form, it will close the modal */}
+                  <button className="btn">Close</button>
+                </form>
+              </div>
+            </div>
+          </dialog>
+
         </div>
         <div className='header'>
           {mostRecentGame && mostRecentGame.image && (
@@ -282,10 +308,10 @@ export default function App() {
             {activeTab === 'Achievements' && (
               <div className='flex flex-col justify-center items-center m-5'>
                 <label className="input input-bordered flex items-center gap-2 w-[50%]">
-                  <input 
-                    type="text" 
-                    className="grow" 
-                    placeholder="Search Achievements" 
+                  <input
+                    type="text"
+                    className="grow"
+                    placeholder="Search Achievements"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
