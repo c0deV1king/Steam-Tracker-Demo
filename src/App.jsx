@@ -11,7 +11,8 @@ export default function App() {
   const {
     profileData,
     gamesToDisplay,
-    allAchievements,  // Add this line
+    allAchievements,
+    setAllAchievements,
     playtime,
     gamesPlayed,
     gamePictures,
@@ -22,7 +23,7 @@ export default function App() {
     syncAllData,
     isSyncing,
     isFullySynced,
-    testSchema
+    testSchema,
   } = useSteamData();
 
   console.log("App: allAchievements:", allAchievements);
@@ -32,7 +33,7 @@ export default function App() {
     window.testSchema = testSchema;
   }, [testSchema]);
 
-  console.log("syncAllData in App:", syncAllData); // Add this line
+  console.log("syncAllData in App:", syncAllData);
 
   console.log("App received gamesToDisplay:", gamesToDisplay);
 
@@ -71,6 +72,10 @@ export default function App() {
 
   useEffect(() => {
     console.log("allAchievements updated:", allAchievements);
+  }, [allAchievements]);
+
+  useEffect(() => {
+    console.log("allAchievements updated in App:", allAchievements);
   }, [allAchievements]);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -262,7 +267,7 @@ export default function App() {
                     {gamesToDisplay
                       .filter(game => game.playtime_forever > 0)
                       .map(game => {
-                        const achievements = (allAchievements && allAchievements[game.appid]) || [];
+                        const achievements = allAchievements[game.appid] || [];
                         const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
                         const totalAchievements = achievements.length;
                         return {
