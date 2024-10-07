@@ -72,6 +72,15 @@ export default function App() {
     console.log("allAchievements updated:", allAchievements);
   }, [allAchievements]);
 
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredAchievements = useMemo(() => {
+    return sortedAchievements.filter(achievement => {
+      const searchString = `${achievement.displayName || achievement.name || ''} ${achievement.description || ''} ${new Date(achievement.unlockTime * 1000).toLocaleString()}`.toLowerCase();
+      return searchString.includes(searchTerm.toLowerCase());
+    });
+  }, [sortedAchievements, searchTerm]);
+
   // need to link up my loading spinner to when the user is loading api data
   return (
     <>
@@ -273,7 +282,13 @@ export default function App() {
             {activeTab === 'Achievements' && (
               <div className='flex flex-col justify-center items-center m-5'>
                 <label className="input input-bordered flex items-center gap-2 w-[50%]">
-                  <input type="text" className="grow" placeholder="Search" />
+                  <input 
+                    type="text" 
+                    className="grow" 
+                    placeholder="Search Achievements" 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 16 16"
@@ -295,8 +310,8 @@ export default function App() {
                     </tr>
                   </thead>
                   <tbody className="bg-primary bg-opacity-5">
-                    {sortedAchievements.length > 0 ? (
-                      sortedAchievements.map((achievement, index) => (
+                    {filteredAchievements.length > 0 ? (
+                      filteredAchievements.map((achievement, index) => (
                         <tr key={`${achievement.appId}-${achievement.apiname}`}>
                           <td className="avatar">
                             <div className="rounded-xl h-[64px] w-[64px]">
@@ -317,7 +332,7 @@ export default function App() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="4" className="text-center">No achievements to display</td>
+                        <td colSpan="4" className="text-center">No achievements match your search</td>
                       </tr>
                     )}
                   </tbody>
