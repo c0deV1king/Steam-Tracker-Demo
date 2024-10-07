@@ -4,6 +4,8 @@ The goal for this project is to make a tracking webapp that will showcase your a
 
 It makes use of the Steam Web API. <br>
 
+Techstack so far: <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/React_Logo_SVG.svg/1920px-React_Logo_SVG.svg.png" height="32" width="32"> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Unofficial_JavaScript_logo_2.svg/1280px-Unofficial_JavaScript_logo_2.svg.png" height="32" width="32"> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Tailwind_CSS_logo.svg/2560px-Tailwind_CSS_logo.svg.png" height="16" width="128">
+
 ## ✅ Current features:
 - Recently played games
 - Profile overview
