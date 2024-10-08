@@ -18,6 +18,23 @@ export const useGamesData = (API_KEY) => {
     const [isSyncing, setIsSyncing] = useState(false);
     const [isFullySynced, setIsFullySynced] = useState(false);
 
+    // load cached achievements on initial render
+    useEffect(() => {
+        const loadCachedAchievements = async () => {
+            const cachedAchievements = await getAllData('achievements');
+            if (cachedAchievements.length > 0) {
+                const achievementsObj = cachedAchievements.reduce((acc, item) => {
+                    acc[item.appid] = item.achievements;
+                    return acc;
+                }, {});
+                setAllAchievements(achievementsObj);
+                console.log("Loaded cached achievements:", achievementsObj);
+            }
+        };
+
+        loadCachedAchievements();
+    }, []);
+
     // Fetch recent games
     useEffect(() => {
         const fetchOverviewGames = async () => {
@@ -79,7 +96,8 @@ export const useGamesData = (API_KEY) => {
                 let mostRecentGameData = null;
 
                 if (gamesWithDetails.length > 0) {
-                    mostRecentGameData = gamesWithDetails[0];
+                    const randomIndex = Math.floor(Math.random() * gamesWithDetails.length);
+                    mostRecentGameData = gamesWithDetails[randomIndex];
                     const randomScreenshot = mostRecentGameData.screenshots.length > 0
                         ? mostRecentGameData.screenshots[Math.floor(Math.random() * mostRecentGameData.screenshots.length)].path_full
                         : null;
@@ -186,16 +204,47 @@ export const useGamesData = (API_KEY) => {
                 localStorage.setItem('cacheTimestampGamePictures', now.toString());
             }
 
-            // Fetch or load cached achievements
-            const cachedAchievements = localStorage.getItem('cachedGamesAchievements');
+            // Load cached achievements from IndexedDB
+            const cachedAchievements = await getAllData('achievements');
+            let achievementsObj = {};
+            if (cachedAchievements.length > 0) {
+                achievementsObj = cachedAchievements.reduce((acc, item) => {
+                    acc[item.appid] = item.achievements;
+                    return acc;
+                }, {});
+                setAllAchievements(achievementsObj);
+                console.log("Loaded cached achievements from IndexedDB:", achievementsObj);
+            }
+
+            // Update gamesToDisplay with cached achievements from IndexedDB
+            let gamesWithCachedAchievements = gamesWithDetails.map(game => ({
+                ...game,
+                achievements: achievementsObj[game.appid] || []
+            }));
+
+            setGamesToDisplay(gamesWithCachedAchievements);
+
+            // Check localStorage for more recent cached achievements
+            const cachedAchievementsString = localStorage.getItem('cachedGamesAchievements');
             const cacheTimestampAchievements = localStorage.getItem('cacheTimestampGamesAchievements');
 
-            let achievementsObj = {};
+            if (cachedAchievementsString && cacheTimestampAchievements && now - parseInt(cacheTimestampAchievements) < 24 * 60 * 60 * 1000) {
+                const localStorageAchievements = JSON.parse(cachedAchievementsString);
+                console.log("Loaded achievements from localStorage cache:", localStorageAchievements);
+                
+                // Merge localStorage achievements with IndexedDB achievements
+                achievementsObj = { ...achievementsObj, ...localStorageAchievements };
+                setAllAchievements(achievementsObj);
 
-            if (cachedAchievements && cacheTimestampAchievements && now - parseInt(cacheTimestampAchievements) < 24 * 60 * 60 * 1000) {
-                achievementsObj = JSON.parse(cachedAchievements);
-                console.log("Loaded achievements from cache:", achievementsObj);
+                // Update gamesToDisplay with merged achievements
+                gamesWithCachedAchievements = gamesWithDetails.map(game => ({
+                    ...game,
+                    achievements: achievementsObj[game.appid] || []
+                }));
+
+                setGamesToDisplay(gamesWithCachedAchievements);
             } else {
+                // Fetch new achievements if localStorage cache is outdated or doesn't exist
                 const gamesWithAchievements = await fetchAchievementsForGames(gamesWithDetails, 'cachedGamesAchievements');
                 achievementsObj = gamesWithAchievements.reduce((acc, game) => {
                     if (game.achievements) {
@@ -204,20 +253,20 @@ export const useGamesData = (API_KEY) => {
                     return acc;
                 }, {});
 
-                // Cache the achievements
+                // Cache the achievements in localStorage
                 localStorage.setItem('cachedGamesAchievements', JSON.stringify(achievementsObj));
                 localStorage.setItem('cacheTimestampGamesAchievements', now.toString());
+
+                console.log("Fetched and cached new achievements:", achievementsObj);
+                setAllAchievements(achievementsObj);
+
+                const updatedGamesWithAchievements = gamesWithDetails.map(game => ({
+                    ...game,
+                    achievements: achievementsObj[game.appid] || []
+                }));
+
+                setGamesToDisplay(updatedGamesWithAchievements);
             }
-
-            console.log("Setting allAchievements:", achievementsObj);
-            setAllAchievements(achievementsObj);
-
-            const gamesWithAchievements = gamesWithDetails.map(game => ({
-                ...game,
-                achievements: achievementsObj[game.appid] || []
-            }));
-
-            setGamesToDisplay(gamesWithAchievements);
         };
 
         fetchGames();
@@ -428,6 +477,13 @@ export const useGamesData = (API_KEY) => {
       setAllAchievements(updatedAchievements);
       console.log("Updated allAchievements:", updatedAchievements);
 
+      // Update gamesToDisplay with new achievements
+      const updatedGamesToDisplay = gamesToDisplay.map(game => ({
+        ...game,
+        achievements: updatedAchievements[game.appid] || []
+      }));
+      setGamesToDisplay(updatedGamesToDisplay);
+
       console.log("Sync completed successfully");
       setIsSyncing(false);
       setIsFullySynced(true);
@@ -435,7 +491,7 @@ export const useGamesData = (API_KEY) => {
       console.error('Failed to sync all data:', error);
       setIsSyncing(false);
     }
-  }, [API_KEY, getGamesWithDetails, fetchAchievementsForGames]);
+  }, [API_KEY, getGamesWithDetails, fetchAchievementsForGames, gamesToDisplay]);
 
     return {
         games,
