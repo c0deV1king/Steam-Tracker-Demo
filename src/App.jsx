@@ -1,6 +1,7 @@
 import './styles.css'
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSteamData } from './hooks/useSteamData';
+import { achievementPages } from './utils/achievementPages';
 import TimeClock from './img/clock-history.svg?react';
 import ControllerSVG from './img/controller.svg?react';
 import GithubSVG from './img/github.svg?react';
@@ -23,8 +24,19 @@ export default function App() {
     syncAllData,
     isSyncing,
     isFullySynced,
-    testSchema,
+    testSchema
   } = useSteamData();
+
+  const {
+    currentPage,
+    setCurrentPage,
+    achievementsPerPage,
+    getCurrentPageAchievements,
+    nextPage,
+    prevPage,
+    goToPage,
+    getTotalPages
+  } = achievementPages(allAchievements);
 
   console.log("App: allAchievements:", allAchievements);
   console.log("App: gamesToDisplay:", gamesToDisplay);
@@ -81,11 +93,25 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredAchievements = useMemo(() => {
-    return sortedAchievements.filter(achievement => {
+    const filtered = sortedAchievements.filter(achievement => {
       const searchString = `${achievement.displayName || achievement.name || ''} ${achievement.description || ''} ${new Date(achievement.unlockTime * 1000).toLocaleString()}`.toLowerCase();
       return searchString.includes(searchTerm.toLowerCase());
     });
-  }, [sortedAchievements, searchTerm]);
+
+    // Calculate total pages
+    const totalPages = Math.ceil(filtered.length / achievementsPerPage);
+
+    // Get current page achievements
+    const indexOfLastAchievement = currentPage * achievementsPerPage;
+    const indexOfFirstAchievement = indexOfLastAchievement - achievementsPerPage;
+    const currentAchievements = filtered.slice(indexOfFirstAchievement, indexOfLastAchievement);
+
+    return { filtered, currentAchievements, totalPages };
+  }, [sortedAchievements, searchTerm, currentPage, achievementsPerPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, setCurrentPage]);
 
   // need to link up my loading spinner to when the user is loading api data
   return (
@@ -341,8 +367,8 @@ export default function App() {
                     </tr>
                   </thead>
                   <tbody className="bg-primary bg-opacity-5">
-                    {filteredAchievements.length > 0 ? (
-                      filteredAchievements.map((achievement, index) => (
+                    {filteredAchievements.currentAchievements.length > 0 ? (
+                      filteredAchievements.currentAchievements.map((achievement, index) => (
                         <tr key={`${achievement.appId}-${achievement.apiname}`}>
                           <td className="avatar">
                             <div className="rounded-xl h-[64px] w-[64px]">
@@ -368,6 +394,25 @@ export default function App() {
                     )}
                   </tbody>
                 </table>
+                <div className="join mt-4">
+                  <button 
+                    className="join-item btn" 
+                    onClick={prevPage} 
+                    disabled={currentPage === 1}
+                  >
+                    «
+                  </button>
+                  <button className="join-item btn">
+                    Page {currentPage} of {filteredAchievements.totalPages}
+                  </button>
+                  <button 
+                    className="join-item btn" 
+                    onClick={nextPage} 
+                    disabled={currentPage === filteredAchievements.totalPages}
+                  >
+                    »
+                  </button>
+                </div>
               </div>
             )}
 
