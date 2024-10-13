@@ -9,6 +9,7 @@ import SyncSVG from './img/arrow-repeat.svg?react';
 import InfoSVG from './img/info-square.svg?react';
 
 export default function App() {
+  // importing use states and functions to be used in the app
   const {
     profileData,
     gamesToDisplay,
@@ -24,7 +25,8 @@ export default function App() {
     syncAllData,
     isSyncing,
     isFullySynced,
-    testSchema
+    testSchema,
+    recentAchievements
   } = useSteamData();
 
   const {
@@ -41,6 +43,7 @@ export default function App() {
   console.log("App: allAchievements:", allAchievements);
   console.log("App: gamesToDisplay:", gamesToDisplay);
 
+  // testing api endpoints, to be called manually with testSchema() in console
   useEffect(() => {
     window.testSchema = testSchema;
   }, [testSchema]);
@@ -49,12 +52,15 @@ export default function App() {
 
   console.log("App received gamesToDisplay:", gamesToDisplay);
 
+  // state for the active tab
   const [activeTab, setActiveTab] = useState('Overview');
 
+  // function for changing the active tab
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
 
+  // sorting the achievements by date achieved
   const sortedAchievements = useMemo(() => {
     console.log("Calculating sortedAchievements");
     console.log("allAchievements:", allAchievements);
@@ -80,6 +86,7 @@ export default function App() {
     return allAchievementsList.sort((a, b) => b.unlockTime - a.unlockTime);
   }, [allAchievements, gamesToDisplay]);
 
+  // logging all sorted achievements, important to make sure achievements are being passed to the dom
   console.log("sortedAchievements:", sortedAchievements);
 
   useEffect(() => {
@@ -90,8 +97,10 @@ export default function App() {
     console.log("allAchievements updated in App:", allAchievements);
   }, [allAchievements]);
 
+  // state for the search term
   const [searchTerm, setSearchTerm] = useState('');
 
+  // filtering the achievements based on the search term
   const filteredAchievements = useMemo(() => {
     const filtered = sortedAchievements.filter(achievement => {
       const searchString = `${achievement.displayName || achievement.name || ''} ${achievement.description || ''} ${new Date(achievement.unlockTime * 1000).toLocaleString()}`.toLowerCase();
@@ -109,11 +118,11 @@ export default function App() {
     return { filtered, currentAchievements, totalPages };
   }, [sortedAchievements, searchTerm, currentPage, achievementsPerPage]);
 
+  // resetting the current page to 1 when the search term changes
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, setCurrentPage]);
 
-  // need to link up my loading spinner to when the user is loading api data
   return (
     <>
       <div className=''>
@@ -257,22 +266,27 @@ export default function App() {
                   <table className="table table-sm w-[48%]">
                     <thead>
                       <tr>
-                        <th> </th>
+                        <th> </th>
                         <th>Achievement</th>
                         <th>Date Earned</th>
                       </tr>
                     </thead>
                     <tbody className="bg-primary bg-opacity-5">
-                      <tr key="#">
-                        <td className="w-1/3">
-                          <div className="w-full h-20 overflow-hidden">
-                            <img src="#" className="w-full h-full object-cover" />
-                            <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Image</div>
-                          </div>
-                        </td>
-                        <td className='w-1/3'> ###</td>
-                        <td className='w-1/3'> ###</td>
-                      </tr>
+                      {recentAchievements.map((achievement) => (
+                        <tr key={`${achievement.appId}-${achievement.apiname}`}>
+                          <td className="w-1/6">
+                            <div className="w-12 h-12 overflow-hidden">
+                              {achievement.icon ? (
+                                <img src={achievement.icon} alt={achievement.displayName || achievement.name} className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Icon</div>
+                              )}
+                            </div>
+                          </td>
+                          <td className='w-1/3'>{achievement.displayName || achievement.name}</td>
+                          <td className='w-1/4'>{new Date(achievement.unlockTime * 1000).toLocaleString()}</td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>

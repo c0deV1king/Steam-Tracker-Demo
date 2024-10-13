@@ -27,6 +27,7 @@ const API_KEY = import.meta.env.VITE_STEAM_API_KEY;
 
 export const useSteamData = () => {
 
+  // transferring code to be used in App.jsx
   const {
     profileData
   } = useProfileData(API_KEY) || {};
@@ -46,7 +47,8 @@ export const useSteamData = () => {
     testSchema,
     isSyncing,
     isFullySynced,
-    syncAllData
+    syncAllData,
+    recentAchievements
   } = useGamesData(API_KEY) || {};
 
   return {
@@ -65,6 +67,7 @@ export const useSteamData = () => {
     profileData,
     isSyncing,
     isFullySynced,
-    syncAllData
-  }; // returning the arrays and functions to be used on import to another component
+    syncAllData,
+    recentAchievements
+  }; // returning the arrays and functions to be used in App.jsx
 };

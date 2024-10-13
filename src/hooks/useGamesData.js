@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { fetchAchievementsForGames } from '../utils/fetchAchievementsForGames';
 import { delayedFetch } from '../utils/rateLimitingAPI';
 import { storeData, getAllData } from '../utils/indexedDB';
 
 export const useGamesData = (API_KEY) => {
 
+    // states to store data
     const [games, setGames] = useState([]);
     const [gamesToDisplay, setGamesToDisplay] = useState([]);
     const [allAchievements, setAllAchievements] = useState({});
@@ -17,6 +18,7 @@ export const useGamesData = (API_KEY) => {
     const [overviewAchievements, setOverviewAchievements] = useState({});
     const [isSyncing, setIsSyncing] = useState(false);
     const [isFullySynced, setIsFullySynced] = useState(false);
+    const [recentAchievements, setRecentAchievements] = useState([]);
 
     // load cached achievements on initial render
     useEffect(() => {
@@ -35,7 +37,7 @@ export const useGamesData = (API_KEY) => {
         loadCachedAchievements();
     }, []);
 
-    // Fetch recent games
+    // Fetch recent games as well as some screenshot data based on the recent games
     useEffect(() => {
         const fetchOverviewGames = async () => {
             console.log("Fetching overview games");
@@ -136,6 +138,7 @@ export const useGamesData = (API_KEY) => {
         fetchOverviewGames();
     }, []);
 
+    // just a api test to see what data gets returned. Using for new endpoints if needed.
     const testSchema = useCallback(async () => {
         console.log("testSchema called")
         try {
@@ -147,7 +150,7 @@ export const useGamesData = (API_KEY) => {
         }
     }, [API_KEY]);
 
-
+    //fetches all the owned games from the steam user as well as some additional data (playtime, ect)
     useEffect(() => {
         console.log("useEffect triggered for fetching games");
         const fetchGames = async () => {
@@ -272,6 +275,7 @@ export const useGamesData = (API_KEY) => {
         fetchGames();
     }, []);
 
+    // gets the games name and images
     const getGamesWithDetails = async (games) => {
         console.log("getGamesWithDetails called")
         const cachedDetails = JSON.parse(localStorage.getItem('cachedGameDetails') || '{}');
@@ -353,13 +357,15 @@ export const useGamesData = (API_KEY) => {
     //     }));
     // };
 
-    useEffect(() => {
-        const gamesWithoutAchievements = gamesToDisplay.filter(game => !allAchievements[game.appid]);
-        if (gamesWithoutAchievements.length > 0) {
-            fetchAchievementsForGames(gamesWithoutAchievements);
-        }
-    }, []);
+    // filters out games that dont have achievements
+    // useEffect(() => {
+    //     const gamesWithoutAchievements = gamesToDisplay.filter(game => !allAchievements[game.appid]);
+    //     if (gamesWithoutAchievements.length > 0) {
+    //         fetchAchievementsForGames(gamesWithoutAchievements);
+    //     }
+    // }, []);
 
+    // function for the handle load more button
     const handleLoadMore = useCallback(async () => {
         
         console.log('handleLoadMore called', new Date().toISOString());
@@ -434,6 +440,7 @@ export const useGamesData = (API_KEY) => {
     updateRecentGamesAchievements();
   }, []);
 
+  // function for syncing all data
   const syncAllData = useCallback(async () => {
     console.log("syncAllData function called");
     setIsSyncing(true);
@@ -493,6 +500,33 @@ export const useGamesData = (API_KEY) => {
     }
   }, [API_KEY, getGamesWithDetails, fetchAchievementsForGames, gamesToDisplay]);
 
+    // getting recent achievements to be used on the overview tab (by date achieved)
+    const getRecentAchievements = useCallback(() => {
+        const allAchievementsList = [];
+        Object.entries(allAchievements).forEach(([appId, achievements]) => {
+            if (Array.isArray(achievements)) {
+                achievements.forEach(achievement => {
+                    if (achievement.achieved) {
+                        allAchievementsList.push({
+                            ...achievement,
+                            appId,
+                            gameName: games.find(game => game.appid.toString() === appId)?.name || 'Unknown Game'
+                        });
+                    }
+                });
+            }
+        });
+        
+        const sortedAchievements = allAchievementsList.sort((a, b) => b.unlockTime - a.unlockTime);
+        return sortedAchievements.slice(0, 10); // Return top 10 recent achievements
+    }, [allAchievements, games]);
+
+    // recentAchievements when allAchievements changes
+    useEffect(() => {
+        setRecentAchievements(getRecentAchievements());
+    }, [allAchievements, getRecentAchievements]);
+
+    // return functions and states to useSteamData
     return {
         games,
         gamesToDisplay,
@@ -508,6 +542,7 @@ export const useGamesData = (API_KEY) => {
         isSyncing,
         isFullySynced,
         syncAllData,
-        testSchema
+        testSchema,
+        recentAchievements
     };
 };
