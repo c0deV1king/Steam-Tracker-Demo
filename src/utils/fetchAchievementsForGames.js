@@ -10,11 +10,7 @@ export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAc
         try {
             // Check if we have cached achievements for this game
             const cachedAchievements = await getData('achievements', game.appid);
-            if (cachedAchievements) {
-                console.log(`Using cached achievements for game ${game.appid}`);
-                return { ...game, achievements: cachedAchievements.achievements };
-            }
-
+            
             const [earnedRes, infoRes] = await Promise.all([
                 delayedFetch(`http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${game.appid}&key=${API_KEY}&steamid=76561198119786249`),
                 delayedFetch(`http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v0002/?appid=${game.appid}&key=${API_KEY}`)
@@ -24,7 +20,7 @@ export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAc
             const infoData = await infoRes.json();
 
             if (earnedData.playerstats && earnedData.playerstats.achievements && infoData.game && infoData.game.availableGameStats && infoData.game.availableGameStats.achievements) {
-                const combinedAchievements = earnedData.playerstats.achievements.map(achievement => {
+                const newAchievements = earnedData.playerstats.achievements.map(achievement => {
                     const achievementInfo = infoData.game.availableGameStats.achievements.find(
                         a => achievement.apiname === a.name
                     );
@@ -40,10 +36,19 @@ export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAc
                     };
                 });
 
-                // Store achievements in IndexedDB
+                // Merge new achievements with cached achievements
+                let combinedAchievements = newAchievements;
+                if (cachedAchievements && cachedAchievements.achievements) {
+                    combinedAchievements = newAchievements.map(newAchievement => {
+                        const cachedAchievement = cachedAchievements.achievements.find(a => a.apiname === newAchievement.apiname);
+                        return cachedAchievement ? { ...cachedAchievement, ...newAchievement } : newAchievement;
+                    });
+                }
+
+                // Store updated achievements in IndexedDB
                 await storeData('achievements', { appid: game.appid, achievements: combinedAchievements });
 
-                console.log(`Fetched achievements for game ${game.appid}:`, combinedAchievements);
+                console.log(`Updated achievements for game ${game.appid}:`, combinedAchievements);
                 return { ...game, achievements: combinedAchievements };
             } else {
                 console.log(`No achievements data available for game ${game.appid}`);
@@ -52,8 +57,7 @@ export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAc
             }
         } catch (error) {
             console.error(`Error fetching achievements for game ${game.appid}:`, error);
-            await storeData('achievements', { appid: game.appid, achievements: [] });
-            return { ...game, achievements: [] };
+            return { ...game, achievements: cachedAchievements ? cachedAchievements.achievements : [] };
         }
     }));
 

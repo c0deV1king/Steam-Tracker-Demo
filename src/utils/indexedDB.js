@@ -23,10 +23,26 @@ export const storeData = async (storeName, data) => {
     const transaction = db.transaction(storeName, 'readwrite');
     const store = transaction.objectStore(storeName);
 
-    const request = store.put(data);
+    // Check if the record already exists
+    const getRequest = store.get(data.appid);
 
-    request.onerror = (event) => reject("Error storing data: " + event.target.error);
-    request.onsuccess = (event) => resolve(event.target.result);
+    getRequest.onsuccess = (event) => {
+      const existingData = event.target.result;
+      if (existingData) {
+        // If the record exists, merge the new data with the existing data
+        const updatedData = { ...existingData, ...data };
+        const updateRequest = store.put(updatedData);
+        updateRequest.onerror = (event) => reject("Error updating data: " + event.target.error);
+        updateRequest.onsuccess = (event) => resolve(event.target.result);
+      } else {
+        // If the record doesn't exist, add the new data
+        const addRequest = store.add(data);
+        addRequest.onerror = (event) => reject("Error adding data: " + event.target.error);
+        addRequest.onsuccess = (event) => resolve(event.target.result);
+      }
+    };
+
+    getRequest.onerror = (event) => reject("Error checking existing data: " + event.target.error);
   });
 };
 
