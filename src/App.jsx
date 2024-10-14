@@ -7,6 +7,7 @@ import ControllerSVG from './img/controller.svg?react';
 import GithubSVG from './img/github.svg?react';
 import SyncSVG from './img/arrow-repeat.svg?react';
 import InfoSVG from './img/info-square.svg?react';
+import { useCharts } from './hooks/useCharts.jsx';
 
 export default function App() {
   // importing use states and functions to be used in the app
@@ -39,6 +40,8 @@ export default function App() {
     goToPage,
     getTotalPages
   } = achievementPages(allAchievements);
+
+  const { renderGenreDistributionChart } = useCharts();
 
   console.log("App: allAchievements:", allAchievements);
   console.log("App: gamesToDisplay:", gamesToDisplay);
@@ -161,7 +164,7 @@ export default function App() {
                 the data. After all that is implemented, there will be more features being developed such as an achievement suggestions, trophy case,
                 and a leaderboard based on a points system developed for the app itself. <br />
                 This app is made with React.js + JavaScript and TailwindCSS currently. <br />
-                Thanks for checking out my project! 
+                Thanks for checking out my project!
               </p>
               <div className="modal-action">
                 <form method="dialog">
@@ -409,9 +412,9 @@ export default function App() {
                   </tbody>
                 </table>
                 <div className="join mt-4">
-                  <button 
-                    className="join-item btn" 
-                    onClick={prevPage} 
+                  <button
+                    className="join-item btn"
+                    onClick={prevPage}
                     disabled={currentPage === 1}
                   >
                     «
@@ -419,9 +422,9 @@ export default function App() {
                   <button className="join-item btn">
                     Page {currentPage} of {filteredAchievements.totalPages}
                   </button>
-                  <button 
-                    className="join-item btn" 
-                    onClick={nextPage} 
+                  <button
+                    className="join-item btn"
+                    onClick={nextPage}
                     disabled={currentPage === filteredAchievements.totalPages}
                   >
                     »
@@ -432,7 +435,16 @@ export default function App() {
 
             {activeTab === 'Stats' && (
               <div className="container mx-auto">
-                {/* Stats content */}
+                <div className="stats-page">
+                  <h1>Game Statistics</h1>
+
+                  <div className="chart-container">
+                    <h2>Genre Distribution</h2>
+                    {renderGenreDistributionChart()}
+                  </div>
+
+                  {/* Add more chart containers here */}
+                </div>
               </div>
             )}
 
