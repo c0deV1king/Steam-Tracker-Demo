@@ -142,7 +142,8 @@ export const useGamesData = (API_KEY) => {
     const testSchema = useCallback(async () => {
         console.log("testSchema called")
         try {
-            const res = await fetch(`https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=${API_KEY}&appid=230410`);
+           // const res = await fetch(`https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=${API_KEY}&appid=230410`);
+            const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=440`);
             const data = await res.json();
             console.log("testSchema data:", data);
         } catch (error) {
@@ -306,7 +307,11 @@ export const useGamesData = (API_KEY) => {
                         appid: game.appid,
                         data: {
                             name: gameDetails.name,
-                            image: gameDetails.header_image
+                            image: gameDetails.header_image,
+                            genres: gameDetails.genres,
+                            developers: gameDetails.developers,
+                            metacritic: gameDetails.metacritic,
+                            type: gameDetails.type
                         },
                         timestamp: now
                     });

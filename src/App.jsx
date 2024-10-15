@@ -41,7 +41,7 @@ export default function App() {
     getTotalPages
   } = achievementPages(allAchievements);
 
-  const { renderGenreDistributionChart } = useCharts();
+  const { renderGenreChart } = useCharts();
 
   console.log("App: allAchievements:", allAchievements);
   console.log("App: gamesToDisplay:", gamesToDisplay);
@@ -436,11 +436,11 @@ export default function App() {
             {activeTab === 'Stats' && (
               <div className="container mx-auto">
                 <div className="stats-page">
-                  <h1>Game Statistics</h1>
+                  <h1 className="text-2xl text-center pt-2 pb-2">Game Statistics</h1>
 
-                  <div className="chart-container">
-                    <h2>Genre Distribution</h2>
-                    {renderGenreDistributionChart()}
+                  <div className="chart-container h-[400px] w-[100%]">
+                    <h2 className="text-center">Your top 3 genres</h2>
+                    {renderGenreChart()}
                   </div>
 
                   {/* Add more chart containers here */}
