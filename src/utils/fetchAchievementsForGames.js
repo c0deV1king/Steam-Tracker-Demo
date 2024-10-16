@@ -4,7 +4,7 @@ import { storeData, getData } from './indexedDB';
 const API_KEY = import.meta.env.VITE_STEAM_API_KEY;
 
 export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAchievements') => {
-    console.log(`Fetching achievements for games (${cacheKey}):`, games);
+   // console.log(`Fetching achievements for games (${cacheKey}):`, games);
 
     const gamesWithAchievements = await Promise.all(games.map(async (game) => {
         try {
@@ -48,10 +48,10 @@ export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAc
                 // Store updated achievements in IndexedDB
                 await storeData('achievements', { appid: game.appid, achievements: combinedAchievements });
 
-                console.log(`Updated achievements for game ${game.appid}:`, combinedAchievements);
+               // console.log(`Updated achievements for game ${game.appid}:`, combinedAchievements);
                 return { ...game, achievements: combinedAchievements };
             } else {
-                console.log(`No achievements data available for game ${game.appid}`);
+              //  console.log(`No achievements data available for game ${game.appid}`);
                 await storeData('achievements', { appid: game.appid, achievements: [] });
                 return { ...game, achievements: [] };
             }
@@ -61,6 +61,6 @@ export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAc
         }
     }));
 
-    console.log(`Fetched achievements for all games`);
+   // console.log(`Fetched achievements for all games`);
     return gamesWithAchievements;
 };

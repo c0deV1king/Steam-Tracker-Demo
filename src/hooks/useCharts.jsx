@@ -1,5 +1,5 @@
 import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, CartesianGrid, XAxis, YAxis, BarChart, Bar } from 'recharts';
 import { getAllData } from '../utils/indexedDB';
 
 // colour palette for the charts
@@ -19,6 +19,13 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
       fill="white"
       textAnchor={x > cx ? 'start' : 'end'}
       dominantBaseline="central"
+      style={{
+        fontSize: '18px',
+        fontWeight: 'bold',
+        stroke: '#000000',
+        strokeWidth: '1px',
+        paintOrder: 'stroke',
+      }}
     >
       {`${payload.genre} ${(percent * 100).toFixed(0)}%`}
     </text>
@@ -29,6 +36,7 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 export const useCharts = () => {
   const [chartData, setChartData] = React.useState({
     genreChart: [],
+    playtimeChart: { hourData: [], dayData: [] },
   });
 
   // fetching data for the charts
@@ -36,13 +44,14 @@ export const useCharts = () => {
     const fetchData = async () => {
       try {
         const moreGameDetails = JSON.parse(localStorage.getItem('cachedGameDetails') || '{}');
+        const achievementData = await getAllData('achievements');
+
 
         const newChartData = {
           genreChart: processGenreChart(moreGameDetails),
-          // example for new chart data: playtimeByMonth: processPlaytimeByMonth(games),
+          playtimeChart: processPlaytimeData(achievementData),
         };
 
-        console.log("New chart data:", newChartData);
         setChartData(newChartData);
 
       } catch (error) {
@@ -60,7 +69,6 @@ export const useCharts = () => {
       .flatMap(game => game.data?.genres || [])
       .filter(Boolean);
 
-    console.log("genres before processing:", genres);
 
     // Count the number of games for each genre
     const genreCounts = genres.reduce((acc, genre) => {
@@ -87,17 +95,69 @@ export const useCharts = () => {
       result.push({ genre: 'Others', amount: othersAmount });
     }
 
-    console.log("Processed genre distribution:", result);
     return result;
   };
 
-  // Other possible chart data
-  const processPlaytimeByMonth = (games) => {
+  // Playtime data includes data for two different charts, grabbiong just the achieved and the unlocked time so I can see what day and hour 
+  // I unlocked the achievements, as well as a count for each day and hour
+  const processPlaytimeData = (achievementData) => {
 
+    const hourCounts = new Array(24).fill(0);
+    const dayCounts = new Array(7).fill(0);
+
+    let totalAchievements = 0;
+
+    if (typeof achievementData !== 'object' || achievementData === null) {
+      console.error("Achievement data is not an object:", achievementData);
+      return { hourData: [], dayData: [] };
+    }
+
+    Object.entries(achievementData).forEach(([appId, gameData], index) => {
+
+      if (!Array.isArray(gameData.achievements)) {
+        return;
+      }
+
+      gameData.achievements.forEach((achievement, achievementIndex) => {
+
+        if (typeof achievement !== 'object' || achievement === null) {
+          return;
+        }
+
+        if (achievement.achieved === 1 || achievement.achieved === true) {
+          if (achievement.unlockTime) {
+            // Check if unlockTime is in the future (indicating an unachieved achievement)
+            const currentTime = Math.floor(Date.now() / 1000);
+            if (achievement.unlockTime > currentTime) {
+              return;
+            }
+
+            const unlockTime = new Date(achievement.unlockTime * 1000);
+            const hour = unlockTime.getHours();
+            const day = unlockTime.getDay();
+
+            hourCounts[hour]++;
+            dayCounts[day]++;
+            totalAchievements++;
+          }
+        }
+      });
+    });
+
+    const hourData = hourCounts.map((count, index) => ({
+      name: `${index}:00`,
+      achievements: count,
+    }));
+
+    const dayData = dayCounts.map((count, index) => ({
+      name: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][index],
+      achievements: count,
+    }));
+
+    return { hourData, dayData };
   };
 
   const renderGenreChart = () => {
-    console.log("Rendering chart with data:", chartData.genreChart);
 
     if (!chartData.genreChart || chartData.genreChart.length === 0) {
       return <div>No data available for genre distribution chart.</div>;
@@ -127,10 +187,85 @@ export const useCharts = () => {
     );
   };
 
-  // Add more render functions for other chart types
+  const renderPlaytimeChart = () => {
+    const { hourData, dayData } = chartData.playtimeChart;
+
+    const fontColour = {
+      fill: 'white',
+    };
+
+    // Determine the preferred time for unlocking achievements
+    const preferredTime = hourData.reduce(
+      (max, current) => (current.achievements > max.achievements ? current : max),
+      hourData[0]
+    );
+
+    const getTimeOfDay = (hour) => {
+      if (hour >= 5 && hour < 12) return "in the morning";
+      if (hour >= 12 && hour < 17) return "in the afternoon";
+      if (hour >= 17 && hour < 21) return "in the evening";
+      return "at night";
+    };
+
+    const preferredDay = dayData.reduce(
+      (max, current) => (current.achievements > max.achievements ? current : max),
+      dayData[0]
+    );
+
+    const getDayOfWeekTranslated = (day) => {
+      switch (day) {
+        case 'Sun':
+          return 'Sunday';
+        case 'Mon':
+          return 'Monday';
+        case 'Tue':
+          return 'Tuesday';
+        case 'Wed':
+          return 'Wednesday';
+        case 'Thu':
+          return 'Thursday';
+        case 'Fri':
+          return 'Friday';
+        case 'Sat':
+          return 'Saturday';
+        default:
+          return day;
+      }
+    };
+
+
+    return (
+      <>
+        <div>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={hourData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <XAxis dataKey="name" style={fontColour} />
+              <Tooltip style={fontColour} />
+              <Legend />
+              <Bar dataKey="achievements" fill="#E187F7" />
+            </BarChart>
+            <p className="text-center">You prefer to achievement hunt <span className="text-success">{getTimeOfDay(parseInt(preferredTime.name))}</span></p>
+          </ResponsiveContainer>
+        </div>
+
+        <div className='mt-[100px]'>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={dayData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <XAxis dataKey="name" style={fontColour} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="achievements" fill="#E2C64B" />
+            </BarChart>
+            <p className="text-center">You prefer to achievement hunt <span className="text-success">{getDayOfWeekTranslated(preferredDay.name)}</span></p>
+          </ResponsiveContainer>
+        </div>
+      </>
+    );
+  };
 
   return {
     chartData,
     renderGenreChart,
+    renderPlaytimeChart,
   };
 };

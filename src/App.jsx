@@ -41,19 +41,19 @@ export default function App() {
     getTotalPages
   } = achievementPages(allAchievements);
 
-  const { renderGenreChart } = useCharts();
+  const { chartData, renderGenreChart, renderPlaytimeChart } = useCharts();
 
-  console.log("App: allAchievements:", allAchievements);
-  console.log("App: gamesToDisplay:", gamesToDisplay);
+//  console.log("App: allAchievements:", allAchievements);
+ // console.log("App: gamesToDisplay:", gamesToDisplay);
 
   // testing api endpoints, to be called manually with testSchema() in console
   useEffect(() => {
     window.testSchema = testSchema;
   }, [testSchema]);
 
-  console.log("syncAllData in App:", syncAllData);
+ // console.log("syncAllData in App:", syncAllData);
 
-  console.log("App received gamesToDisplay:", gamesToDisplay);
+ // console.log("App received gamesToDisplay:", gamesToDisplay);
 
   // state for the active tab
   const [activeTab, setActiveTab] = useState('Overview');
@@ -65,12 +65,12 @@ export default function App() {
 
   // sorting the achievements by date achieved
   const sortedAchievements = useMemo(() => {
-    console.log("Calculating sortedAchievements");
-    console.log("allAchievements:", allAchievements);
+   // console.log("Calculating sortedAchievements");
+   // console.log("allAchievements:", allAchievements);
 
     const allAchievementsList = [];
     Object.entries(allAchievements).forEach(([appId, achievements]) => {
-      console.log(`Processing appId: ${appId}, achievements:`, achievements);
+    //  console.log(`Processing appId: ${appId}, achievements:`, achievements);
       if (Array.isArray(achievements)) {
         achievements.forEach(achievement => {
           if (achievement.achieved) {
@@ -85,19 +85,19 @@ export default function App() {
         console.warn(`Achievements for appId ${appId} is not an array:`, achievements);
       }
     });
-    console.log("Final allAchievementsList:", allAchievementsList);
+   // console.log("Final allAchievementsList:", allAchievementsList);
     return allAchievementsList.sort((a, b) => b.unlockTime - a.unlockTime);
   }, [allAchievements, gamesToDisplay]);
 
   // logging all sorted achievements, important to make sure achievements are being passed to the dom
-  console.log("sortedAchievements:", sortedAchievements);
+ // console.log("sortedAchievements:", sortedAchievements);
 
   useEffect(() => {
-    console.log("allAchievements updated:", allAchievements);
+ //   console.log("allAchievements updated:", allAchievements);
   }, [allAchievements]);
 
   useEffect(() => {
-    console.log("allAchievements updated in App:", allAchievements);
+  //  console.log("allAchievements updated in App:", allAchievements);
   }, [allAchievements]);
 
   // state for the search term
@@ -199,7 +199,7 @@ export default function App() {
                 <button
                   className="btn btn-accent h-5 min-h-0 m-2 mb-3"
                   onClick={() => {
-                    console.log("Sync button clicked");
+                  //  console.log("Sync button clicked");
                     if (syncAllData) {
                       syncAllData();
                     } else {
@@ -438,9 +438,15 @@ export default function App() {
                 <div className="stats-page">
                   <h1 className="text-2xl text-center pt-2 pb-2">Game Statistics</h1>
 
-                  <div className="chart-container h-[400px] w-[100%]">
-                    <h2 className="text-center">Your top 3 genres</h2>
-                    {renderGenreChart()}
+                  <div className="chart-container h-[250px] w-[100%]">
+                    {chartData.genreChart.length > 0 ? renderGenreChart() : <p>Loading genre data...</p>}
+                  </div>
+
+                  <div className="chart-container h-[800px] w-[100%]">
+                    {chartData.playtimeChart.hourData.length > 0 && chartData.playtimeChart.dayData.length > 0 ? 
+                      renderPlaytimeChart() : 
+                      <p>Loading playtime data...</p>
+                    }
                   </div>
 
                   {/* Add more chart containers here */}
