@@ -48,7 +48,8 @@ export const useSteamData = () => {
     isSyncing,
     isFullySynced,
     syncAllData,
-    recentAchievements
+    recentAchievements,
+    mostPlayedGame
   } = useGamesData(API_KEY) || {};
 
   return {
@@ -68,6 +69,7 @@ export const useSteamData = () => {
     isSyncing,
     isFullySynced,
     syncAllData,
-    recentAchievements
+    recentAchievements,
+    mostPlayedGame
   }; // returning the arrays and functions to be used in App.jsx
 };

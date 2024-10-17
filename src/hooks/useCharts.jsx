@@ -182,7 +182,7 @@ export const useCharts = () => {
             ))}
           </Pie>
         </PieChart>
-        <h1 className="text-center">You mostly play <span className="text-success">{chartData.genreChart[0].genre.toLowerCase()}</span> games</h1>
+        <h1 className="text-center text-xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl">You mostly play <span className="text-success">{chartData.genreChart[0].genre.toLowerCase()}</span> games</h1>
       </ResponsiveContainer>
     );
   };
@@ -244,7 +244,7 @@ export const useCharts = () => {
               <Legend />
               <Bar dataKey="achievements" fill="#E187F7" />
             </BarChart>
-            <p className="text-center">You prefer to achievement hunt <span className="text-success">{getTimeOfDay(parseInt(preferredTime.name))}</span></p>
+            <p className="text-center text-xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl">You prefer to achievement hunt <span className="text-success">{getTimeOfDay(parseInt(preferredTime.name))}</span></p>
           </ResponsiveContainer>
         </div>
 
@@ -256,7 +256,7 @@ export const useCharts = () => {
               <Legend />
               <Bar dataKey="achievements" fill="#E2C64B" />
             </BarChart>
-            <p className="text-center">You prefer to achievement hunt <span className="text-success">{getDayOfWeekTranslated(preferredDay.name)}</span></p>
+            <p className="text-center text-xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl">You prefer to achievement hunt <span className="text-success">{getDayOfWeekTranslated(preferredDay.name)}</span></p>
           </ResponsiveContainer>
         </div>
       </>
