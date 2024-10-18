@@ -48,6 +48,7 @@ export default function App() {
 
   const handleAuth = () => {
     setIsAuthenticated(true);
+    window.location.reload();
   };
 
   // Check for stored credentials on component mount

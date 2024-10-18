@@ -18,6 +18,7 @@ const AuthPage = ({ onLogin }) => {
     localStorage.setItem('steamId', steamId);
     localStorage.setItem('apiKey', apiKey);
     onLogin();
+    window.location.reload();
   };
 
   return (
