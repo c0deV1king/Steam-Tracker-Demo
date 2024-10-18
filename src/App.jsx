@@ -8,8 +8,10 @@ import GithubSVG from './img/github.svg?react';
 import SyncSVG from './img/arrow-repeat.svg?react';
 import InfoSVG from './img/info-square.svg?react';
 import { useCharts } from './hooks/useCharts.jsx';
+import { AuthPage } from './components/AuthPage.jsx';
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   // importing use states and functions to be used in the app
   const {
     profileData,
@@ -44,6 +46,9 @@ export default function App() {
 
   const { chartData, renderGenreChart, renderPlaytimeChart } = useCharts();
 
+  const handleAuth = () => {
+    setIsAuthenticated(true);
+  };
   //  console.log("App: allAchievements:", allAchievements);
   // console.log("App: gamesToDisplay:", gamesToDisplay);
 
@@ -130,6 +135,11 @@ export default function App() {
   useEffect(() => {
     console.log("Most played game:", mostPlayedGame);
   }, [mostPlayedGame]);
+
+  if (!isAuthenticated) {
+    return <AuthPage onLogin={handleAuth} />;
+  }
+
 
   return (
     <>
