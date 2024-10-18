@@ -300,21 +300,27 @@ export default function App() {
                       </tr>
                     </thead>
                     <tbody className="bg-primary bg-opacity-5">
-                      {recentAchievements.map((achievement) => (
-                        <tr key={`${achievement.appId}-${achievement.apiname}`}>
-                          <td className="w-1/6">
-                            <div className="w-12 h-12 overflow-hidden">
-                              {achievement.icon ? (
-                                <img src={achievement.icon} alt={achievement.displayName || achievement.name} className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Icon</div>
-                              )}
-                            </div>
-                          </td>
-                          <td className='w-1/3'>{achievement.displayName || achievement.name}</td>
-                          <td className='w-1/4'>{new Date(achievement.unlockTime * 1000).toLocaleString()}</td>
+                      {recentAchievements && recentAchievements.length > 0 ? (
+                        recentAchievements.map((achievement) => (
+                          <tr key={`${achievement.appId}-${achievement.apiname}`}>
+                            <td className="w-1/6">
+                              <div className="w-12 h-12 overflow-hidden">
+                                {achievement.icon ? (
+                                  <img src={achievement.icon} alt={achievement.displayName || achievement.name} className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Icon</div>
+                                )}
+                              </div>
+                            </td>
+                            <td className='w-1/3'>{achievement.displayName || achievement.name}</td>
+                            <td className='w-1/4'>{new Date(achievement.unlockTime * 1000).toLocaleString()}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="3" className="text-center">No recent achievements to display.</td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 </div>

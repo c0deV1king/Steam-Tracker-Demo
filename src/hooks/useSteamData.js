@@ -1,10 +1,12 @@
 import { useGamesData } from './useGamesData'
 import { useProfileData } from './useProfileData'
-
+import { fetchAchievementsForGames } from '../utils/fetchAchievementsForGames'
+import { useEffect, useState } from 'react';
 // Grabbing my stored api key from .env NOTE: vite requires "VITE_" in front of variables stored in .env
-const API_KEY = import.meta.env.VITE_STEAM_API_KEY;
 
 // NOTES FOR MYSELF
+
+// After doing the auth, I realise that I need to have a specific hook for all api calls to easily manage the keys and steam ids.
 
 // bio/app showcase: have a popup when the user first opens the app and authenticates and has a showcase video of the app, along with a bio about me.
 
@@ -27,10 +29,30 @@ const API_KEY = import.meta.env.VITE_STEAM_API_KEY;
 
 export const useSteamData = () => {
 
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [apiKey, setApiKey] = useState(null);
+  const [steamId, setSteamId] = useState(null);
+
+  useEffect(() => {
+    const storedApiKey = localStorage.getItem('apiKey');
+    const storedSteamId = localStorage.getItem('steamId');
+    
+    if (storedApiKey && storedSteamId) {
+      setApiKey(storedApiKey);
+      setSteamId(storedSteamId);
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, []);
   // transferring code to be used in App.jsx
   const {
     profileData
-  } = useProfileData(API_KEY) || {};
+  } = useProfileData(apiKey, steamId, isAuthenticated)
+
+  const {
+    gamesWithAchievements
+  } = fetchAchievementsForGames(apiKey, steamId, isAuthenticated)
 
   const { 
     games,
@@ -48,9 +70,11 @@ export const useSteamData = () => {
     isSyncing,
     isFullySynced,
     syncAllData,
-    recentAchievements,
-    mostPlayedGame
-  } = useGamesData(API_KEY) || {};
+    recentAchievements = [],
+    mostPlayedGame,
+    allGamesList
+
+  } = useGamesData(apiKey, steamId, isAuthenticated) || {};
 
   return {
     games,
@@ -70,6 +94,11 @@ export const useSteamData = () => {
     isFullySynced,
     syncAllData,
     recentAchievements,
-    mostPlayedGame
+    mostPlayedGame,
+    isAuthenticated,
+    apiKey,
+    steamId,
+    gamesWithAchievements,
+    allGamesList
   }; // returning the arrays and functions to be used in App.jsx
 };
