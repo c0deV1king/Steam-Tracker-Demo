@@ -49,6 +49,16 @@ export default function App() {
   const handleAuth = () => {
     setIsAuthenticated(true);
   };
+
+  // Check for stored credentials on component mount
+  useEffect(() => {
+    const storedSteamId = localStorage.getItem('steamId');
+    const storedApiKey = localStorage.getItem('apiKey');
+    if (storedSteamId && storedApiKey) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   //  console.log("App: allAchievements:", allAchievements);
   // console.log("App: gamesToDisplay:", gamesToDisplay);
 

@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const AuthPage = ({ onLogin }) => {
   const [steamId, setSteamId] = useState('');
   const [apiKey, setApiKey] = useState('');
 
+  useEffect(() => {
+    // Load saved credentials from localStorage on component mount
+    const savedSteamId = localStorage.getItem('steamId');
+    const savedApiKey = localStorage.getItem('apiKey');
+    if (savedSteamId) setSteamId(savedSteamId);
+    if (savedApiKey) setApiKey(savedApiKey);
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     // Here you would typically validate the credentials
+    localStorage.setItem('steamId', steamId);
+    localStorage.setItem('apiKey', apiKey);
     onLogin();
   };
 
