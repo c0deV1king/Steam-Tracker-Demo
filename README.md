@@ -14,11 +14,11 @@ Techstack so far: <img src="https://upload.wikimedia.org/wikipedia/commons/thumb
 - An achievements tab to show all your achievements, including a search bar
   (Requires a full sync to show all your achievements, otherwise it just shows whats available in the games tab)
 - A full sync button to sync all your games and achievements<br>
+- A stats tab that takes your information and displays cool stats based on it<br>
+- Steam authentication
 
 ## 📖 Planned features:
-- A stats tab that takes your information and displays cool stats based on it (Tab exists but its empty)
 - A "play next" feature that suggests what achievements and games to play next
-- Steam authentication so users can actually use the app and get their data <br>
 
 ## 🚀 Future endeavours:
 - A leaderboard using a site exlusive points system <br>
