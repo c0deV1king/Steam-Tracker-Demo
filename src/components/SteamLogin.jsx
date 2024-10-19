@@ -9,7 +9,7 @@ const SteamLogin = ({ onSteamIdReceived }) => {
     const isProduction = import.meta.env.PROD;
     const returnUrl = isProduction
       ? 'https://c0dev1king.github.io/Steam-Tracker-Demo/auth/steam/return'
-      : `http://localhost:5173${baseUrl}auth/steam/return`;
+      : `${window.location.origin}${baseUrl}auth/steam/return`;
     
     const params = new URLSearchParams({
       'openid.ns': 'http://specs.openid.net/auth/2.0',

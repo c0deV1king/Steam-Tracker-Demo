@@ -6,11 +6,4 @@ import svgr from 'vite-plugin-svgr'
 export default defineConfig({
   plugins: [react(), svgr()],
   base: '/Steam-Tracker-Demo/',
-  server: {
-    historyApiFallback: {
-      rewrites: [
-        { from: /^\/auth\/steam\/return/, to: '/index.html' }
-      ]
-    }
-  }
 })
