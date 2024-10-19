@@ -79,7 +79,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                 // console.log("No cached games found, fetching recent games");
 
                 try {
-                    const res = await delayedFetch(`http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${apiKey}&steamid=${steamId}&format=json`);
+                    const res = await delayedFetch(`https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${apiKey}&steamid=${steamId}&format=json`);
                     const data = await res.json();
                     //console.log("Recent games API response:", data);
                     const recentGamesData = data.response.games || [];
@@ -185,7 +185,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                     }
                 } else {
                     // Fetch games from API
-                    const res = await delayedFetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${apiKey}&steamid=${steamId}&format=json&include_played_free_games=1`);
+                    const res = await delayedFetch(`https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${apiKey}&steamid=${steamId}&format=json&include_played_free_games=1`);
                     const data = await res.json();
                     allGamesList = data.response.games || [];
                     setGames(allGamesList);
@@ -491,7 +491,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
 
             try {
                 // Fetch all owned games
-                const res = await delayedFetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${apiKey}&steamid=${steamId}&format=json&include_played_free_games=1`);
+                const res = await delayedFetch(`https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${apiKey}&steamid=${steamId}&format=json&include_played_free_games=1`);
                 const data = await res.json();
                 const allGames = data.response.games || [];
 

@@ -10,7 +10,7 @@ export const useProfileData = (apiKey, steamId, isAuthenticated) => {
         if (isAuthenticated && apiKey && steamId) {
             const fetchProfileData = async () => {
                 try {
-                    const res = await delayedFetch(`http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${apiKey}&steamids=${steamId}`);
+                    const res = await delayedFetch(`https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${apiKey}&steamids=${steamId}`);
                     const data = await res.json();
                     setProfileData(data.response.players[0]);
                     console.log("Profile data:", data.response.players[0]);
