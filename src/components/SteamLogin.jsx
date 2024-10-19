@@ -3,8 +3,13 @@ import React, { useEffect } from 'react';
 const SteamLogin = ({ onSteamIdReceived }) => {
   const handleSteamLogin = () => {
     const steamOpenIdUrl = 'https://steamcommunity.com/openid/login';
-    const baseUrl = import.meta.env.BASE_URL || '/'; // Use Vite's base URL if available
-    const returnUrl = `${window.location.origin}${baseUrl}auth/steam/return`;
+    const baseUrl = import.meta.env.BASE_URL || '/';
+    
+    // Determine the return URL based on the environment
+    const isProduction = import.meta.env.PROD;
+    const returnUrl = isProduction
+      ? 'https://c0dev1king.github.io/Steam-Tracker-Demo/auth/steam/return'
+      : `http://localhost:5173${baseUrl}auth/steam/return`;
     
     const params = new URLSearchParams({
       'openid.ns': 'http://specs.openid.net/auth/2.0',
