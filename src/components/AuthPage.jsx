@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import SteamLogin from './SteamLogin';
 
 const AuthPage = ({ onLogin }) => {
   const [steamId, setSteamId] = useState('');
@@ -19,6 +20,10 @@ const AuthPage = ({ onLogin }) => {
     localStorage.setItem('apiKey', apiKey);
     onLogin();
     window.location.reload();
+  };
+
+  const handleSteamIdReceived = (receivedSteamId) => {
+    setSteamId(receivedSteamId);
   };
 
   return (
@@ -48,10 +53,14 @@ const AuthPage = ({ onLogin }) => {
               required
             />
           </div>
-          <button type="submit" className="w-full btn btn-primary">
+          <button type="submit" className="w-full btn btn-primary mb-4">
             Authenticate
           </button>
         </form>
+        <div className="text-center">
+          <p className="mb-2">Or</p>
+          <SteamLogin onSteamIdReceived={handleSteamIdReceived} />
+        </div>
       </div>
     </div>
   );

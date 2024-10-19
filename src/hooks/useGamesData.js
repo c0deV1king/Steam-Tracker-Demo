@@ -53,7 +53,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                 const now = new Date().getTime();
                 //console.log("Recent games cache checked")
 
-                if (cachedOverviewGames && cacheTimestampOverviewGames && now - parseInt(cacheTimestampOverviewGames) < 24 * 60 * 60 * 1000) {
+                if (cachedOverviewGames && cacheTimestampOverviewGames && now - parseInt(cacheTimestampOverviewGames) < 12 * 60 * 60 * 1000) {
                     // console.log("Loading recent games from cache");
                     const parsedOverviewGames = JSON.parse(cachedOverviewGames);
                     setOverviewGames(parsedOverviewGames.games);
@@ -79,14 +79,14 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                 // console.log("No cached games found, fetching recent games");
 
                 try {
-                    const res = await fetch(`http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${apiKey}&steamid=${steamId}&format=json`);
+                    const res = await delayedFetch(`http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${apiKey}&steamid=${steamId}&format=json`);
                     const data = await res.json();
                     //console.log("Recent games API response:", data);
                     const recentGamesData = data.response.games || [];
                     //console.log("Recent games data:", recentGamesData);
 
                     const gamesWithDetails = await Promise.all(recentGamesData.map(async (game) => {
-                        const detailsRes = await fetch(`https://store.steampowered.com/api/appdetails?appids=${game.appid}`);
+                        const detailsRes = await delayedFetch(`https://store.steampowered.com/api/appdetails?appids=${game.appid}`);
                         const detailsData = await detailsRes.json();
                         const gameDetails = detailsData[game.appid].data;
                         return {
@@ -173,7 +173,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                 let allGamesList = [];
                 let gamePicturesObj = {};
 
-                if (cachedGames && cacheTimestamp && now - parseInt(cacheTimestamp) < 24 * 60 * 60 * 1000) {
+                if (cachedGames && cacheTimestamp && now - parseInt(cacheTimestamp) < 12 * 60 * 60 * 1000) {
                     allGamesList = JSON.parse(cachedGames);
                     setGames(allGamesList);
                     //  console.log("Loaded games from cache");
@@ -185,7 +185,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                     }
                 } else {
                     // Fetch games from API
-                    const res = await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${apiKey}&steamid=${steamId}&format=json&include_played_free_games=1`);
+                    const res = await delayedFetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${apiKey}&steamid=${steamId}&format=json&include_played_free_games=1`);
                     const data = await res.json();
                     allGamesList = data.response.games || [];
                     setGames(allGamesList);
@@ -241,7 +241,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                 const cachedAchievementsString = localStorage.getItem('cachedGamesAchievements');
                 const cacheTimestampAchievements = localStorage.getItem('cacheTimestampGamesAchievements');
 
-                if (cachedAchievementsString && cacheTimestampAchievements && now - parseInt(cacheTimestampAchievements) < 24 * 60 * 60 * 1000) {
+                if (cachedAchievementsString && cacheTimestampAchievements && now - parseInt(cacheTimestampAchievements) < 12 * 60 * 60 * 1000) {
                     const localStorageAchievements = JSON.parse(cachedAchievementsString);
                     // console.log("Loaded achievements from localStorage cache:", localStorageAchievements);
 
@@ -293,7 +293,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
         const now = new Date().getTime();
 
         const gamesNeedingDetails = games.filter(game =>
-            !cachedDetails[game.appid] || now - cachedDetails[game.appid].timestamp >= 24 * 60 * 60 * 1000
+            !cachedDetails[game.appid] || now - cachedDetails[game.appid].timestamp >= 12 * 60 * 60 * 1000
         );
 
         if (gamesNeedingDetails.length === 0) {
