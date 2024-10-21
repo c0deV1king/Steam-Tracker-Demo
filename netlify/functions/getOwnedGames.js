@@ -16,7 +16,7 @@ export async function handler(event, context) {
     } catch (error) {
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: `Failed to fetch owned games for steamid: ${steamId}` })
+        body: JSON.stringify({ error: `Failed to fetch owned games for steamid: ${steamid}` })
       };
     }
   };

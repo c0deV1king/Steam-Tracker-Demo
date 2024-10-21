@@ -4,7 +4,7 @@ import { delayedFetch } from '../utils/rateLimitingAPI';
 import { storeData, getAllData } from '../utils/indexedDB';
 
 
-export const useGamesData = (apiKey, steamId, isAuthenticated) => {
+export const useGamesData = (steamId, isAuthenticated) => {
 
     // states to store data
     const [games, setGames] = useState([]);
@@ -25,7 +25,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
 
     // load cached achievements on initial render
     useEffect(() => {
-        if (isAuthenticated && apiKey && steamId) {
+        if (isAuthenticated && steamId) {
             const loadCachedAchievements = async () => {
                 const cachedAchievements = await getAllData('achievements');
                 if (cachedAchievements.length > 0) {
@@ -40,11 +40,11 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
 
             loadCachedAchievements();
         }
-    }, [isAuthenticated, apiKey, steamId]);
+    }, [isAuthenticated, steamId]);
 
     // Fetch recent games as well as some screenshot data based on the recent games
     useEffect(() => {
-        if (isAuthenticated && apiKey && steamId) {
+        if (isAuthenticated && steamId) {
             const fetchOverviewGames = async () => {
                 //console.log("Fetching overview games");
 
@@ -79,7 +79,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                 // console.log("No cached games found, fetching recent games");
 
                 try {
-                    const res = await delayedFetch(`/.netlify/functions/getRecentGames/?key=${apiKey}&steamid=${steamId}`);
+                    const res = await delayedFetch(`/.netlify/functions/getRecentGames/?steamid=${steamId}`);
                     const data = await res.json();
                     //console.log("Recent games API response:", data);
                     const recentGamesData = data.response.games || [];
@@ -98,7 +98,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                     }));
 
                     //console.log("Games with details:", gamesWithDetails);
-                    const gamesWithAchievements = await fetchAchievementsForGames(gamesWithDetails, 'cachedOverviewAchievements', apiKey, steamId, isAuthenticated);
+                    const gamesWithAchievements = await fetchAchievementsForGames(gamesWithDetails, 'cachedOverviewAchievements', steamId, isAuthenticated);
                     //console.log("Games with achievements:", gamesWithAchievements);
 
                     let mostRecentGameData = null;
@@ -143,13 +143,12 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
             };
             fetchOverviewGames();
         }
-    }, [isAuthenticated, apiKey, steamId]);
+    }, [isAuthenticated, steamId]);
 
     // just a api test to see what data gets returned. Using for new endpoints if needed.
     const testSchema = useCallback(async () => {
         // console.log("testSchema called")
         try {
-            // const res = await fetch(`https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=${API_KEY}&appid=230410`);
             const res = await fetch(`/.netlify/functions/getSchemaForGame/?appid=440`);
             const data = await res.json();
             //  console.log("testSchema data:", data);
@@ -160,7 +159,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
 
     //fetches all the owned games from the steam user as well as some additional data (playtime, ect)
     useEffect(() => {
-        if (isAuthenticated && apiKey && steamId) {
+        if (isAuthenticated && steamId) {
             //  console.log("useEffect triggered for fetching games");
             const fetchGames = async () => {
                 // console.log("Fetching games");
@@ -185,7 +184,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                     }
                 } else {
                     // Fetch games from API
-                    const res = await delayedFetch(`/.netlify/functions/getOwnedGames/?key=${apiKey}&steamid=${steamId}`);
+                    const res = await delayedFetch(`/.netlify/functions/getOwnedGames/?steamid=${steamId}`);
                     const data = await res.json();
                     allGamesList = data.response.games || [];
                     setGames(allGamesList);
@@ -258,7 +257,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                     setGamesToDisplay(gamesWithCachedAchievements);
                 } else {
                     // Fetch new achievements if localStorage cache is outdated or doesn't exist
-                    const gamesWithAchievements = await fetchAchievementsForGames(gamesWithDetails, 'cachedGamesAchievements', apiKey, steamId, isAuthenticated);
+                    const gamesWithAchievements = await fetchAchievementsForGames(gamesWithDetails, 'cachedGamesAchievements', steamId, isAuthenticated);
                     achievementsObj = gamesWithAchievements.reduce((acc, game) => {
                         if (game.achievements) {
                             acc[game.appid] = game.achievements;
@@ -284,7 +283,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
 
             fetchGames();
         }
-    }, [isAuthenticated, apiKey, steamId]);
+    }, [isAuthenticated, steamId]);
 
     // gets the games name and images
     const getGamesWithDetails = async (games) => {
@@ -305,7 +304,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
         }
 
         const newDetails = [];
-        if (isAuthenticated && apiKey && steamId) {
+        if (isAuthenticated && steamId) {
             for (const game of gamesNeedingDetails) {
                 try {
                     const detailsRes = await delayedFetch(`/.netlify/functions/getAppDetails/?appid=${game.appid}`);
@@ -355,7 +354,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
     };
 
     useEffect(() => {
-        if (isAuthenticated && apiKey && steamId) {
+        if (isAuthenticated && steamId) {
             const updateMostPlayedGame = async () => {
                 if (games.length > 0) {
                     const highestPlayedGame = games.reduce((max, game) =>
@@ -375,7 +374,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
 
             updateMostPlayedGame();
         }
-    }, [isAuthenticated, apiKey, steamId, games]);
+    }, [isAuthenticated, steamId, games]);
 
 
     // const getOverviewGamesWithDetails = async (games) => {
@@ -406,7 +405,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
 
     // function for the handle load more button
     const handleLoadMore = useCallback(async () => {
-        if (isAuthenticated && apiKey && steamId) {
+        if (isAuthenticated && steamId) {
             // console.log('handleLoadMore called', new Date().toISOString());
 
             const currentLength = gamesToDisplay.length;
@@ -435,7 +434,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
             // Only fetch achievements for games that don't have cached achievements
             const gamesNeedingAchievements = gamesWithAchievements.filter(game => !game.achievements);
             if (gamesNeedingAchievements.length > 0) {
-                const newAchievements = await fetchAchievementsForGames(gamesNeedingAchievements, 'cachedGamesAchievements', apiKey, steamId, isAuthenticated);
+                const newAchievements = await fetchAchievementsForGames(gamesNeedingAchievements, 'cachedGamesAchievements', steamId, isAuthenticated);
                 newAchievements.forEach(game => {
                     const index = gamesWithAchievements.findIndex(g => g.appid === game.appid);
                     if (index !== -1) {
@@ -466,32 +465,32 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                 return updatedPictures;
             });
         }
-    }, [isAuthenticated, apiKey, steamId, games, gamesToDisplay, getGamesWithDetails, fetchAchievementsForGames]);
+    }, [isAuthenticated, steamId, games, gamesToDisplay, getGamesWithDetails, fetchAchievementsForGames]);
 
     // Update achievements for recent games
     useEffect(() => {
-        if (isAuthenticated && apiKey && steamId) {
+        if (isAuthenticated && steamId) {
             const updateRecentGamesAchievements = async () => {
                 if (recentGames.length > 0) {
                     const recentGamesWithDetails = await getGamesWithDetails(recentGames);
-                    await fetchAchievementsForGames(recentGamesWithDetails, 'cachedGamesAchievements', apiKey, steamId, isAuthenticated);
+                    await fetchAchievementsForGames(recentGamesWithDetails, 'cachedGamesAchievements', steamId, isAuthenticated);
                     setRecentGames([...recentGamesWithDetails]);
                 }
             };
             updateRecentGamesAchievements();
         }
-    }, [isAuthenticated, apiKey, steamId, recentGames, getGamesWithDetails, fetchAchievementsForGames]);
+    }, [isAuthenticated, steamId, recentGames, getGamesWithDetails, fetchAchievementsForGames]);
 
     // function for syncing all data
     const syncAllData = useCallback(async () => {
-        if (isAuthenticated && apiKey && steamId) {
+        if (isAuthenticated && steamId) {
             //  console.log("syncAllData function called");
             setIsSyncing(true);
             setIsFullySynced(false);
 
             try {
                 // Fetch all owned games
-                const res = await delayedFetch(`/.netlify/functions/getOwnedGames/?key=${apiKey}&steamid=${steamId}`);
+                const res = await delayedFetch(`/.netlify/functions/getOwnedGames/?steamid=${steamId}`);
                 const data = await res.json();
                 const allGames = data.response.games || [];
 
@@ -499,7 +498,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                 const gamesWithDetails = await getGamesWithDetails(allGames);
 
                 // Fetch achievements for all games
-                const gamesWithAchievements = await fetchAchievementsForGames(gamesWithDetails, 'cachedGamesAchievements', apiKey, steamId, isAuthenticated);
+                const gamesWithAchievements = await fetchAchievementsForGames(gamesWithDetails, 'cachedGamesAchievements', steamId, isAuthenticated);
 
                 // Update state
                 setGames(gamesWithAchievements);
@@ -542,11 +541,11 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                 setIsSyncing(false);
             }
         }
-    }, [isAuthenticated, apiKey, steamId, getGamesWithDetails, fetchAchievementsForGames, gamesToDisplay]);
+    }, [isAuthenticated, steamId, getGamesWithDetails, fetchAchievementsForGames, gamesToDisplay]);
 
     // getting recent achievements to be used on the overview tab (by date achieved)
     const getRecentAchievements = useCallback(() => {
-        if (isAuthenticated && apiKey && steamId) {
+        if (isAuthenticated && steamId) {
             const allAchievementsList = [];
             Object.entries(allAchievements).forEach(([appId, achievements]) => {
                 if (Array.isArray(achievements)) {
@@ -565,7 +564,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
             const sortedAchievements = allAchievementsList.sort((a, b) => b.unlockTime - a.unlockTime);
             return sortedAchievements.slice(0, 10); // Return top 10 recent achievements
         }
-    }, [isAuthenticated, apiKey, steamId, allAchievements, games]);
+    }, [isAuthenticated, steamId, allAchievements, games]);
 
     // recentAchievements when allAchievements changes
     useEffect(() => {
@@ -592,7 +591,6 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
         recentAchievements,
         mostPlayedGame,
         isAuthenticated,
-        apiKey,
         steamId
     };
 };

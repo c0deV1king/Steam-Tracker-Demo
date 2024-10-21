@@ -30,15 +30,12 @@ import { useEffect, useState } from 'react';
 export const useSteamData = () => {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [apiKey, setApiKey] = useState(null);
   const [steamId, setSteamId] = useState(null);
 
   useEffect(() => {
-    const storedApiKey = localStorage.getItem('apiKey');
     const storedSteamId = localStorage.getItem('steamId');
     
-    if (storedApiKey && storedSteamId) {
-      setApiKey(storedApiKey);
+    if (storedSteamId) {
       setSteamId(storedSteamId);
       setIsAuthenticated(true);
     } else {
@@ -48,11 +45,11 @@ export const useSteamData = () => {
   // transferring code to be used in App.jsx
   const {
     profileData
-  } = useProfileData(apiKey, steamId, isAuthenticated)
+  } = useProfileData(steamId, isAuthenticated)
 
   const {
     gamesWithAchievements
-  } = fetchAchievementsForGames(apiKey, steamId, isAuthenticated)
+  } = fetchAchievementsForGames(steamId, isAuthenticated)
 
   const { 
     games,
@@ -74,7 +71,7 @@ export const useSteamData = () => {
     mostPlayedGame,
     allGamesList
 
-  } = useGamesData(apiKey, steamId, isAuthenticated) || {};
+  } = useGamesData(steamId, isAuthenticated) || {};
 
   return {
     games,
@@ -96,7 +93,6 @@ export const useSteamData = () => {
     recentAchievements,
     mostPlayedGame,
     isAuthenticated,
-    apiKey,
     steamId,
     gamesWithAchievements,
     allGamesList

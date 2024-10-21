@@ -2,22 +2,22 @@ import { useState, useEffect } from "react";
 import { delayedFetch } from "../utils/rateLimitingAPI";
 
 
-export const useProfileData = (apiKey, steamId, isAuthenticated) => {
+export const useProfileData = (steamId, isAuthenticated) => {
 
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        if (isAuthenticated && apiKey && steamId) {
+        if (isAuthenticated && steamId) {
             const fetchProfileData = async () => {
-                if (!apiKey || !steamId) {
+                if (!steamId) {
                     setLoading(false);
                     return;
                 }
 
                 try {
-                    const response = await fetch(`/.netlify/functions/getPlayerSummary/?key=${apiKey}&steamids=${steamId}`);
+                    const response = await fetch(`/.netlify/functions/getPlayerSummary/?steamid=${steamId}`);
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
@@ -38,14 +38,13 @@ export const useProfileData = (apiKey, steamId, isAuthenticated) => {
             };
             fetchProfileData();
         }
-    }, [isAuthenticated, apiKey, steamId]);
+    }, [isAuthenticated, steamId]);
 
     return {
         profileData,
         loading,
         error,
         isAuthenticated,
-        apiKey,
         steamId
     };
 }

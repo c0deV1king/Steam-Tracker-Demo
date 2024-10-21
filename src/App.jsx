@@ -54,8 +54,7 @@ export default function App() {
   // Check for stored credentials on component mount
   useEffect(() => {
     const storedSteamId = localStorage.getItem('steamId');
-    const storedApiKey = localStorage.getItem('apiKey');
-    if (storedSteamId && storedApiKey) {
+    if (storedSteamId) {
       setIsAuthenticated(true);
     }
   }, []);

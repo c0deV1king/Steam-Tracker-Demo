@@ -2,8 +2,8 @@ import { delayedFetch } from './rateLimitingAPI';
 import { storeData, getData } from './indexedDB';
 
 
-export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAchievements', apiKey, steamId, isAuthenticated) => {
-    if (isAuthenticated && apiKey && steamId) {
+export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAchievements', steamId, isAuthenticated) => {
+    if (isAuthenticated && steamId) {
         try {
             // console.log(`Fetching achievements for games (${cacheKey}):`, games);
 
@@ -13,8 +13,8 @@ export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAc
                     const cachedAchievements = await getData('achievements', game.appid);
 
                     const [earnedRes, infoRes] = await Promise.all([
-                        delayedFetch(`/.netlify/functions/getPlayerAchievements/?appid=${game.appid}&key=${apiKey}&steamid=${steamId}`),
-                        delayedFetch(`/.netlify/functions/getSchemaForGame/?appid=${game.appid}&key=${apiKey}`)
+                        delayedFetch(`/.netlify/functions/getPlayerAchievements/?appid=${game.appid}&steamid=${steamId}`),
+                        delayedFetch(`/.netlify/functions/getSchemaForGame/?appid=${game.appid}`)
                     ]);
 
                     const earnedData = await earnedRes.json();

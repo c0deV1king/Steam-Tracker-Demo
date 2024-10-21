@@ -3,7 +3,6 @@ import SteamLogin from './SteamLogin';
 
 const AuthPage = ({ onLogin }) => {
   const [steamId, setSteamId] = useState('');
-  const [apiKey, setApiKey] = useState('');
 
   // NETLIFY SERVERLESS FUNCTION TESTING
   const [mockUser, setMockUser] = useState(null);
@@ -11,9 +10,7 @@ const AuthPage = ({ onLogin }) => {
   useEffect(() => {
     // Load saved credentials from localStorage on component mount
     const savedSteamId = localStorage.getItem('steamId');
-    const savedApiKey = localStorage.getItem('apiKey');
     if (savedSteamId) setSteamId(savedSteamId);
-    if (savedApiKey) setApiKey(savedApiKey);
 
     // NETLIFY SERVERLESS FUNCTION TESTING
     fetchMockUser();
@@ -37,7 +34,6 @@ const AuthPage = ({ onLogin }) => {
     e.preventDefault();
     // Here you would typically validate the credentials
     localStorage.setItem('steamId', steamId);
-    localStorage.setItem('apiKey', apiKey);
     onLogin();
     window.location.reload();
   };
@@ -58,17 +54,6 @@ const AuthPage = ({ onLogin }) => {
               id="steamId"
               value={steamId}
               onChange={(e) => setSteamId(e.target.value)}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label htmlFor="apiKey" className="block mb-2">API Key</label>
-            <input
-              type="text"
-              id="apiKey"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
               className="w-full p-2 border rounded"
               required
             />
