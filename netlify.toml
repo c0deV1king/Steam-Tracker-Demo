@@ -17,3 +17,13 @@
      for = "/*.css"
        [headers.values]
        Content-Type = "text/css"
+
+   [[headers]]
+     for = "/Steam-Tracker-Demo/assets/*.js"
+       [headers.values]
+       Content-Type = "application/javascript"
+
+   [[headers]]
+     for = "/Steam-Tracker-Demo/assets/*.css"
+       [headers.values]
+       Content-Type = "text/css"

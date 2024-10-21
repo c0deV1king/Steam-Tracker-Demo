@@ -7,5 +7,6 @@ export default defineConfig({
   base: '/Steam-Tracker-Demo/',
   build: {
     outDir: 'dist',
+    assetsDir: 'assets',
   },
 })
