@@ -8,7 +8,7 @@ const SteamLogin = ({ onSteamIdReceived }) => {
     // Determine the return URL based on the environment
     const isProduction = import.meta.env.PROD;
     const returnUrl = isProduction
-      ? 'https://c0dev1king.github.io/Steam-Tracker-Demo/auth/steam/return'
+      ? 'https://steam-tracker.netlify.app/auth/steam/return'
       : `${window.location.origin}${baseUrl}auth/steam/return`;
     
     const params = new URLSearchParams({
