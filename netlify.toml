@@ -1,29 +1,31 @@
-   [build]
-     command = "npm run build"
-     publish = "dist"
-     functions = "netlify/functions"
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
 
-   [[redirects]]
-     from = "/*"
-     to = "/index.html"
-     status = 200
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
-   [[headers]]
-     for = "/*.js"
-       [headers.values]
-       Content-Type = "application/javascript"
+[[headers]]
+  for = "/*"
+    [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Origin, X-Requested-With, Content-Type, Accept"
 
-   [[headers]]
-     for = "/*.css"
-       [headers.values]
-       Content-Type = "text/css"
+[[headers]]
+  for = "/Steam-Tracker-Demo/*"
+    [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
 
-   [[headers]]
-     for = "/Steam-Tracker-Demo/assets/*.js"
-       [headers.values]
-       Content-Type = "application/javascript"
+[[headers]]
+  for = "/Steam-Tracker-Demo/*.js"
+    [headers.values]
+    Content-Type = "application/javascript"
 
-   [[headers]]
-     for = "/Steam-Tracker-Demo/assets/*.css"
-       [headers.values]
-       Content-Type = "text/css"
+[[headers]]
+  for = "/Steam-Tracker-Demo/*.css"
+    [headers.values]
+    Content-Type = "text/css"

@@ -4,7 +4,7 @@ import svgr from 'vite-plugin-svgr'
 
 export default defineConfig({
   plugins: [react(), svgr()],
-  base: '/Steam-Tracker-Demo/',
+  base: './',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
