@@ -13,8 +13,8 @@ export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAc
                     const cachedAchievements = await getData('achievements', game.appid);
 
                     const [earnedRes, infoRes] = await Promise.all([
-                        delayedFetch(`https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${game.appid}&key=${apiKey}&steamid=${steamId}`),
-                        delayedFetch(`https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v0002/?appid=${game.appid}&key=${apiKey}`)
+                        delayedFetch(`/.netlify/functions/getPlayerAchievements/?appid=${game.appid}&key=${apiKey}&steamid=${steamId}`),
+                        delayedFetch(`/.netlify/functions/getSchemaForGame/?appid=${game.appid}&key=${apiKey}`)
                     ]);
 
                     const earnedData = await earnedRes.json();

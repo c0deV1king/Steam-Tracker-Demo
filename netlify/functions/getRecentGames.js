@@ -1,12 +1,12 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
-exports.handler = async function(event, context) {
+export async function handler(event, context) {
     // Function logic here
     const steamApiKey = process.env.STEAM_API_KEY;
-    const steamId = event.queryStringParameters.steamId;
+    const steamid = event.queryStringParameters.steamid;
   
     try {
-      const response = await fetch(`https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${steamApiKey}&steamid=${steamId}&format=json`);
+      const response = await fetch(`https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${steamApiKey}&steamid=${steamid}&format=json`);
       const data = await response.json();
   
       return {

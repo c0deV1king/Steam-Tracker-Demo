@@ -79,14 +79,14 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                 // console.log("No cached games found, fetching recent games");
 
                 try {
-                    const res = await delayedFetch(`https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${apiKey}&steamid=${steamId}&format=json`);
+                    const res = await delayedFetch(`/.netlify/functions/getRecentGames/?key=${apiKey}&steamid=${steamId}`);
                     const data = await res.json();
                     //console.log("Recent games API response:", data);
                     const recentGamesData = data.response.games || [];
                     //console.log("Recent games data:", recentGamesData);
 
                     const gamesWithDetails = await Promise.all(recentGamesData.map(async (game) => {
-                        const detailsRes = await delayedFetch(`https://store.steampowered.com/api/appdetails?appids=${game.appid}`);
+                        const detailsRes = await delayedFetch(`/.netlify/functions/getAppDetails/?appid=${game.appid}`);
                         const detailsData = await detailsRes.json();
                         const gameDetails = detailsData[game.appid].data;
                         return {
@@ -150,7 +150,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
         // console.log("testSchema called")
         try {
             // const res = await fetch(`https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=${API_KEY}&appid=230410`);
-            const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=440`);
+            const res = await fetch(`/.netlify/functions/getSchemaForGame/?appid=440`);
             const data = await res.json();
             //  console.log("testSchema data:", data);
         } catch (error) {
@@ -185,7 +185,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
                     }
                 } else {
                     // Fetch games from API
-                    const res = await delayedFetch(`https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${apiKey}&steamid=${steamId}&format=json&include_played_free_games=1`);
+                    const res = await delayedFetch(`/.netlify/functions/getOwnedGames/?key=${apiKey}&steamid=${steamId}`);
                     const data = await res.json();
                     allGamesList = data.response.games || [];
                     setGames(allGamesList);
@@ -308,7 +308,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
         if (isAuthenticated && apiKey && steamId) {
             for (const game of gamesNeedingDetails) {
                 try {
-                    const detailsRes = await delayedFetch(`https://store.steampowered.com/api/appdetails?appids=${game.appid}`);
+                    const detailsRes = await delayedFetch(`/.netlify/functions/getAppDetails/?appid=${game.appid}`);
                     // console.log(`Details requested for game ${game.appid}`);
                     const detailsData = await detailsRes.json();
 
@@ -491,7 +491,7 @@ export const useGamesData = (apiKey, steamId, isAuthenticated) => {
 
             try {
                 // Fetch all owned games
-                const res = await delayedFetch(`https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${apiKey}&steamid=${steamId}&format=json&include_played_free_games=1`);
+                const res = await delayedFetch(`/.netlify/functions/getOwnedGames/?key=${apiKey}&steamid=${steamId}`);
                 const data = await res.json();
                 const allGames = data.response.games || [];
 

@@ -1,13 +1,13 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
-exports.handler = async function(event, context) {
+export async function handler(event, context) {
     // Function logic here
     const steamApiKey = process.env.STEAM_API_KEY;
-    const steamId = event.queryStringParameters.steamId;
+    const steamid = event.queryStringParameters.steamid;
     const appid = event.queryStringParameters.appid;
   
     try {
-      const response = await fetch(`https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${appid}&key=${steamApiKey}&steamid=${steamId}`);
+      const response = await fetch(`https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${appid}&key=${steamApiKey}&steamid=${steamid}`);
       const data = await response.json();
   
       return {
