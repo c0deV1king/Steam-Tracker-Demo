@@ -29,3 +29,9 @@
   for = "/Steam-Tracker-Demo/*.css"
     [headers.values]
     Content-Type = "text/css"
+
+[functions]
+  node_bundler = "esbuild"
+
+[build.environment]
+  NODE_VERSION = "18"

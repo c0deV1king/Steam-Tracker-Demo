@@ -1,5 +1,4 @@
-import fetch from 'node-fetch';
-import querystring from 'querystring';
+const fetch = require('node-fetch');
 
 export async function handler(event, context) {
   const params = new URLSearchParams(event.queryStringParameters);
