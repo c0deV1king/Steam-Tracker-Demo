@@ -13,20 +13,19 @@
     "deploy": "gh-pages -d dist -b gh-pages"
   },
   "dependencies": {
-    "gh-pages": "^6.1.1",
     "node-fetch": "^3.3.2",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "recharts": "^2.13.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.8.0",
+    "@eslint/js": "^8.38.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
     "daisyui": "^4.12.10",
-    "eslint": "^9.8.0",
+    "eslint": "^8.38.0",
     "eslint-plugin-react": "^7.35.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
