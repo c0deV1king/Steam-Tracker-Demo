@@ -1,39 +1,23 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 const SteamLogin = ({ onSteamIdReceived }) => {
   const handleSteamLogin = () => {
-    const steamOpenIdUrl = 'https://steamcommunity.com/openid/login';
-    const baseUrl = import.meta.env.BASE_URL || '/';
-    
-    // Determine the return URL based on the environment
-    const isProduction = import.meta.env.PROD;
-    const returnUrl = isProduction
-      ? 'https://steam-tracker.netlify.app/auth/steam/return'
-      : `${window.location.origin}${baseUrl}auth/steam/return`;
-    
-    const params = new URLSearchParams({
-      'openid.ns': 'http://specs.openid.net/auth/2.0',
-      'openid.mode': 'checkid_setup',
-      'openid.return_to': returnUrl,
-      'openid.realm': window.location.origin,
-      'openid.identity': 'http://specs.openid.net/auth/2.0/identifier_select',
-      'openid.claimed_id': 'http://specs.openid.net/auth/2.0/identifier_select',
-    });
-
-    window.location.href = `${steamOpenIdUrl}?${params.toString()}`;
+    window.location.href = '/.netlify/functions/steam-login';
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const steamIdParam = urlParams.get('openid.claimed_id');
+    const steamId = urlParams.get('steamId');
+    const error = urlParams.get('error');
     
-    if (steamIdParam) {
-      const steamId = steamIdParam.split('/').pop();
+    if (steamId) {
       localStorage.setItem('steamId', steamId);
       onSteamIdReceived(steamId);
-      // Redirect back to the auth page
-      const baseUrl = import.meta.env.BASE_URL || '/';
-      window.location.href = baseUrl;
+      // Clear the URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (error) {
+      console.error('Authentication failed:', error);
+      // Handle the error (e.g., show an error message to the user)
     }
   }, [onSteamIdReceived]);
 
