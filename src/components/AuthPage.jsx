@@ -5,13 +5,33 @@ const AuthPage = ({ onLogin }) => {
   const [steamId, setSteamId] = useState('');
   const [apiKey, setApiKey] = useState('');
 
+  // NETLIFY SERVERLESS FUNCTION TESTING
+  const [mockUser, setMockUser] = useState(null);
+
   useEffect(() => {
     // Load saved credentials from localStorage on component mount
     const savedSteamId = localStorage.getItem('steamId');
     const savedApiKey = localStorage.getItem('apiKey');
     if (savedSteamId) setSteamId(savedSteamId);
     if (savedApiKey) setApiKey(savedApiKey);
+
+    // NETLIFY SERVERLESS FUNCTION TESTING
+    fetchMockUser();
   }, []);
+
+  // NETLIFY SERVERLESS FUNCTION TESTING
+  const fetchMockUser = async () => {
+    try {
+      const response = await fetch('/.netlify/functions/hello');
+      if (!response.ok) {
+        throw new Error('Failed to fetch mock user data');
+      }
+      const data = await response.json();
+      setMockUser(data);
+    } catch (error) {
+      console.error('Error fetching mock user:', error);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
