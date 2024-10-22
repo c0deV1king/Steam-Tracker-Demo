@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SteamLogin from './SteamLogin';
 
-const AuthPage = ({ onLogin }) => {
+const AuthPage = ({ onLogin, onDemoLogin }) => {
   const [steamId, setSteamId] = useState('');
 
   // NETLIFY SERVERLESS FUNCTION TESTING
@@ -66,6 +66,11 @@ const AuthPage = ({ onLogin }) => {
           <p className="mb-2">Or</p>
           <SteamLogin onSteamIdReceived={handleSteamIdReceived} />
         </div>
+        <button
+          onClick={onDemoLogin}
+          className="w-full btn btn-secondary mt-4"
+        > Try Demo Mode
+        </button>
       </div>
     </div>
   );

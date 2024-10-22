@@ -12,6 +12,7 @@ import { AuthPage } from './components/AuthPage.jsx';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isDemo, setIsDemo] = useState(false);
   // importing use states and functions to be used in the app
   const {
     profileData,
@@ -49,6 +50,10 @@ export default function App() {
   const handleAuth = () => {
     setIsAuthenticated(true);
     window.location.reload();
+  };
+
+  const handleDemoLogin = () => {
+    setIsDemo(true);
   };
 
   // Check for stored credentials on component mount
@@ -146,8 +151,8 @@ export default function App() {
     console.log("Most played game:", mostPlayedGame);
   }, [mostPlayedGame]);
 
-  if (!isAuthenticated) {
-    return <AuthPage onLogin={handleAuth} />;
+  if (!isAuthenticated && !isDemo) {
+    return <AuthPage onLogin={handleAuth} onDemoLogin={handleDemoLogin} />;
   }
 
 
