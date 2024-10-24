@@ -71,12 +71,3 @@ export const getAllData = async (storeName) => {
     request.onsuccess = (event) => resolve(event.target.result);
   });
 };
-
-export const deleteDatabase = () => {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.deleteDatabase(dbName);
-
-    request.onerror = (event) => reject("Error deleting database: " + event.target.error);
-    request.onsuccess = () => resolve();
-  });
-}
