@@ -9,21 +9,44 @@ export const useSteamData = () => {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [steamId, setSteamId] = useState(null);
+  const [isDemo, setIsDemo] = useState(false);
 
   useEffect(() => {
     const storedSteamId = localStorage.getItem('steamId');
+    const storedIsDemo = localStorage.getItem('isDemo') === 'true';
     
     if (storedSteamId) {
       setSteamId(storedSteamId);
       setIsAuthenticated(true);
+    } else if (storedIsDemo) {
+      setIsDemo(true);
     } else {
       setIsAuthenticated(false);
     }
   }, []);
+
+  const setIsAuthenticatedAndSave = (value) => {
+    setIsAuthenticated(value);
+    if (!value) {
+      localStorage.removeItem('steamId');
+    }
+  };
+
+  const setIsDemoAndSave = (value) => {
+    setIsDemo(value);
+    localStorage.setItem('isDemo', value);
+    if (value) {
+      localStorage.removeItem('steamId');
+      setIsAuthenticated(false);
+    } else {
+      localStorage.removeItem('isDemo');
+    }
+  };
+
   // transferring code to be used in App.jsx
   const {
     profileData
-  } = useProfileData(steamId, isAuthenticated)
+  } = useProfileData(steamId, isAuthenticated, isDemo)
 
   const {
     gamesWithAchievements
@@ -73,6 +96,9 @@ export const useSteamData = () => {
     isAuthenticated,
     steamId,
     gamesWithAchievements,
-    allGamesList
+    allGamesList,
+    isDemo,
+    setIsDemo: setIsDemoAndSave,
+    setIsAuthenticated: setIsAuthenticatedAndSave,
   }; // returning the arrays and functions to be used in App.jsx
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SteamLogin from './SteamLogin';
+import { useSteamData } from '../hooks/useSteamData';
 
 const AuthPage = ({ onLogin, onDemoLogin }) => {
   const [steamId, setSteamId] = useState('');
@@ -38,6 +39,11 @@ const AuthPage = ({ onLogin, onDemoLogin }) => {
     window.location.reload();
   };
 
+  const handleDemoLogin = () => {
+    onDemoLogin();
+    window.location.reload();
+  };
+
   const handleSteamIdReceived = (receivedSteamId) => {
     setSteamId(receivedSteamId);
   };
@@ -67,7 +73,7 @@ const AuthPage = ({ onLogin, onDemoLogin }) => {
           <SteamLogin onSteamIdReceived={handleSteamIdReceived} />
         </div>
         <button
-          onClick={onDemoLogin}
+          onClick={handleDemoLogin}
           className="w-full btn btn-secondary mt-4"
         > Try Demo Mode
         </button>

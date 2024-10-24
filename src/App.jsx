@@ -11,10 +11,11 @@ import { useCharts } from './hooks/useCharts.jsx';
 import { AuthPage } from './components/AuthPage.jsx';
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isDemo, setIsDemo] = useState(false);
-  // importing use states and functions to be used in the app
   const {
+    isAuthenticated,
+    isDemo,
+    setIsAuthenticated,
+    setIsDemo,
     profileData,
     gamesToDisplay,
     allAchievements,
@@ -31,7 +32,7 @@ export default function App() {
     isFullySynced,
     testSchema,
     recentAchievements,
-    mostPlayedGame
+    mostPlayedGame,
   } = useSteamData();
 
   const {
