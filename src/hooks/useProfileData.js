@@ -15,20 +15,7 @@ export const useProfileData = (steamId, isAuthenticated, isDemo) => {
             setLoading(true);
             setError(null);
 
-            if (isDemo) {
-                console.log('Fetching demo profile data');
-                try {
-                    const response = await fetch('/.netlify/functions/getDemoPlayerSummary');
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const data = await response.json();
-                    setProfileData(data.response.players[0]);
-                } catch (error) {
-                    console.error('Error fetching demo profile data:', error);
-                    setError(error.message);
-                }
-            } else if (isAuthenticated && steamId) {
+            if (isAuthenticated && steamId) {
                 console.log('Fetching authenticated profile data');
                 try {
                     const response = await fetch(`/.netlify/functions/getPlayerSummary/?steamid=${steamId}`);

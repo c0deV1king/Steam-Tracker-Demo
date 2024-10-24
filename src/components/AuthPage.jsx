@@ -5,31 +5,13 @@ import { useSteamData } from '../hooks/useSteamData';
 const AuthPage = ({ onLogin, onDemoLogin }) => {
   const [steamId, setSteamId] = useState('');
 
-  // NETLIFY SERVERLESS FUNCTION TESTING
-  const [mockUser, setMockUser] = useState(null);
 
   useEffect(() => {
     // Load saved credentials from localStorage on component mount
     const savedSteamId = localStorage.getItem('steamId');
     if (savedSteamId) setSteamId(savedSteamId);
-
-    // NETLIFY SERVERLESS FUNCTION TESTING
-    fetchMockUser();
   }, []);
 
-  // NETLIFY SERVERLESS FUNCTION TESTING
-  const fetchMockUser = async () => {
-    try {
-      const response = await fetch('/.netlify/functions/hello');
-      if (!response.ok) {
-        throw new Error('Failed to fetch mock user data');
-      }
-      const data = await response.json();
-      setMockUser(data);
-    } catch (error) {
-      console.error('Error fetching mock user:', error);
-    }
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
