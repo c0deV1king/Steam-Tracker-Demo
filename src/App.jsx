@@ -9,8 +9,10 @@ import SyncSVG from './img/arrow-repeat.svg?react';
 import InfoSVG from './img/info-square.svg?react';
 import { useCharts } from './hooks/useCharts.jsx';
 import { AuthPage } from './components/AuthPage.jsx';
+import { clearAllStorage } from './utils/clearStorage';
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(false);
   const {
     isAuthenticated,
     isDemo,
@@ -55,6 +57,14 @@ export default function App() {
 
   const handleDemoLogin = () => {
     setIsDemo(true);
+  };
+
+  const handleLogout = async () => {
+    console.log("Logout button clicked");
+    await clearAllStorage();
+    setIsAuthenticated(false);
+    setIsDemo(false);
+    window.location.reload();
   };
 
   // Check for stored credentials on component mount
@@ -242,6 +252,7 @@ export default function App() {
                   <SyncSVG className='w-4 h-4 fill-black' />
                   {isSyncing ? 'Syncing...' : isFullySynced ? 'Fully Synced' : 'Sync all data'}
                 </button>
+                <button className='btn btn-warning h-5 min-h-0 m-2 mb-3' onClick={handleLogout}>Logout</button>
               </div>
             </div>
           )}
