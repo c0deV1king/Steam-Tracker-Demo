@@ -569,7 +569,7 @@ export default function App() {
                 <div className="divider"></div>
 
                 <video style={{ borderRadius: '10px', border: '2px solid #fde047' }} width="100%" height="auto" controls>
-                  <source src="/src/media/Steam-Tracker-Demo-Tour.mp4" type="video/mp4" />
+                  <source src="/src/media/Steam-Tracker-Tour-Compressed.mp4" type="video/mp4" />
                 </video>
               </div>
               <div className='flex flex-row justify-center items-center'>
