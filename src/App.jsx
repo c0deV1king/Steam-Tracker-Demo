@@ -81,10 +81,6 @@ export default function App() {
   //  console.log("App: allAchievements:", allAchievements);
   // console.log("App: gamesToDisplay:", gamesToDisplay);
 
-  // testing api endpoints, to be called manually with testSchema() in console
-  useEffect(() => {
-    window.testSchema = testSchema;
-  }, [testSchema]);
 
   // console.log("syncAllData in App:", syncAllData);
 
@@ -551,27 +547,37 @@ export default function App() {
             )
           )}
 
-          <button className="btn btn-accent h-8 min-h-0 m-2 mb-3" onClick={() => document.getElementById('my_modal_5').showModal()}>
-            <InfoSVG className='w-4 h-4 fill-black' />
-            About Me
-          </button>
+          <button className="btn btn-accent" onClick={() => document.getElementById('my_modal_4').showModal()}>App Demo</button>
+          <dialog id="my_modal_4" className="modal">
+            <div className='flex flex-col justify-center items-center'>
+              <div className="modal-box w-12/12 max-w-5xl flex flex-col justify-center items-center">
 
-          <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
-            <div className="modal-box">
-              <h3 className="font-bold text-lg">Hello!</h3>
-              <p className="py-4">
-                Welcome to SteamTracker! My name is Austin, or c0dev1king, I am a aspiring software developer and this is one of my projects.
-                SteamTracker will track your games, achievements, recent games, recent achievements and a bunch of cool statistics based on
-                the data. After all that is implemented, there will be more features being developed such as an achievement suggestions, trophy case,
-                and a leaderboard based on a points system developed for the app itself. <br />
-                This app is made with React.js + JavaScript and TailwindCSS currently. <br />
-                Thanks for checking out my project!
-              </p>
-              <div className="modal-action">
-                <form method="dialog">
-                  {/* if there is a button in form, it will close the modal */}
-                  <button className="btn">Close</button>
-                </form>
+                <p className="font-bold text-lg">Welcome to my app, SteamTracker! I am an aspiring software developer, currently a student at GetCoding on the east coast of Canada.
+                  The purpose of this project was to learn React and some more about APIs. I decided to tack on TailwindCSS for better styling and it seems to have been worth it.
+                  I made this an app for achievement hunters because I am an achievement hunter myself and I feel I could also benefit from a tool like this.
+                  There will be more features added to the project over time, for more info on that, visit the <a className='text-accent' href="https://github.com/c0deV1king/Steam-Tracker-Demo" target="_blank" rel="noopener noreferrer">repo</a> on GitHub. 
+                  Thanks for checking out my project!</p>
+
+                <div className="flex flex-row justify-center items-center gap-4 pt-5">
+                  <p className='font-bold text-lg'>Tech Stack:</p>
+                  <img src='https://camo.githubusercontent.com/e88633b8cf461e3ec31845227bea9dcdc2105c978f85c33d1a25ab891b3ca290/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f77696b6970656469612f636f6d6d6f6e732f7468756d622f332f33302f52656163745f4c6f676f5f5356472e7376672f3139323070782d52656163745f4c6f676f5f5356472e7376672e706e67' alt='React Logo' className='w-8 h-8' />
+                  <img src='https://camo.githubusercontent.com/1253027a98fef1178fd945c4fe07490a4ef5820810ae26c184a7222602b8bb01/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f77696b6970656469612f636f6d6d6f6e732f7468756d622f392f39392f556e6f6666696369616c5f4a6176615363726970745f6c6f676f5f322e7376672f3132383070782d556e6f6666696369616c5f4a6176615363726970745f6c6f676f5f322e7376672e706e67' alt='JS logo' className='w-8 h-8' />
+                  <img src='https://camo.githubusercontent.com/866d3535e0157c035205e7a6a4b93cdf35ff21279ad5ad3ad0f9bfb956dcc7f9/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f77696b6970656469612f636f6d6d6f6e732f7468756d622f392f39352f5461696c77696e645f4353535f6c6f676f2e7376672f3235363070782d5461696c77696e645f4353535f6c6f676f2e7376672e706e67' alt='Tailwind logo' className='w-15 h-5' />
+                  <img src='https://dka575ofm4ao0.cloudfront.net/pages-transactional_logos/retina/29133/Netlify-Logo.png' alt='Netlify logo' className='w-15 h-8 bg-white rounded-xl' />
+                </div>
+
+                <div className="divider"></div>
+
+                <video style={{ borderRadius: '10px', border: '2px solid #fde047' }} width="100%" height="auto" controls>
+                  <source src="/src/media/Steam-Tracker-Demo-Tour.mp4" type="video/mp4" />
+                </video>
+              </div>
+              <div className='flex flex-row justify-center items-center'>
+                <div className="modal-action">
+                  <form method="dialog">
+                    <button className="btn btn-accent">Close</button>
+                  </form>
+                </div>
               </div>
             </div>
           </dialog>
