@@ -23,7 +23,7 @@ Live Link: https://steam-tracker.netlify.app/
 - A "play next" feature that suggests what achievements and games to play next
 
 ## 🚀 Future endeavours:
-- A leaderboard using a site exlusive points system <br>
+- A leaderboard using a site exclusive points system <br>
 <br>
 
 >[!IMPORTANT]
