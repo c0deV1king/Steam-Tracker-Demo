@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SteamLogin from './SteamLogin';
 import { useSteamData } from '../hooks/useSteamData';
+import GithubSVG from '../img/github.svg?react';
 
 const AuthPage = ({ onLogin, onDemoLogin }) => {
   const [steamId, setSteamId] = useState('');
@@ -31,9 +32,9 @@ const AuthPage = ({ onLogin, onDemoLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-base-200">
-      <div className="bg-base-100 p-8 rounded-lg shadow-lg w-96">
-        <h1 className="text-3xl font-bold mb-6 text-center">SteamTracker</h1>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="bg-base-100 p-8 rounded-lg shadow-lg w-96 border border-black">
+        <h1 className="text-3xl mb-6 text-center"><span className="font-bold">STEAM</span>TRACKER</h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="steamId" className="block mb-2">Steam ID</label>
@@ -50,15 +51,20 @@ const AuthPage = ({ onLogin, onDemoLogin }) => {
             Authenticate
           </button>
         </form>
-        <div className="text-center">
+        <div className="text-center flex flex-col justify-center items-center">
           <p className="mb-2">Or</p>
           <SteamLogin onSteamIdReceived={handleSteamIdReceived} />
         </div>
         <button
           onClick={handleDemoLogin}
-          className="w-full btn btn-secondary mt-4"
+          className="w-full btn btn-accent mt-4"
         > Try Demo Mode
         </button>
+
+        <div className='flex flex-col justify-center items-center'>
+          <a href="https://github.com/c0dev1king" target="_blank" rel="noopener noreferrer"><GithubSVG className='github-logo w-[32px] h-[32px] fill-black mt-4' /></a>
+        </div>
+
       </div>
     </div>
   );

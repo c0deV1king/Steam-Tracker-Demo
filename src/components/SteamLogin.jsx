@@ -22,9 +22,7 @@ const SteamLogin = ({ onSteamIdReceived }) => {
   }, [onSteamIdReceived]);
 
   return (
-    <button onClick={handleSteamLogin} className="btn btn-primary">
-      Sign in with Steam
-    </button>
+    <img onClick={handleSteamLogin} src="https://community.fastly.steamstatic.com/public/images/signinthroughsteam/sits_01.png" alt="Sign in with Steam" className='cursor-pointer' />
   );
 };
 
