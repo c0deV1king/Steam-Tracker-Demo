@@ -13,11 +13,70 @@ import { AuthPage } from './components/AuthPage.jsx';
 import { clearAllStorage } from './utils/clearStorage';
 
 const LoadingScreen = () => {
+  const [currentMessage, setCurrentMessage] = useState(0);
+  const [displayedText, setDisplayedText] = useState('');
+  const [showCursor, setShowCursor] = useState(true);
+  const messages = [
+    "fetching your games...",
+    "fetching your achievements...",
+    "getting inital games...",
+    "grabbing your data...",
+    "taking a peak at your profile...",
+    "deciding what screenshot you might like best...",
+    "shouting at dragons...",
+    "taking an arrow to the knee..."
+  ];
+
+  useEffect(() => {
+    const messageInterval = setInterval(() => {
+      setCurrentMessage(current => {
+        const nextIndex = Math.floor(Math.random() * messages.length);
+        return nextIndex;
+      });
+      setDisplayedText(''); // Reset displayed text when message changes
+    }, 4000);
+
+    return () => clearInterval(messageInterval);
+  }, []);
+
+  // Effect for typing animation
+  useEffect(() => {
+    const currentFullMessage = messages[currentMessage];
+    if (displayedText.length < currentFullMessage.length) {
+      const typingInterval = setInterval(() => {
+        setDisplayedText(current => {
+          if (current.length < currentFullMessage.length) {
+            return currentFullMessage.slice(0, current.length + 1);
+          }
+          return current;
+        });
+      }, 50); // Adjust typing speed here (lower = faster)
+
+      return () => clearInterval(typingInterval);
+    }
+  }, [currentMessage, displayedText, messages]);
+
+  // Effect for cursor blinking
+  useEffect(() => {
+    const cursorInterval = setInterval(() => {
+      setShowCursor(current => !current);
+    }, 530); // Adjust blink speed here
+
+    return () => clearInterval(cursorInterval);
+  }, []);
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-base-200 p-8 rounded-lg shadow-lg text-center">
         <span className="loading loading-spinner loading-lg text-accent"></span>
-        <p className="mt-4 text-accent">Loading...</p>
+        <div className="flex flex-row items-center justify-center bg-base-300 rounded-lg p-1 mt-2">
+          <p className="text-gray-500 pr-1"> &gt; </p>
+          <p className="text-gray-300"> 
+            {displayedText}
+            <span className={`${showCursor ? 'opacity-100' : 'opacity-0'}`}>|</span>
+          </p>
+        </div>
+        <p className="mt-4 text-warning text-sm italic"> Loading times depends on how big your steam library is </p>
       </div>
     </div>
   );
