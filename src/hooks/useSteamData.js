@@ -70,8 +70,9 @@ export const useSteamData = () => {
     syncAllData,
     recentAchievements = [],
     mostPlayedGame,
-    allGamesList
-
+    allGamesList,
+    isLoading,
+    setIsLoading
   } = useGamesData(steamId, isAuthenticated) || {};
 
   return {
@@ -100,5 +101,7 @@ export const useSteamData = () => {
     isDemo,
     setIsDemo: setIsDemoAndSave,
     setIsAuthenticated: setIsAuthenticatedAndSave,
+    isLoading,
+    setIsLoading
   }; // returning the arrays and functions to be used in App.jsx
 };

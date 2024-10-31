@@ -22,6 +22,7 @@ export const useGamesData = (steamId, isAuthenticated) => {
     const [recentAchievements, setRecentAchievements] = useState([]);
     const [allGamesList, setAllGamesList] = useState([]);
     const [mostPlayedGame, setMostPlayedGame] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     // load cached achievements on initial render
     useEffect(() => {
@@ -46,12 +47,9 @@ export const useGamesData = (steamId, isAuthenticated) => {
     useEffect(() => {
         if (isAuthenticated && steamId) {
             const fetchOverviewGames = async () => {
-                //console.log("Fetching overview games");
-
                 const cachedOverviewGames = localStorage.getItem('cachedOverviewGames');
                 const cacheTimestampOverviewGames = localStorage.getItem('cacheTimestampOverviewGames');
                 const now = new Date().getTime();
-                //console.log("Recent games cache checked")
 
                 if (cachedOverviewGames && cacheTimestampOverviewGames && now - parseInt(cacheTimestampOverviewGames) < 12 * 60 * 60 * 1000) {
                     // console.log("Loading recent games from cache");
@@ -75,8 +73,6 @@ export const useGamesData = (steamId, isAuthenticated) => {
                     // console.log("Loaded recent games from cache");
                     return;
                 }
-
-                // console.log("No cached games found, fetching recent games");
 
                 try {
                     const res = await delayedFetch(`/.netlify/functions/getRecentGames/?steamid=${steamId}`);
@@ -183,6 +179,7 @@ export const useGamesData = (steamId, isAuthenticated) => {
                         // console.log("Loaded game pictures from cache");
                     }
                 } else {
+                    setIsLoading(true);
                     // Fetch games from API
                     const res = await delayedFetch(`/.netlify/functions/getOwnedGames/?steamid=${steamId}`);
                     const data = await res.json();
@@ -278,7 +275,11 @@ export const useGamesData = (steamId, isAuthenticated) => {
                     }));
 
                     setGamesToDisplay(updatedGamesWithAchievements);
+
+                    // force a refresh to update the UI
+                    window.location.reload();
                 }
+                setIsLoading(false);
             };
 
             fetchGames();
@@ -406,10 +407,10 @@ export const useGamesData = (steamId, isAuthenticated) => {
     // function for the handle load more button
     const handleLoadMore = useCallback(async () => {
         if (isAuthenticated && steamId) {
-            // console.log('handleLoadMore called', new Date().toISOString());
-
-            const currentLength = gamesToDisplay.length;
-            const newGames = games.slice(currentLength, currentLength + 20);
+            setIsLoading(true);
+            try {
+                const currentLength = gamesToDisplay.length;
+                const newGames = games.slice(currentLength, currentLength + 20);
 
             const gamesWithDetails = await getGamesWithDetails(newGames);
             //  console.log("Awaiting games with details")
@@ -456,14 +457,19 @@ export const useGamesData = (steamId, isAuthenticated) => {
                 return updatedAchievements;
             });
 
-            // Update gamePictures state
-            setGamePictures(prevPictures => {
-                const updatedPictures = { ...prevPictures };
-                gamesWithAchievements.forEach(game => {
-                    updatedPictures[game.appid] = game.image;
+                // Update gamePictures state
+                setGamePictures(prevPictures => {
+                    const updatedPictures = { ...prevPictures };
+                    gamesWithAchievements.forEach(game => {
+                        updatedPictures[game.appid] = game.image;
+                    });
+                    return updatedPictures;
                 });
-                return updatedPictures;
-            });
+            } catch (error) {
+                console.error('Error loading more games:', error);
+            } finally {
+                setIsLoading(false);
+            }
         }
     }, [isAuthenticated, steamId, games, gamesToDisplay, getGamesWithDetails, fetchAchievementsForGames]);
 
@@ -487,6 +493,7 @@ export const useGamesData = (steamId, isAuthenticated) => {
             //  console.log("syncAllData function called");
             setIsSyncing(true);
             setIsFullySynced(false);
+            setIsLoading(true);
 
             try {
                 // Fetch all owned games
@@ -536,9 +543,13 @@ export const useGamesData = (steamId, isAuthenticated) => {
                 // console.log("Sync completed successfully");
                 setIsSyncing(false);
                 setIsFullySynced(true);
+                setIsLoading(false);
+                // force a refresh to update the UI
+                window.location.reload();
             } catch (error) {
                 console.error('Failed to sync all data:', error);
                 setIsSyncing(false);
+                setIsLoading(false);
             }
         }
     }, [isAuthenticated, steamId, getGamesWithDetails, fetchAchievementsForGames, gamesToDisplay]);
@@ -560,7 +571,6 @@ export const useGamesData = (steamId, isAuthenticated) => {
                     });
                 }
             });
-
             const sortedAchievements = allAchievementsList.sort((a, b) => b.unlockTime - a.unlockTime);
             return sortedAchievements.slice(0, 10); // Return top 10 recent achievements
         }
@@ -591,6 +601,8 @@ export const useGamesData = (steamId, isAuthenticated) => {
         recentAchievements,
         mostPlayedGame,
         isAuthenticated,
-        steamId
+        steamId,
+        isLoading,
+        setIsLoading
     };
 };

@@ -12,8 +12,19 @@ import DemoCharts from './components/demoCharts.jsx';
 import { AuthPage } from './components/AuthPage.jsx';
 import { clearAllStorage } from './utils/clearStorage';
 
+const LoadingScreen = () => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-base-200 p-8 rounded-lg shadow-lg text-center">
+        <span className="loading loading-spinner loading-lg text-accent"></span>
+        <p className="mt-4 text-accent">Loading...</p>
+      </div>
+    </div>
+  );
+};
+
 export default function App() {
-  const [isLoading, setIsLoading] = useState(false);
+
   const {
     isAuthenticated,
     isDemo,
@@ -36,6 +47,8 @@ export default function App() {
     testSchema,
     recentAchievements,
     mostPlayedGame,
+    isLoading,
+    setIsLoading
   } = useSteamData();
 
   const {
@@ -522,6 +535,7 @@ export default function App() {
 
   return (
     <>
+      {isLoading && <LoadingScreen />}
       <div className=''>
         <div className='container mx-auto bg-transparent h-15 w-[50%] flex justify-center items-center'>
           <h1 className="container mx-auto text-center text-4xl"><b>STEAM</b>TRACKER</h1>
@@ -555,7 +569,7 @@ export default function App() {
                 <p className="font-bold text-lg">Welcome to my app, SteamTracker! I am an aspiring software developer, currently a student at GetCoding on the east coast of Canada.
                   The purpose of this project was to learn React and some more about APIs. I decided to tack on TailwindCSS for better styling and it seems to have been worth it.
                   I made this an app for achievement hunters because I am an achievement hunter myself and I feel I could also benefit from a tool like this.
-                  There will be more features added to the project over time, for more info on that, visit the <a className='text-accent' href="https://github.com/c0deV1king/Steam-Tracker-Demo" target="_blank" rel="noopener noreferrer">repo</a> on GitHub. 
+                  There will be more features added to the project over time, for more info on that, visit the <a className='text-accent' href="https://github.com/c0deV1king/Steam-Tracker-Demo" target="_blank" rel="noopener noreferrer">repo</a> on GitHub.
                   Thanks for checking out my project!</p>
 
                 <div className="flex flex-row justify-center items-center gap-4 pt-5">
