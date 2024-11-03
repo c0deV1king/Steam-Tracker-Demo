@@ -30,3 +30,15 @@ Live Link: https://steam-tracker.netlify.app/
 
 >[!IMPORTANT]
 >SteamTracker is not an official Steam product. The Steam name, logo, and related trademarks are trademarks of Valve Corporation. Valve Corporation is not affiliated with SteamTracker.
+
+## Previews
+- Log in with steam using steam authentication
+![Login with steam](/src/img/gif-steamtr-01.gif) <br>
+- See your games and load more dynamically at the bottom
+![Game tab and load more](/src/img/gif-steamtr-02.gif) <br>
+- All your achievements sorted into pages and a convinent search bar to find achievements
+![Achievements tab and search bar](/src/img/gif-steamtr-03.gif) <br>
+- See some cool stats based on your data
+![Stats tab](/src/img/gif-steamtr-04.gif) <br>
+- A demo account incase you don't have a steam account or don't want to log in
+![Demo account preview](/src/img/gif-steamtr-05.gif) <br>
