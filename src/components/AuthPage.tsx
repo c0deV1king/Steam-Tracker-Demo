@@ -2,32 +2,34 @@ import React, { useState, useEffect } from 'react';
 import SteamLogin from './SteamLogin';
 import { useSteamData } from '../hooks/useSteamData';
 import GithubSVG from '../img/github.svg?react';
+import { ChangelogPage } from './ChangelogPage';
 
-const AuthPage = ({ onLogin, onDemoLogin }) => {
-  const [steamId, setSteamId] = useState('');
+interface AuthPageProps {
+  onLogin: () => void;
+  onDemoLogin: () => void;
+}
 
+const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onDemoLogin }) => {
+  const [steamId, setSteamId] = useState<string>('');
 
   useEffect(() => {
-    // Load saved credentials from localStorage on component mount
     const savedSteamId = localStorage.getItem('steamId');
     if (savedSteamId) setSteamId(savedSteamId);
   }, []);
 
-
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    // Here you would typically validate the credentials
     localStorage.setItem('steamId', steamId);
     onLogin();
     window.location.reload();
   };
 
-  const handleDemoLogin = () => {
+  const handleDemoLogin = (): void => {
     onDemoLogin();
     window.location.reload();
   };
 
-  const handleSteamIdReceived = (receivedSteamId) => {
+  const handleSteamIdReceived = (receivedSteamId: string): void => {
     setSteamId(receivedSteamId);
   };
 
@@ -63,6 +65,18 @@ const AuthPage = ({ onLogin, onDemoLogin }) => {
 
         <div className='flex flex-col justify-center items-center'>
           <a href="https://github.com/c0dev1king" target="_blank" rel="noopener noreferrer"><GithubSVG className='github-logo w-[32px] h-[32px] fill-black mt-4' /></a>
+        </div>
+
+        <div className='flex flex-row justify-center items-center mt-4'>
+          <button className="btn hover:text-accent text-sm italic bg-transparent border-none hover:bg-transparent font-normal p-0" onClick={() => document.getElementById('my_modal_3').showModal()}>&lt;changelog /&gt;</button>
+          <dialog id="my_modal_3" className="modal">
+            <div className="modal-box">
+              <form method="dialog">
+                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+              </form>
+              <ChangelogPage />
+            </div>
+          </dialog>
         </div>
 
       </div>

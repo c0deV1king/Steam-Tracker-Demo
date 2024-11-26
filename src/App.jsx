@@ -9,8 +9,10 @@ import SyncSVG from './img/arrow-repeat.svg?react';
 import InfoSVG from './img/info-square.svg?react';
 import { useCharts } from './hooks/useCharts.jsx';
 import DemoCharts from './components/demoCharts.jsx';
-import { AuthPage } from './components/AuthPage.jsx';
+import { AuthPage } from './components/AuthPage.tsx';
 import { clearAllStorage } from './utils/clearStorage';
+
+
 
 const LoadingScreen = () => {
   const [currentMessage, setCurrentMessage] = useState(0);
