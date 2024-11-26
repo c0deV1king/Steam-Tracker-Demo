@@ -2,9 +2,31 @@ import React, { PureComponent } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, Tooltip, Legend } from 'recharts';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
-
 const RADIAN = Math.PI / 180;
-const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, payload }) => {
+
+interface PieDataItem {
+  name: string;
+  value: number;
+  genre: string;
+}
+
+interface BarDataItem {
+  name: string;
+  achievements: number;
+}
+
+interface CustomizedLabelProps {
+  cx: number;
+  cy: number;
+  midAngle: number;
+  innerRadius: number;
+  outerRadius: number;
+  percent: number;
+  index: number;
+  payload: PieDataItem;
+}
+
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, payload }: CustomizedLabelProps) => {
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
@@ -17,7 +39,7 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 };
 
 // Function to render a Pie Chart
-const renderDemoPieChart = (data) => (
+const renderDemoPieChart = (data: PieDataItem[]) => (
     <ResponsiveContainer width="100%" height="100%">
         <PieChart width={400} height={400}>
             <Pie
@@ -30,7 +52,7 @@ const renderDemoPieChart = (data) => (
                 fill="#8884d8"
                 dataKey="value"
             >
-                {data.map((entry, index) => (
+                {data.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
             </Pie>
@@ -38,8 +60,7 @@ const renderDemoPieChart = (data) => (
     </ResponsiveContainer>
 );
 
-// Function to render the first Bar Chart
-const renderDemoBarChart = (data) => (
+const renderDemoBarChart = (data: BarDataItem[]) => (
     <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data}>
             <XAxis dataKey="name" />
@@ -50,8 +71,7 @@ const renderDemoBarChart = (data) => (
     </ResponsiveContainer>
 );
 
-// Function to render the second Bar Chart
-const renderSecondBarChart = (data) => (
+const renderSecondBarChart = (data: BarDataItem[]) => (
     <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data}>
             <XAxis dataKey="name" />
@@ -62,16 +82,22 @@ const renderSecondBarChart = (data) => (
     </ResponsiveContainer>
 );
 
-class DemoCharts extends PureComponent {
+interface DemoChartsState {
+    pieChart: React.ReactNode;
+    barChart: React.ReactNode;
+    secondBarChart: React.ReactNode;
+}
+
+class DemoCharts extends PureComponent<{}, DemoChartsState> {
     render() {
-        const pieData = [
+        const pieData: PieDataItem[] = [
             { name: 'Group A', value: 400, genre: 'Shooter' },
             { name: 'Group B', value: 300, genre: 'Strategy' },
             { name: 'Group C', value: 300, genre: 'RPG' },
             { name: 'Group D', value: 700, genre: 'Other' },
         ];
 
-        const barData = [
+        const barData: BarDataItem[] = [
             { name: '0:00', achievements: 53 },
             { name: '1:00', achievements: 30 },
             { name: '2:00', achievements: 55 },
@@ -98,7 +124,7 @@ class DemoCharts extends PureComponent {
             { name: '23:00', achievements: 44 },
         ];
 
-        const secondBarData = [
+        const secondBarData: BarDataItem[] = [
             { name: 'Sunday', achievements: 126 },
             { name: 'Monday', achievements: 72 },
             { name: 'Tuesday', achievements: 35 },
