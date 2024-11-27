@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
-const SteamLogin = ({ onSteamIdReceived }) => {
-  const handleSteamLogin = () => {
+interface SteamLoginProps {
+  onSteamIdReceived: (steamId: string) => void;
+}
+
+const SteamLogin: React.FC<SteamLoginProps> = ({ onSteamIdReceived }) => {
+  const handleSteamLogin = (): void => {
     window.location.href = '/.netlify/functions/steam-login';
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const steamId = urlParams.get('steamId');
     const error = urlParams.get('error');
@@ -22,7 +26,12 @@ const SteamLogin = ({ onSteamIdReceived }) => {
   }, [onSteamIdReceived]);
 
   return (
-    <img onClick={handleSteamLogin} src="https://community.fastly.steamstatic.com/public/images/signinthroughsteam/sits_01.png" alt="Sign in with Steam" className='cursor-pointer' />
+    <img 
+      onClick={handleSteamLogin} 
+      src="https://community.fastly.steamstatic.com/public/images/signinthroughsteam/sits_01.png" 
+      alt="Sign in with Steam" 
+      className='cursor-pointer' 
+    />
   );
 };
 

@@ -7,8 +7,8 @@ import ControllerSVG from './img/controller.svg?react';
 import GithubSVG from './img/github.svg?react';
 import SyncSVG from './img/arrow-repeat.svg?react';
 import InfoSVG from './img/info-square.svg?react';
-import { useCharts } from './hooks/useCharts.jsx';
-import DemoCharts from './components/demoCharts.jsx';
+import { useCharts } from './hooks/useCharts.tsx';
+import DemoCharts from './components/demoCharts.tsx';
 import { AuthPage } from './components/AuthPage.tsx';
 import { clearAllStorage } from './utils/clearStorage';
 

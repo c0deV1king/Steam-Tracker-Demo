@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import SteamLogin from './SteamLogin';
+import SteamLogin from './SteamLogin.tsx';
 import { useSteamData } from '../hooks/useSteamData';
 import GithubSVG from '../img/github.svg?react';
 import { ChangelogPage } from './ChangelogPage';
