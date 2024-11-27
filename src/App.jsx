@@ -144,6 +144,20 @@ export default function App() {
     window.location.reload();
   };
 
+  const apiTest = async () => {
+    try {
+      console.log("Starting API test...");
+      const response = await fetch(`/.netlify/functions/getApiTest?appId=1915380`);
+      const data = await response.json();
+      console.log("API Response:", data);
+      console.log("Response status:", response.status);
+      console.log("Response headers:", response.headers);
+    } catch (error) {
+      console.error("API Error:", error);
+    }
+  };
+  window.apiTest = apiTest;
+
   // Check for stored credentials on component mount
   useEffect(() => {
     const storedSteamId = localStorage.getItem('steamId');
@@ -594,6 +608,14 @@ export default function App() {
     )
   }
 
+  const renderDemoAdvisor = () => {
+    return (
+      <div>
+        <p>Advisor not currently available in demo mode</p>
+      </div>
+    )
+  }
+
   return (
     <>
       {isLoading && <LoadingScreen />}
@@ -720,6 +742,7 @@ export default function App() {
             <a role="tab" className={`tab ${activeTab === 'Games' ? 'tab-active' : ''}`} onClick={() => handleTabChange('Games')}>Games</a>
             <a role="tab" className={`tab ${activeTab === 'Achievements' ? 'tab-active' : ''}`} onClick={() => handleTabChange('Achievements')}>Achievements</a>
             <a role="tab" className={`tab ${activeTab === 'Stats' ? 'tab-active' : ''}`} onClick={() => handleTabChange('Stats')}>Stats</a>
+            <a role="tab" className={`tab ${activeTab === 'Advisor' ? 'tab-active' : ''}`} onClick={() => handleTabChange('Advisor')}>Advisor</a>
           </div>
 
           <div className="overflow-x-auto flex flex-row justify-center items-center">
@@ -979,6 +1002,50 @@ export default function App() {
                     )}
                     <h2 className="text-xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mb-[10%]">Most Played Game</h2>
                     {/* Add more chart containers here */}
+                  </div>
+                </div>
+              ))}
+
+              {/* Advisor notes:
+              - To suggest next games, get acheivement percentages for all played games, calculate the average percentage of all achievements, and use the average
+              to determine the order of suggested games.
+              - To suggest achievements, get achievement percentages for all played games, and order the achievements by percentages.
+              */}
+
+            {activeTab === 'Advisor' && (
+              isDemo ? renderDemoAdvisor() : (
+                <div>
+                  <h1 className="text-2xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mt-5 mb-[10%]">Advisor</h1>
+                  <p className="text-lg text-center">Plans:</p>
+                  <ul className="text-lg text-center">
+                    <li>Suggest next games to play</li>
+                    <li>Suggest achievements to go for</li>
+                  </ul>
+
+                  <div className="container mx-auto w-full flex flex-row justify-between items-start gap-4 p-4">
+                    <table className="table table-sm">
+                      <thead>
+                        <tr>
+                          <th className="w-1/3"> </th>
+                          <th className="w-1/2">Game</th>
+                          <th className="w-1/6">Average Achievement Completion</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-primary bg-opacity-5">
+                        <tr>
+                          <td className="w-1/3">
+                            <div className="aspect-[460/215] w-full overflow-hidden">
+                              <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/440/header.jpg?t=1729702978" alt="#" className="w-full h-full object-cover" />
+                              <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Image</div>
+                            </div>
+                          </td>
+                          <td className="w-1/2">Team Fortress 2</td>
+                          <td className="w-1/6 text-center text-success font-bold text-5xl">
+                            67%
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               ))}
