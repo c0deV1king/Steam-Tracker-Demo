@@ -705,7 +705,7 @@ export default function App() {
           )}
         </div>
 
-        <div className='contaier mx-auto bg-base-200 sm:w-[75%] lg:w-[50%] border-2 border-base-100'>
+        <div className='contaier mx-auto bg-base-200 sm:w-[75%] lg:w-[50%] '>
           {isDemo ? renderDemoProfile() : (
             profileData && (
               <div className='flex flex-col container mx-auto justify-center items-center'>
