@@ -12,18 +12,25 @@ export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAc
                     // Check if we have cached achievements for this game
                     const cachedAchievements = await getData('achievements', game.appid);
 
-                    const [earnedRes, infoRes] = await Promise.all([
+                    const [earnedRes, infoRes, percentagesRes] = await Promise.all([
                         delayedFetch(`/.netlify/functions/getPlayerAchievements/?appid=${game.appid}&steamid=${steamId}`),
-                        delayedFetch(`/.netlify/functions/getSchemaForGame/?appid=${game.appid}`)
+                        delayedFetch(`/.netlify/functions/getSchemaForGame/?appid=${game.appid}`),
+                        delayedFetch(`/.netlify/functions/getAchievementPercentages/?appid=${game.appid}`)
                     ]);
 
                     const earnedData = await earnedRes.json();
                     const infoData = await infoRes.json();
+                    const percentagesData = await percentagesRes.json();
 
                     if (earnedData.playerstats && earnedData.playerstats.achievements && infoData.game && infoData.game.availableGameStats && infoData.game.availableGameStats.achievements) {
+                        const achievementPercentages = percentagesData.achievementpercentages?.achievements || [];
+
                         const newAchievements = earnedData.playerstats.achievements.map(achievement => {
                             const achievementInfo = infoData.game.availableGameStats.achievements.find(
                                 a => achievement.apiname === a.name
+                            );
+                            const percentageInfo = achievementPercentages.find(
+                                p => p.name === achievement.apiname
                             );
 
                             return {
@@ -33,7 +40,8 @@ export const fetchAchievementsForGames = async (games, cacheKey = 'cachedGamesAc
                                 description: achievementInfo ? achievementInfo.description : '',
                                 icon: achievementInfo ? achievementInfo.icon : '',
                                 achieved: achievement.achieved,
-                                unlockTime: achievement.unlocktime
+                                unlockTime: achievement.unlocktime,
+                                percentage: percentageInfo ? percentageInfo.percent : 0
                             };
                         });
 

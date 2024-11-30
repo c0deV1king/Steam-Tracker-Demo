@@ -11,8 +11,7 @@ import { useCharts } from './hooks/useCharts.tsx';
 import DemoCharts from './components/demoCharts.tsx';
 import { AuthPage } from './components/AuthPage.tsx';
 import { clearAllStorage } from './utils/clearStorage';
-
-
+import { getAllData } from './utils/indexedDB';
 
 const LoadingScreen = () => {
   const [currentMessage, setCurrentMessage] = useState(0);
@@ -249,6 +248,24 @@ export default function App() {
     console.log("Most played game:", mostPlayedGame);
   }, [mostPlayedGame]);
 
+  const [idbGames, setIdbGames] = useState([]);
+  const [advisorPage, setAdvisorPage] = useState(1);
+
+  useEffect(() => {
+    const fetchIdbGames = async () => {
+      try {
+        const games = await getAllData('games');
+        setIdbGames(games);
+      } catch (error) {
+        console.error('Error fetching games from IndexedDB:', error);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchIdbGames();
+    }
+  }, [isAuthenticated]);
+
   if (!isAuthenticated && !isDemo) {
     return <AuthPage onLogin={handleAuth} onDemoLogin={handleDemoLogin} />;
   }
@@ -308,8 +325,8 @@ export default function App() {
                     <img src={"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/230410/696dc084e8cc668428ea5a9a022f5c41127eed7c.jpg"} alt={"Achievement image"} className="w-full h-full object-cover" />
                   </div>
                 </td>
-                <td className='w-1/3'>Our Tools Shape Us</td>
-                <td className='w-1/4'>10/18/2024</td>
+                <td>Our Tools Shape Us</td>
+                <td>10/18/2024</td>
               </tr>
               <tr>
                 <td className="w-1/6">
@@ -317,8 +334,8 @@ export default function App() {
                     <img src={"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/230410/58342bec33e2a10a20e675368282ed244aae0d68.jpg"} alt={"Achievement image"} className="w-full h-full object-cover" />
                   </div>
                 </td>
-                <td className='w-1/3'>Battle Mastery II</td>
-                <td className='w-1/4'>10/16/2024</td>
+                <td>Battle Mastery II</td>
+                <td>10/16/2024</td>
               </tr>
               <tr>
                 <td className="w-1/6">
@@ -326,8 +343,8 @@ export default function App() {
                     <img src={"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/230410/696dc084e8cc668428ea5a9a022f5c41127eed7c.jpg"} alt={"Achievement image"} className="w-full h-full object-cover" />
                   </div>
                 </td>
-                <td className='w-1/3'>You're Not Alone</td>
-                <td className='w-1/4'>10/07/2024</td>
+                <td>You're Not Alone</td>
+                <td>10/07/2024</td>
               </tr>
               <tr>
                 <td className="w-1/6">
@@ -335,8 +352,8 @@ export default function App() {
                     <img src={"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/1544020/92a325b79becc219cfea5f22f1cac01747d9fb59.jpg"} alt={"Achievement image"} className="w-full h-full object-cover" />
                   </div>
                 </td>
-                <td className='w-1/3'>The Commonality</td>
-                <td className='w-1/4'>09/26/2024</td>
+                <td>The Commonality</td>
+                <td>09/26/2024</td>
               </tr>
             </tbody>
           </table>
@@ -761,8 +778,8 @@ export default function App() {
                       <thead>
                         <tr>
                           <th className="w-1/3"> </th>
-                          <th className="w-1/2">Game Name</th>
-                          <th className="w-1/6">Achievements</th>
+                          <th>Game Name</th>
+                          <th>Achievements</th>
                         </tr>
                       </thead>
                       <tbody className="bg-primary bg-opacity-5">
@@ -1001,7 +1018,6 @@ export default function App() {
                       <p>Loading most played game data...</p>
                     )}
                     <h2 className="text-xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mb-[10%]">Most Played Game</h2>
-                    {/* Add more chart containers here */}
                   </div>
                 </div>
               ))}
@@ -1014,45 +1030,84 @@ export default function App() {
 
             {activeTab === 'Advisor' && (
               isDemo ? renderDemoAdvisor() : (
-                <div>
-                  <h1 className="text-2xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mt-5 mb-[10%]">Advisor</h1>
-                  <p className="text-lg text-center">Plans:</p>
-                  <ul className="text-lg text-center">
-                    <li>Suggest next games to play</li>
-                    <li>Suggest achievements to go for</li>
-                  </ul>
-
-                  <div className="container mx-auto w-full flex flex-row justify-between items-start gap-4 p-4">
-                    <table className="table table-sm">
-                      <thead>
-                        <tr>
-                          <th className="w-1/3"> </th>
-                          <th className="w-1/2">Game</th>
-                          <th className="w-1/6">Average Achievement Completion</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-primary bg-opacity-5">
-                        <tr>
-                          <td className="w-1/3">
-                            <div className="aspect-[460/215] w-full overflow-hidden">
-                              <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/440/header.jpg?t=1729702978" alt="#" className="w-full h-full object-cover" />
-                              <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Image</div>
+                <div className="overflow-x-auto">
+                  <h1 className='text-2xl pt-2 pb-2 mr-5 ml-5 mt-5 mb-5'><span className='font-bold'>NEXT</span>GAMES:</h1>
+                  <div className="min-w-full flex flex-col bg-base-100 rounded-xl">
+                    {idbGames
+                      .filter(game => allAchievements[game.appid]?.length > 0)
+                      .map(game => {
+                        const achievements = allAchievements[game.appid] || [];
+                        const completedAchievements = achievements.filter(a => a.achieved).length;
+                        const totalAchievements = achievements.length;
+                        const completionRate = completedAchievements / totalAchievements;
+                        
+                        const totalGlobalPercentages = achievements.reduce((sum, a) => sum + (a.percentage || 0), 0);
+                        const averageGlobalPercentage = achievements.length > 0 
+                          ? (totalGlobalPercentages / achievements.length).toFixed(1)
+                          : 0;
+                        
+                        return {
+                          ...game,
+                          completionRate,
+                          averageGlobalPercentage: Number(averageGlobalPercentage)
+                        };
+                      })
+                      .filter(game => game.completionRate < 1)
+                      .sort((a, b) => b.averageGlobalPercentage - a.averageGlobalPercentage)
+                      .slice((advisorPage - 1) * 10, advisorPage * 10)
+                      .map(game => (
+                        <tr key={game.appid} className="hover:bg-primary hover:bg-opacity-10 transition-colors flex items-center">
+                          <td className="p-4">
+                            <img
+                              src={`https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appid}/header.jpg`}
+                              alt={game.name}
+                              className="w-full h-auto rounded-lg"
+                            />
+                          </td>
+                          <td className="p-4">
+                            <div className="font-semibold text-lg">{game.name}</div>
+                            <div className="text-sm text-gray-500">
+                              Average Global Completion: <span className="font-bold text-success">{game.averageGlobalPercentage}%</span>
                             </div>
                           </td>
-                          <td className="w-1/2">Team Fortress 2</td>
-                          <td className="w-1/6 text-center text-success font-bold text-5xl">
-                            67%
+                          <td className="p-4">
+                            <div className="flex items-center space-x-2">
+                              <TimeClock className="w-4 h-4" />
+                              <span>{game.playtime_forever ? Math.round(game.playtime_forever / 60) : 0} hours</span>
+                            </div>
                           </td>
                         </tr>
-                      </tbody>
-                    </table>
+                      ))}
+                  </div>
+                  <div className="flex justify-center mt-4 mb-4 space-x-2">
+                    <button
+                      onClick={() => setAdvisorPage(prev => Math.max(1, prev - 1))}
+                      disabled={advisorPage === 1}
+                      className="px-4 py-2 bg-primary text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Previous
+                    </button>
+                    <span className="px-4 py-2">
+                      Page {advisorPage}
+                    </span>
+                    <button
+                      onClick={() => setAdvisorPage(prev => prev + 1)}
+                      disabled={idbGames
+                        .filter(game => allAchievements[game.appid]?.length > 0)
+                        .filter(game => {
+                          const achievements = allAchievements[game.appid] || [];
+                          const completedAchievements = achievements.filter(a => a.achieved).length;
+                          const totalAchievements = achievements.length;
+                          return completedAchievements / totalAchievements < 1;
+                        }).length <= advisorPage * 10}
+                      className="px-4 py-2 bg-primary text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
                   </div>
                 </div>
               ))}
-
           </div>
-
-
         </div>
       </div >
 
