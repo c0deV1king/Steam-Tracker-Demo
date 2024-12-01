@@ -7,9 +7,9 @@ import ControllerSVG from './img/controller.svg?react';
 import GithubSVG from './img/github.svg?react';
 import SyncSVG from './img/arrow-repeat.svg?react';
 import InfoSVG from './img/info-square.svg?react';
-import { useCharts } from './hooks/useCharts.tsx';
-import DemoCharts from './components/demoCharts.tsx';
-import { AuthPage } from './components/AuthPage.tsx';
+import { useCharts } from './hooks/useCharts';
+import DemoCharts from './components/demoCharts';
+import { AuthPage } from './components/AuthPage';
 import { clearAllStorage } from './utils/clearStorage';
 import { getAllData } from './utils/indexedDB';
 
@@ -122,8 +122,6 @@ export default function App() {
     getTotalPages
   } = achievementPages(allAchievements);
 
-  const demoCharts = new DemoCharts();
-  const { pieChart, barChart, secondBarChart } = demoCharts.render();
   const { chartData, renderGenreChart, renderPlaytimeChart } = useCharts();
 
   const handleAuth = () => {
@@ -284,8 +282,8 @@ export default function App() {
             <thead>
               <tr>
                 <th className="w-1/3"> </th>
-                <th className="w-1/2">Game Name</th>
-                <th className="w-1/6">Achievements</th>
+                <th>Game Name</th>
+                <th>Achievements</th>
               </tr>
             </thead>
             <tbody className="bg-primary bg-opacity-5">
@@ -536,19 +534,9 @@ export default function App() {
         <div className="stats-page">
           <h1 className="text-2xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mt-5 mb-[10%]">Game Statistics</h1>
 
-          <div className="chart-container h-[250px] w-[100%]">
-            {pieChart}
-            <h2 className="text-xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mb-[10%]">You mainly play <span className='text-success font-bold'>Shooter</span> games</h2>
+          <div className="chart-container">
+            <DemoCharts />
           </div>
-
-          <div className="chart-container h-[800px] w-[100%] mt-[10%]">
-            {barChart}
-            <h2 className="text-xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mb-[10%]">You prefer to play games at <span className='text-success font-bold'>night</span></h2>
-            {secondBarChart}
-            <h2 className="text-xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mb-[10%]">You prefer to play games on <span className='text-success font-bold'>Saturday</span></h2>
-          </div>
-
-
 
           <div className='flex flex-row justify-center items-center mt-5 w-[100%]'>
             <div className="container flex flex-col justify-center items-center mr-0 w-[50%]">

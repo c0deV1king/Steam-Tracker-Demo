@@ -1,11 +1,7 @@
 import React, { useEffect } from 'react';
 
-interface SteamLoginProps {
-  onSteamIdReceived: (steamId: string) => void;
-}
-
-const SteamLogin: React.FC<SteamLoginProps> = ({ onSteamIdReceived }) => {
-  const handleSteamLogin = (): void => {
+const SteamLogin = ({ onSteamIdReceived }) => {
+  const handleSteamLogin = () => {
     window.location.href = '/.netlify/functions/steam-login';
   };
 

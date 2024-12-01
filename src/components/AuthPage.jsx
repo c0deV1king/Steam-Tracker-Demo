@@ -1,35 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import SteamLogin from './SteamLogin.tsx';
+import SteamLogin from './SteamLogin';
 import { useSteamData } from '../hooks/useSteamData';
 import GithubSVG from '../img/github.svg?react';
 import { ChangelogPage } from './ChangelogPage';
 
-interface AuthPageProps {
-  onLogin: () => void;
-  onDemoLogin: () => void;
-}
-
-const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onDemoLogin }) => {
-  const [steamId, setSteamId] = useState<string>('');
+const AuthPage = ({ onLogin, onDemoLogin }) => {
+  const [steamId, setSteamId] = useState('');
 
   useEffect(() => {
     const savedSteamId = localStorage.getItem('steamId');
     if (savedSteamId) setSteamId(savedSteamId);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     localStorage.setItem('steamId', steamId);
     onLogin();
     window.location.reload();
   };
 
-  const handleDemoLogin = (): void => {
+  const handleDemoLogin = () => {
     onDemoLogin();
     window.location.reload();
   };
 
-  const handleSteamIdReceived = (receivedSteamId: string): void => {
+  const handleSteamIdReceived = (receivedSteamId) => {
     setSteamId(receivedSteamId);
   };
 

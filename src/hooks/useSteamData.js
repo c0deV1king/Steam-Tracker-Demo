@@ -1,4 +1,4 @@
-import { useGamesData } from './useGamesData.ts'
+import { useGamesData } from './useGamesData'
 import { useProfileData } from './useProfileData'
 import { fetchAchievementsForGames } from '../utils/fetchAchievementsForGames'
 import { useEffect, useState } from 'react';
