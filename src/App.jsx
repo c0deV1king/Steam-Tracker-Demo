@@ -11,8 +11,7 @@ import { useCharts } from './hooks/useCharts.tsx';
 import DemoCharts from './components/demoCharts.tsx';
 import { AuthPage } from './components/AuthPage.tsx';
 import { clearAllStorage } from './utils/clearStorage';
-
-
+import { getAllData } from './utils/indexedDB';
 
 const LoadingScreen = () => {
   const [currentMessage, setCurrentMessage] = useState(0);
@@ -144,6 +143,20 @@ export default function App() {
     window.location.reload();
   };
 
+  const apiTest = async () => {
+    try {
+      console.log("Starting API test...");
+      const response = await fetch(`/.netlify/functions/getApiTest?appId=1915380`);
+      const data = await response.json();
+      console.log("API Response:", data);
+      console.log("Response status:", response.status);
+      console.log("Response headers:", response.headers);
+    } catch (error) {
+      console.error("API Error:", error);
+    }
+  };
+  window.apiTest = apiTest;
+
   // Check for stored credentials on component mount
   useEffect(() => {
     const storedSteamId = localStorage.getItem('steamId');
@@ -235,6 +248,24 @@ export default function App() {
     console.log("Most played game:", mostPlayedGame);
   }, [mostPlayedGame]);
 
+  const [idbGames, setIdbGames] = useState([]);
+  const [advisorPage, setAdvisorPage] = useState(1);
+
+  useEffect(() => {
+    const fetchIdbGames = async () => {
+      try {
+        const games = await getAllData('games');
+        setIdbGames(games);
+      } catch (error) {
+        console.error('Error fetching games from IndexedDB:', error);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchIdbGames();
+    }
+  }, [isAuthenticated]);
+
   if (!isAuthenticated && !isDemo) {
     return <AuthPage onLogin={handleAuth} onDemoLogin={handleDemoLogin} />;
   }
@@ -294,8 +325,8 @@ export default function App() {
                     <img src={"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/230410/696dc084e8cc668428ea5a9a022f5c41127eed7c.jpg"} alt={"Achievement image"} className="w-full h-full object-cover" />
                   </div>
                 </td>
-                <td className='w-1/3'>Our Tools Shape Us</td>
-                <td className='w-1/4'>10/18/2024</td>
+                <td>Our Tools Shape Us</td>
+                <td>10/18/2024</td>
               </tr>
               <tr>
                 <td className="w-1/6">
@@ -303,8 +334,8 @@ export default function App() {
                     <img src={"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/230410/58342bec33e2a10a20e675368282ed244aae0d68.jpg"} alt={"Achievement image"} className="w-full h-full object-cover" />
                   </div>
                 </td>
-                <td className='w-1/3'>Battle Mastery II</td>
-                <td className='w-1/4'>10/16/2024</td>
+                <td>Battle Mastery II</td>
+                <td>10/16/2024</td>
               </tr>
               <tr>
                 <td className="w-1/6">
@@ -312,8 +343,8 @@ export default function App() {
                     <img src={"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/230410/696dc084e8cc668428ea5a9a022f5c41127eed7c.jpg"} alt={"Achievement image"} className="w-full h-full object-cover" />
                   </div>
                 </td>
-                <td className='w-1/3'>You're Not Alone</td>
-                <td className='w-1/4'>10/07/2024</td>
+                <td>You're Not Alone</td>
+                <td>10/07/2024</td>
               </tr>
               <tr>
                 <td className="w-1/6">
@@ -321,8 +352,8 @@ export default function App() {
                     <img src={"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/1544020/92a325b79becc219cfea5f22f1cac01747d9fb59.jpg"} alt={"Achievement image"} className="w-full h-full object-cover" />
                   </div>
                 </td>
-                <td className='w-1/3'>The Commonality</td>
-                <td className='w-1/4'>09/26/2024</td>
+                <td>The Commonality</td>
+                <td>09/26/2024</td>
               </tr>
             </tbody>
           </table>
@@ -594,6 +625,14 @@ export default function App() {
     )
   }
 
+  const renderDemoAdvisor = () => {
+    return (
+      <div>
+        <p>Advisor not currently available in demo mode</p>
+      </div>
+    )
+  }
+
   return (
     <>
       {isLoading && <LoadingScreen />}
@@ -683,7 +722,7 @@ export default function App() {
           )}
         </div>
 
-        <div className='contaier mx-auto bg-base-200 sm:w-[75%] lg:w-[50%] border-2 border-base-100'>
+        <div className='contaier mx-auto bg-base-200 sm:w-[75%] lg:w-[50%] '>
           {isDemo ? renderDemoProfile() : (
             profileData && (
               <div className='flex flex-col container mx-auto justify-center items-center'>
@@ -720,6 +759,7 @@ export default function App() {
             <a role="tab" className={`tab ${activeTab === 'Games' ? 'tab-active' : ''}`} onClick={() => handleTabChange('Games')}>Games</a>
             <a role="tab" className={`tab ${activeTab === 'Achievements' ? 'tab-active' : ''}`} onClick={() => handleTabChange('Achievements')}>Achievements</a>
             <a role="tab" className={`tab ${activeTab === 'Stats' ? 'tab-active' : ''}`} onClick={() => handleTabChange('Stats')}>Stats</a>
+            <a role="tab" className={`tab ${activeTab === 'Advisor' ? 'tab-active' : ''}`} onClick={() => handleTabChange('Advisor')}>Advisor</a>
           </div>
 
           <div className="overflow-x-auto flex flex-row justify-center items-center">
@@ -738,8 +778,8 @@ export default function App() {
                       <thead>
                         <tr>
                           <th className="w-1/3"> </th>
-                          <th className="w-1/2">Game Name</th>
-                          <th className="w-1/6">Achievements</th>
+                          <th>Game Name</th>
+                          <th>Achievements</th>
                         </tr>
                       </thead>
                       <tbody className="bg-primary bg-opacity-5">
@@ -978,14 +1018,131 @@ export default function App() {
                       <p>Loading most played game data...</p>
                     )}
                     <h2 className="text-xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mb-[10%]">Most Played Game</h2>
-                    {/* Add more chart containers here */}
                   </div>
                 </div>
               ))}
 
+            {activeTab === 'Advisor' && (
+              isDemo ? renderDemoAdvisor() : (
+                <div className="overflow-x-auto">
+                  <h1 className='text-2xl pt-2 pb-2 mr-5 ml-5 mt-5 mb-5'><span className='font-bold'>NEXT</span>GAMES:</h1>
+                  <div className="min-w-full flex flex-col bg-base-100 rounded-xl">
+                    {idbGames
+                      .filter(game => allAchievements[game.appid]?.length > 0)
+                      .map(game => {
+                        const achievements = allAchievements[game.appid] || [];
+                        const completedAchievements = achievements.filter(a => a.achieved).length;
+                        const totalAchievements = achievements.length;
+                        const completionRate = completedAchievements / totalAchievements;
+                        
+                        const totalGlobalPercentages = achievements.reduce((sum, a) => sum + (a.percentage || 0), 0);
+                        const averageGlobalPercentage = achievements.length > 0 
+                          ? (totalGlobalPercentages / achievements.length).toFixed(1)
+                          : 0;
+                        
+                        return {
+                          ...game,
+                          completionRate,
+                          averageGlobalPercentage: Number(averageGlobalPercentage)
+                        };
+                      })
+                      .filter(game => game.completionRate < 1)
+                      .sort((a, b) => b.averageGlobalPercentage - a.averageGlobalPercentage)
+                      .slice((advisorPage - 1) * 10, advisorPage * 10)
+                      .map(game => (
+                        <tr key={game.appid} className="hover:bg-primary hover:bg-opacity-10 transition-colors flex items-center">
+                          <td className="p-4">
+                            <img
+                              src={`https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appid}/header.jpg`}
+                              alt={game.name}
+                              className="w-full h-auto rounded-lg"
+                            />
+                          </td>
+                          <td className="p-4">
+                            <div className="font-semibold text-lg">{game.name}</div>
+                            <div className="text-sm text-gray-500">
+                              Average Global Completion: <span className="font-bold text-accent">{game.averageGlobalPercentage}%</span>
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <div className="flex items-center space-x-2">
+                              <TimeClock className="w-4 h-4" />
+                              <span>{game.playtime_forever ? Math.round(game.playtime_forever / 60) : 0} hours</span>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </div>
+                  <div className="flex justify-center mt-4 mb-4 space-x-2">
+                    <button
+                      onClick={() => setAdvisorPage(prev => Math.max(1, prev - 1))}
+                      disabled={advisorPage === 1}
+                      className="px-4 py-2 bg-primary text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Previous
+                    </button>
+                    <span className="px-4 py-2">
+                      Page {advisorPage}
+                    </span>
+                    <button
+                      onClick={() => setAdvisorPage(prev => prev + 1)}
+                      disabled={idbGames
+                        .filter(game => allAchievements[game.appid]?.length > 0)
+                        .filter(game => {
+                          const achievements = allAchievements[game.appid] || [];
+                          const completedAchievements = achievements.filter(a => a.achieved).length;
+                          const totalAchievements = achievements.length;
+                          return completedAchievements / totalAchievements < 1;
+                        }).length <= advisorPage * 10}
+                      className="px-4 py-2 bg-primary text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </div>
+
+                  <div className="container mx-auto mb-5">
+                    <h1 className='text-2xl pt-2 pb-2 mr-5 ml-5 mt-5 mb-5'><span className='font-bold'>NEXT</span>ACHIEVEMENTS:</h1>
+                    <div className="grid grid-cols-1 gap-4 mx-5">
+                      {(() => {
+                        const cachedGameDetails = JSON.parse(localStorage.getItem('cachedGameDetails') || '{}');
+                        return Object.entries(allAchievements)
+                          .flatMap(([appId, achievements]) => 
+                            achievements
+                              .filter(achievement => !achievement.achieved)
+                              .map(achievement => ({
+                                ...achievement,
+                                appId,
+                                gameName: cachedGameDetails[appId]?.data?.name || 'Unknown Game'
+                              }))
+                          )
+                          .sort((a, b) => b.percentage - a.percentage)
+                          .slice(0, 10)
+                          .map((achievement, index) => (
+                            <div key={`${achievement.appId}-${achievement.apiname}`} className="bg-base-100 rounded-xl p-4 shadow-xl">
+                              <div className="flex items-center space-x-4">
+                                <div className="avatar">
+                                  <div className="rounded-xl h-[64px] w-[64px]">
+                                    <img src={achievement.icon} alt={achievement.displayName} />
+                                  </div>
+                                </div>
+                                <div className="flex-grow">
+                                  <div className="font-bold">{achievement.displayName}</div>
+                                  <div className="text-sm opacity-70">{achievement.description}</div>
+                                  <div className="text-sm mt-1">
+                                    <span className="text-accent">{achievement.gameName}</span> • 
+                                    <span className="ml-2">{achievement.percentage.toFixed(1)}% of players have this</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ));
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              ))
+            }
           </div>
-
-
         </div>
       </div >
 

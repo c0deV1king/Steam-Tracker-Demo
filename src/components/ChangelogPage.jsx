@@ -9,6 +9,16 @@ const ChangelogPage = () => {
         <div className="space-y-8">
           {/* Version entries */}
           <div className="border-l-4 border-primary pl-4">
+            <h2 className="text-xl font-semibold">v1.1.0 - Advisor Update</h2>
+            <p className="text-sm text-gray-500 mb-2">2024-12-01</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Added an advisor tab</li>
+              <li>Shows your games in order of average achievement percentage</li>
+              <li>Also shows your top 10 achievements that are easiest to complete</li>
+            </ul>
+          </div>
+          
+          <div className="border-l-4 border-primary pl-4">
             <h2 className="text-xl font-semibold">v1.0.0 - Project Changelog</h2>
             <p className="text-sm text-gray-500 mb-2">2024-11-20</p>
             <ul className="list-disc list-inside space-y-1">
