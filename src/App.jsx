@@ -1022,12 +1022,6 @@ export default function App() {
                 </div>
               ))}
 
-              {/* Advisor notes:
-              - To suggest next games, get acheivement percentages for all played games, calculate the average percentage of all achievements, and use the average
-              to determine the order of suggested games.
-              - To suggest achievements, get achievement percentages for all played games, and order the achievements by percentages.
-              */}
-
             {activeTab === 'Advisor' && (
               isDemo ? renderDemoAdvisor() : (
                 <div className="overflow-x-auto">
@@ -1067,7 +1061,7 @@ export default function App() {
                           <td className="p-4">
                             <div className="font-semibold text-lg">{game.name}</div>
                             <div className="text-sm text-gray-500">
-                              Average Global Completion: <span className="font-bold text-success">{game.averageGlobalPercentage}%</span>
+                              Average Global Completion: <span className="font-bold text-accent">{game.averageGlobalPercentage}%</span>
                             </div>
                           </td>
                           <td className="p-4">
@@ -1105,8 +1099,49 @@ export default function App() {
                       Next
                     </button>
                   </div>
+
+                  <div className="container mx-auto mb-5">
+                    <h1 className='text-2xl pt-2 pb-2 mr-5 ml-5 mt-5 mb-5'><span className='font-bold'>NEXT</span>ACHIEVEMENTS:</h1>
+                    <div className="grid grid-cols-1 gap-4 mx-5">
+                      {(() => {
+                        const cachedGameDetails = JSON.parse(localStorage.getItem('cachedGameDetails') || '{}');
+                        return Object.entries(allAchievements)
+                          .flatMap(([appId, achievements]) => 
+                            achievements
+                              .filter(achievement => !achievement.achieved)
+                              .map(achievement => ({
+                                ...achievement,
+                                appId,
+                                gameName: cachedGameDetails[appId]?.data?.name || 'Unknown Game'
+                              }))
+                          )
+                          .sort((a, b) => b.percentage - a.percentage)
+                          .slice(0, 10)
+                          .map((achievement, index) => (
+                            <div key={`${achievement.appId}-${achievement.apiname}`} className="bg-base-100 rounded-xl p-4 shadow-xl">
+                              <div className="flex items-center space-x-4">
+                                <div className="avatar">
+                                  <div className="rounded-xl h-[64px] w-[64px]">
+                                    <img src={achievement.icon} alt={achievement.displayName} />
+                                  </div>
+                                </div>
+                                <div className="flex-grow">
+                                  <div className="font-bold">{achievement.displayName}</div>
+                                  <div className="text-sm opacity-70">{achievement.description}</div>
+                                  <div className="text-sm mt-1">
+                                    <span className="text-accent">{achievement.gameName}</span> • 
+                                    <span className="ml-2">{achievement.percentage.toFixed(1)}% of players have this</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ));
+                      })()}
+                    </div>
+                  </div>
                 </div>
-              ))}
+              ))
+            }
           </div>
         </div>
       </div >
