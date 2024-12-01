@@ -3,138 +3,23 @@ import { fetchAchievementsForGames } from '../utils/fetchAchievementsForGames';
 import { delayedFetch } from '../utils/rateLimitingAPI';
 import { storeData, getAllData } from '../utils/indexedDB';
 
-// API Response Interfaces
-interface SteamGameResponse {
-    response: {
-        games: Game[];
-    };
-}
-
-interface AppDetailsResponse {
-    [key: string]: {
-        success: boolean;
-        data: {
-            name: string;
-            header_image: string;
-            screenshots?: Screenshot[];
-            genres?: Genre[];
-            developers?: string[];
-            metacritic?: {
-                score: number;
-            };
-            type?: string;
-        };
-    };
-}
-
-interface CachedGameDetail {
-    data: {
-        name: string;
-        image: string;
-        genres?: Genre[];
-        developers?: string[];
-        metacritic?: {
-            score: number;
-        };
-        type?: string;
-    };
-    timestamp: number;
-}
-
-interface CachedGameDetails {
-    [key: number]: CachedGameDetail;
-}
-
-// Data Interfaces
-interface Game {
-    appid: number;
-    playtime_forever: number;
-    name?: string;
-    image?: string;
-    screenshots?: Screenshot[];
-    achievements?: Achievement[];
-    genres?: Genre[];
-    developers?: string[];
-    metacritic?: {
-        score: number;
-    };
-    type?: string;
-}
-
-interface Screenshot {
-    path_full: string;
-}
-
-interface Achievement {
-    apiname: string;
-    achieved: number;
-    unlockTime: number;
-    name?: string;
-    description?: string;
-}
-
-interface Genre {
-    id: number;
-    description: string;
-}
-
-interface GamePictures {
-    [key: number]: string;
-}
-
-interface AllAchievements {
-    [key: string]: Achievement[];
-}
-
-interface RecentAchievement extends Achievement {
-    appId: string;
-    gameName: string;
-}
-
-// Hook return type
-interface UseGamesDataReturn {
-    games: Game[];
-    gamesToDisplay: Game[];
-    allAchievements: AllAchievements;
-    setAllAchievements: React.Dispatch<React.SetStateAction<AllAchievements>>;
-    playtime: number;
-    gamesPlayed: number;
-    gamePictures: GamePictures;
-    overviewGames: Game[];
-    recentGames: Game[];
-    handleLoadMore: () => Promise<void>;
-    mostRecentGame: Game | null;
-    isSyncing: boolean;
-    isFullySynced: boolean;
-    syncAllData: () => Promise<void>;
-    testSchema: () => Promise<void>;
-    recentAchievements: RecentAchievement[];
-    mostPlayedGame: Game | null;
-    isAuthenticated: boolean;
-    steamId: string;
-    isLoading: boolean;
-    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-// Update the hook signature with proper types
-export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
-    // Update state definitions with proper types
-    const [games, setGames] = useState<Game[]>([]);
-    const [gamesToDisplay, setGamesToDisplay] = useState<Game[]>([]);
-    const [allAchievements, setAllAchievements] = useState<AllAchievements>({});
-    const [recentGames, setRecentGames] = useState<Game[]>([]);
-    const [mostRecentGame, setMostRecentGame] = useState<Game | null>(null);
-    const [playtime, setPlaytime] = useState<number>(0);
-    const [gamesPlayed, setGamesPlayed] = useState<number>(0);
-    const [gamePictures, setGamePictures] = useState<GamePictures>({});
-    const [overviewGames, setOverviewGames] = useState<Game[]>([]);
-    const [overviewAchievements, setOverviewAchievements] = useState<AllAchievements>({});
-    const [isSyncing, setIsSyncing] = useState<boolean>(false);
-    const [isFullySynced, setIsFullySynced] = useState<boolean>(false);
-    const [recentAchievements, setRecentAchievements] = useState<(Achievement & { appId: string; gameName: string })[]>([]);
-    const [allGamesList, setAllGamesList] = useState<Game[]>([]);
-    const [mostPlayedGame, setMostPlayedGame] = useState<Game | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+export function useGamesData(steamId, isAuthenticated) {
+    const [games, setGames] = useState([]);
+    const [gamesToDisplay, setGamesToDisplay] = useState([]);
+    const [allAchievements, setAllAchievements] = useState({});
+    const [recentGames, setRecentGames] = useState([]);
+    const [mostRecentGame, setMostRecentGame] = useState(null);
+    const [playtime, setPlaytime] = useState(0);
+    const [gamesPlayed, setGamesPlayed] = useState(0);
+    const [gamePictures, setGamePictures] = useState({});
+    const [overviewGames, setOverviewGames] = useState([]);
+    const [overviewAchievements, setOverviewAchievements] = useState({});
+    const [isSyncing, setIsSyncing] = useState(false);
+    const [isFullySynced, setIsFullySynced] = useState(false);
+    const [recentAchievements, setRecentAchievements] = useState([]);
+    const [allGamesList, setAllGamesList] = useState([]);
+    const [mostPlayedGame, setMostPlayedGame] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     // load cached achievements on initial render
     useEffect(() => {
@@ -142,7 +27,7 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
             const loadCachedAchievements = async () => {
                 const cachedAchievements = await getAllData('achievements');
                 if (cachedAchievements.length > 0) {
-                    const achievementsObj = cachedAchievements.reduce<AllAchievements>((acc, item: { appid: string, achievements: Achievement[] }) => {
+                    const achievementsObj = cachedAchievements.reduce((acc, item) => {
                         acc[item.appid] = item.achievements;
                         return acc;
                     }, {});
@@ -158,18 +43,13 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
     useEffect(() => {
         if (isAuthenticated && steamId) {
             const fetchOverviewGames = async () => {
-                interface CachedOverviewGames {
-                    games: Game[];
-                    mostRecentGame: Game | null;
-                }
-
                 const cachedOverviewGames = localStorage.getItem('cachedOverviewGames');
                 const cacheTimestampOverviewGames = localStorage.getItem('cacheTimestampOverviewGames');
                 const now = new Date().getTime();
 
                 if (cachedOverviewGames && cacheTimestampOverviewGames && 
                     now - parseInt(cacheTimestampOverviewGames) < 12 * 60 * 60 * 1000) {
-                    const parsedOverviewGames = JSON.parse(cachedOverviewGames) as CachedOverviewGames;
+                    const parsedOverviewGames = JSON.parse(cachedOverviewGames);
                     setOverviewGames(parsedOverviewGames.games);
 
                     if (parsedOverviewGames.mostRecentGame?.screenshots?.length) {
@@ -187,13 +67,13 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
 
                 try {
                     const res = await delayedFetch(`/.netlify/functions/getRecentGames/?steamid=${steamId}`);
-                    const data = await res.json() as SteamGameResponse;
+                    const data = await res.json();
                     const recentGamesData = data.response.games || [];
 
                     const gamesWithDetails = await Promise.all(
                         recentGamesData.map(async (game) => {
                             const detailsRes = await delayedFetch(`/.netlify/functions/getAppDetails/?appid=${game.appid}`);
-                            const detailsData = await detailsRes.json() as AppDetailsResponse;
+                            const detailsData = await detailsRes.json();
                             const gameDetails = detailsData[game.appid].data;
                             return {
                                 ...game,
@@ -211,8 +91,7 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
                         isAuthenticated
                     );
 
-                    let mostRecentGameData: Game | null = null;
-
+                    let mostRecentGameData = null;
 
                     if (gamesWithDetails.length > 0) {
                         const randomIndex = Math.floor(Math.random() * gamesWithDetails.length);
@@ -233,7 +112,7 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
 
                     setOverviewGames(gamesWithAchievements);
                     setOverviewAchievements(
-                        gamesWithAchievements.reduce<AllAchievements>((acc, game) => {
+                        gamesWithAchievements.reduce((acc, game) => {
                             if (game.achievements) {
                                 acc[game.appid] = game.achievements;
                             }
@@ -266,8 +145,8 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
                 const cachedGamePictures = localStorage.getItem('cachedGamePictures');
                 const now = new Date().getTime();
 
-                let allGamesList: Game[] = [];
-                let gamePicturesObj: GamePictures = {};
+                let allGamesList = [];
+                let gamePicturesObj = {};
 
                 if (cachedGames && cacheTimestamp && 
                     now - parseInt(cacheTimestamp) < 12 * 60 * 60 * 1000) {
@@ -281,7 +160,7 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
                 } else {
                     setIsLoading(true);
                     const res = await delayedFetch(`/.netlify/functions/getOwnedGames/?steamid=${steamId}`);
-                    const data = await res.json() as SteamGameResponse;
+                    const data = await res.json();
                     allGamesList = data.response.games || [];
                     setGames(allGamesList);
                     setAllGamesList(allGamesList);
@@ -313,9 +192,9 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
 
                 // Load cached achievements from IndexedDB
                 const cachedAchievements = await getAllData('achievements');
-                let achievementsObj: AllAchievements = {};
+                let achievementsObj = {};
                 if (cachedAchievements.length > 0) {
-                    achievementsObj = cachedAchievements.reduce<AllAchievements>((acc, item: { appid: string, achievements: Achievement[] }) => {
+                    achievementsObj = cachedAchievements.reduce((acc, item) => {
                         acc[item.appid] = item.achievements;
                         return acc;
                     }, {});
@@ -336,7 +215,7 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
 
                 if (cachedAchievementsString && cacheTimestampAchievements && 
                     now - parseInt(cacheTimestampAchievements) < 12 * 60 * 60 * 1000) {
-                    const localStorageAchievements = JSON.parse(cachedAchievementsString) as AllAchievements;
+                    const localStorageAchievements = JSON.parse(cachedAchievementsString);
 
                     // Merge localStorage achievements with IndexedDB achievements
                     achievementsObj = { ...achievementsObj, ...localStorageAchievements };
@@ -358,16 +237,12 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
                         isAuthenticated
                     );
                     
-                    achievementsObj = gamesWithAchievements.reduce<AllAchievements>((acc, game) => {
+                    achievementsObj = gamesWithAchievements.reduce((acc, game) => {
                         if (game.achievements) {
                             acc[game.appid] = game.achievements;
                         }
                         return acc;
                     }, {});
-
-                    // Cache the achievements in localStorage
-                    localStorage.setItem('cachedGamesAchievements', JSON.stringify(achievementsObj));
-                    localStorage.setItem('cacheTimestampGamesAchievements', now.toString());
 
                     setAllAchievements(achievementsObj);
 
@@ -378,7 +253,9 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
 
                     setGamesToDisplay(updatedGamesWithAchievements);
 
-                    // force a refresh to update the UI
+                    localStorage.setItem('cachedGamesAchievements', JSON.stringify(achievementsObj));
+                    localStorage.setItem('cacheTimestampGamesAchievements', now.toString());
+
                     window.location.reload();
                 }
                 setIsLoading(false);
@@ -388,9 +265,8 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
         }
     }, [isAuthenticated, steamId]);
 
-    // gets the games name and images
-    const getGamesWithDetails = async (games: Game[]): Promise<Game[]> => {
-        const cachedDetails: CachedGameDetails = JSON.parse(localStorage.getItem('cachedGameDetails') || '{}');
+    const getGamesWithDetails = async (games) => {
+        const cachedDetails = JSON.parse(localStorage.getItem('cachedGameDetails') || '{}');
         const now = new Date().getTime();
 
         const gamesNeedingDetails = games.filter(game =>
@@ -404,17 +280,13 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
             }));
         }
 
-        const newDetails: {
-            appid: number;
-            data: CachedGameDetail['data'];
-            timestamp: number;
-        }[] = [];
+        const newDetails = [];
 
         if (isAuthenticated && steamId) {
             for (const game of gamesNeedingDetails) {
                 try {
                     const detailsRes = await delayedFetch(`/.netlify/functions/getAppDetails/?appid=${game.appid}`);
-                    const detailsData = await detailsRes.json() as AppDetailsResponse;
+                    const detailsData = await detailsRes.json();
 
                     if (detailsData[game.appid].success) {
                         const gameDetails = detailsData[game.appid].data;
@@ -478,35 +350,7 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
         }
     }, [isAuthenticated, steamId, games]);
 
-
-    // const getOverviewGamesWithDetails = async (games) => {
-    //     return Promise.all(games.map(async (game) => {
-    //         try {
-    //             const detailsRes = await fetch(`https://store.steampowered.com/api/appdetails?appids=${game.appid}`);
-    //             const detailsData = await detailsRes.json();
-    //             const gameDetails = detailsData[game.appid].data;
-    //             return {
-    //                 ...game,
-    //                 name: gameDetails.name,
-    //                 image: gameDetails.header_image
-    //             };
-    //         } catch (error) {
-    //             console.error(`Error fetching details for game ${game.appid}:`, error);
-    //             return game;
-    //         }
-    //     }));
-    // };
-
-    // filters out games that dont have achievements
-    // useEffect(() => {
-    //     const gamesWithoutAchievements = gamesToDisplay.filter(game => !allAchievements[game.appid]);
-    //     if (gamesWithoutAchievements.length > 0) {
-    //         fetchAchievementsForGames(gamesWithoutAchievements);
-    //     }
-    // }, []);
-
-    // function for the handle load more button
-    const handleLoadMore = useCallback(async (): Promise<void> => {
+    const handleLoadMore = useCallback(async () => {
         if (isAuthenticated && steamId) {
             setIsLoading(true);
             try {
@@ -517,7 +361,7 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
 
                 // Check if we have cached achievements
                 const cachedGamesAchievements = localStorage.getItem('cachedGamesAchievements');
-                let cachedAchievementsObj: AllAchievements = {};
+                let cachedAchievementsObj = {};
                 if (cachedGamesAchievements) {
                     cachedAchievementsObj = JSON.parse(cachedGamesAchievements);
                 }
@@ -595,8 +439,7 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
         }
     }, [isAuthenticated, steamId, recentGames, getGamesWithDetails, fetchAchievementsForGames]);
 
-    // function for syncing all data
-    const syncAllData = useCallback(async (): Promise<void> => {
+    const syncAllData = useCallback(async () => {
         if (isAuthenticated && steamId) {
             setIsSyncing(true);
             setIsFullySynced(false);
@@ -604,7 +447,7 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
 
             try {
                 const res = await delayedFetch(`/.netlify/functions/getOwnedGames/?steamid=${steamId}`);
-                const data = await res.json() as SteamGameResponse;
+                const data = await res.json();
                 const allGames = data.response.games || [];
 
                 const gamesWithDetails = await getGamesWithDetails(allGames);
@@ -618,7 +461,7 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
                 setGames(gamesWithAchievements);
                 setGamesToDisplay(gamesWithAchievements.slice(0, 20));
 
-                const newGamePictures = gamesWithAchievements.reduce<GamePictures>((acc, game) => {
+                const newGamePictures = gamesWithAchievements.reduce((acc, game) => {
                     if (game.image) {
                         acc[game.appid] = game.image;
                     }
@@ -629,7 +472,7 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
                 await Promise.all(gamesWithAchievements.map(game => storeData('games', game)));
 
                 const allAchievementsData = await getAllData('achievements');
-                const updatedAchievements = allAchievementsData.reduce<AllAchievements>((acc, item: { appid: string, achievements: Achievement[] }) => {
+                const updatedAchievements = allAchievementsData.reduce((acc, item) => {
                     acc[item.appid] = item.achievements;
                     return acc;
                 }, {});
@@ -654,11 +497,9 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
         }
     }, [isAuthenticated, steamId, getGamesWithDetails, gamesToDisplay]);
 
-
-    // getting recent achievements to be used on the overview tab (by date achieved)
-    const getRecentAchievements = useCallback((): RecentAchievement[] | undefined => {
+    const getRecentAchievements = useCallback(() => {
         if (isAuthenticated && steamId) {
-            const allAchievementsList: RecentAchievement[] = [];
+            const allAchievementsList = [];
             Object.entries(allAchievements).forEach(([appId, achievements]) => {
                 if (Array.isArray(achievements)) {
                     achievements.forEach(achievement => {
@@ -707,5 +548,5 @@ export const useGamesData = (steamId: string, isAuthenticated: boolean) => {
         steamId,
         isLoading,
         setIsLoading
-    } as const; // Use const assertion for better type inference
-};
+    };
+}
