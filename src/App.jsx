@@ -403,9 +403,7 @@ export default function App() {
           </tbody>
         </table>
         <div className="flex justify-center items-center">
-          <button
-            className="btn btn-info min-h-0 h-8 m-5 opacity-50 cursor-not-allowed"
-          > Load More
+          <button className="btn btn-info min-h-0 h-8 m-5 opacity-50 cursor-not-allowed"> Load More
           </button>
           <p className="text-sm text-gray-500">Disabled in demo mode</p>
         </div>
@@ -1012,54 +1010,58 @@ export default function App() {
 
             {activeTab === 'Advisor' && (
               isDemo ? renderDemoAdvisor() : (
-                <div className="overflow-x-auto">
+                <div>
                   <h1 className='text-2xl pt-2 pb-2 mr-5 ml-5 mt-5 mb-5'><span className='font-bold'>NEXT</span>GAMES:</h1>
                   <div className="min-w-full flex flex-col bg-base-100 rounded-xl">
-                    {idbGames
-                      .filter(game => allAchievements[game.appid]?.length > 0)
-                      .map(game => {
-                        const achievements = allAchievements[game.appid] || [];
-                        const completedAchievements = achievements.filter(a => a.achieved).length;
-                        const totalAchievements = achievements.length;
-                        const completionRate = completedAchievements / totalAchievements;
-                        
-                        const totalGlobalPercentages = achievements.reduce((sum, a) => sum + (a.percentage || 0), 0);
-                        const averageGlobalPercentage = achievements.length > 0 
-                          ? (totalGlobalPercentages / achievements.length).toFixed(1)
-                          : 0;
-                        
-                        return {
-                          ...game,
-                          completionRate,
-                          averageGlobalPercentage: Number(averageGlobalPercentage)
-                        };
-                      })
-                      .filter(game => game.completionRate < 1)
-                      .sort((a, b) => b.averageGlobalPercentage - a.averageGlobalPercentage)
-                      .slice((advisorPage - 1) * 10, advisorPage * 10)
-                      .map(game => (
-                        <tr key={game.appid} className="hover:bg-primary hover:bg-opacity-10 transition-colors flex items-center">
-                          <td className="p-4">
-                            <img
-                              src={`https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appid}/header.jpg`}
-                              alt={game.name}
-                              className="w-full h-auto rounded-lg"
-                            />
-                          </td>
-                          <td className="p-4">
-                            <div className="font-semibold text-lg">{game.name}</div>
-                            <div className="text-sm text-gray-500">
-                              Average Global Completion: <span className="font-bold text-accent">{game.averageGlobalPercentage}%</span>
-                            </div>
-                          </td>
-                          <td className="p-4">
-                            <div className="flex items-center space-x-2">
-                              <TimeClock className="w-4 h-4" />
-                              <span>{game.playtime_forever ? Math.round(game.playtime_forever / 60) : 0} hours</span>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                    <table className="w-full">
+                      <tbody>
+                        {idbGames
+                          .filter(game => allAchievements[game.appid]?.length > 0)
+                          .map(game => {
+                            const achievements = allAchievements[game.appid] || [];
+                            const completedAchievements = achievements.filter(a => a.achieved).length;
+                            const totalAchievements = achievements.length;
+                            const completionRate = completedAchievements / totalAchievements;
+                            
+                            const totalGlobalPercentages = achievements.reduce((sum, a) => sum + (a.percentage || 0), 0);
+                            const averageGlobalPercentage = achievements.length > 0 
+                              ? (totalGlobalPercentages / achievements.length).toFixed(1)
+                              : 0;
+                            
+                            return {
+                              ...game,
+                              completionRate,
+                              averageGlobalPercentage: Number(averageGlobalPercentage)
+                            };
+                          })
+                          .filter(game => game.completionRate < 1)
+                          .sort((a, b) => b.averageGlobalPercentage - a.averageGlobalPercentage)
+                          .slice((advisorPage - 1) * 10, advisorPage * 10)
+                          .map(game => (
+                            <tr key={game.appid} className="hover:bg-primary hover:bg-opacity-10 transition-colors">
+                              <td className="p-4">
+                                <img
+                                  src={`https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appid}/header.jpg`}
+                                  alt={game.name}
+                                  className="w-full h-auto rounded-lg"
+                                />
+                              </td>
+                              <td className="p-4">
+                                <div className="font-semibold text-lg">{game.name}</div>
+                                <div className="text-sm text-gray-500">
+                                  Average Global Completion: <span className="font-bold text-accent">{game.averageGlobalPercentage}%</span>
+                                </div>
+                              </td>
+                              <td className="p-4">
+                                <div className="flex items-center space-x-2">
+                                  <TimeClock className="w-4 h-4" />
+                                  <span>{game.playtime_forever ? Math.round(game.playtime_forever / 60) : 0} hours</span>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
                   </div>
                   <div className="flex justify-center mt-4 mb-4 space-x-2">
                     <button
@@ -1118,7 +1120,7 @@ export default function App() {
                                   <div className="text-sm opacity-70">{achievement.description}</div>
                                   <div className="text-sm mt-1">
                                     <span className="text-accent">{achievement.gameName}</span> • 
-                                    <span className="ml-2">{achievement.percentage.toFixed(1)}% of players have this</span>
+                                    <span className="ml-2">{(achievement.percentage || 0).toFixed(1)}% of players have this</span>
                                   </div>
                                 </div>
                               </div>
