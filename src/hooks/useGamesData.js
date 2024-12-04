@@ -15,11 +15,19 @@ export function useGamesData(steamId, isAuthenticated) {
     const [overviewGames, setOverviewGames] = useState([]);
     const [overviewAchievements, setOverviewAchievements] = useState({});
     const [isSyncing, setIsSyncing] = useState(false);
-    const [isFullySynced, setIsFullySynced] = useState(false);
+    const [isFullySynced, setIsFullySynced] = useState(() => {
+        const stored = localStorage.getItem('isFullySynced');
+        return stored === 'true';
+    });
     const [recentAchievements, setRecentAchievements] = useState([]);
     const [allGamesList, setAllGamesList] = useState([]);
     const [mostPlayedGame, setMostPlayedGame] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+
+    // Update localStorage when isFullySynced changes
+    useEffect(() => {
+        localStorage.setItem('isFullySynced', isFullySynced.toString());
+    }, [isFullySynced]);
 
     // load cached achievements on initial render
     useEffect(() => {
@@ -486,9 +494,18 @@ export function useGamesData(steamId, isAuthenticated) {
                 setGamesToDisplay(updatedGamesToDisplay);
 
                 setIsSyncing(false);
-                setIsFullySynced(true);
                 setIsLoading(false);
+                
+                await new Promise(resolve => setTimeout(resolve, 100));
                 window.location.reload();
+
+                setIsFullySynced(true);
+                localStorage.setItem('isFullySynced', 'true');
+                // After setting fully synced, load all games
+                if (games.length > 0) {
+                    const allGamesWithDetails = await getGamesWithDetails(games);
+                    setGamesToDisplay(allGamesWithDetails);
+                }
             } catch (error) {
                 console.error('Failed to sync all data:', error);
                 setIsSyncing(false);

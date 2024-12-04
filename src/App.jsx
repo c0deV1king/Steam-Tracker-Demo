@@ -264,6 +264,16 @@ export default function App() {
     }
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    const loadGamesFromIdb = async () => {
+      if (isFullySynced) {
+        const storedGames = await getAllData('games');
+        setIdbGames(storedGames);
+      }
+    };
+    loadGamesFromIdb();
+  }, [isFullySynced]);
+
   if (!isAuthenticated && !isDemo) {
     return <AuthPage onLogin={handleAuth} onDemoLogin={handleDemoLogin} />;
   }
@@ -831,62 +841,110 @@ export default function App() {
 
             {activeTab === 'Games' && (
               isDemo ? renderDemoGames() : (
-                <div>
-                  <table className="table table-sm w-[95%]">
-                    <thead>
-                      <tr>
-                        <th> </th>
-                        <th>Game Name</th>
-                        <th>Achievements Earned</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-primary bg-opacity-5">
-                      {gamesToDisplay
-                        .filter(game => game.playtime_forever > 0)
-                        .map(game => {
-                          const achievements = allAchievements[game.appid] || [];
-                          const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
-                          const totalAchievements = achievements.length;
-                          return {
-                            ...game,
-                            earnedAchievements,
-                            totalAchievements
-                          };
-                        })
-                        .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
-                        .map((game, index) => (
-                          <tr key={game.appid} >
-                            <td className="avatar">
-                              <div className="mask rounded-md h-[107.5px] w-[230px]">
-                                <img
-                                  src={gamePictures[game.appid]}
-                                  alt="Game image" />
-                              </div>
-                            </td>
-                            <td>{game.name}</td>
-                            <td>
-                              {game.totalAchievements > 0 ? (
-                                `${game.earnedAchievements} / ${game.totalAchievements}`
-                              ) : (
-                                'No achievements'
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
-                  <div className="flex justify-center items-center">
-                    <button
-                      className="btn btn-info min-h-0 h-8 m-5"
-                      onClick={handleLoadMore}
-                      disabled={isSyncing}
-                    >
-                      {isFullySynced ? 'Load More' : 'Load More'}
-                    </button>
+                !isFullySynced ? (
+                  <div>
+                    <table className="table table-sm w-[95%]">
+                      <thead>
+                        <tr>
+                          <th> </th>
+                          <th>Game Name</th>
+                          <th>Achievements Earned</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-primary bg-opacity-5">
+                        {gamesToDisplay
+                          .filter(game => game.playtime_forever > 0)
+                          .map(game => {
+                            const achievements = allAchievements[game.appid] || [];
+                            const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
+                            const totalAchievements = achievements.length;
+                            return {
+                              ...game,
+                              earnedAchievements,
+                              totalAchievements
+                            };
+                          })
+                          .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
+                          .map((game, index) => (
+                            <tr key={game.appid} >
+                              <td className="avatar">
+                                <div className="mask rounded-md h-[107.5px] w-[230px]">
+                                  <img
+                                    src={gamePictures[game.appid]}
+                                    alt="Game image" />
+                                </div>
+                              </td>
+                              <td>{game.name}</td>
+                              <td>
+                                {game.totalAchievements > 0 ? (
+                                  `${game.earnedAchievements} / ${game.totalAchievements}`
+                                ) : (
+                                  'No achievements'
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                    <div className="flex justify-center items-center">
+                      <button
+                        className="btn btn-info min-h-0 h-8 m-5"
+                        onClick={handleLoadMore}
+                        disabled={isSyncing}
+                      >
+                        Load More
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
-
+                ) : (
+                  <div>
+                    <table className="table table-sm w-[95%]">
+                      <thead>
+                        <tr>
+                          <th> </th>
+                          <th>Game Name</th>
+                          <th>Achievements Earned</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-primary bg-opacity-5">
+                        {idbGames
+                          .filter(game => game.playtime_forever > 0)
+                          .map(game => {
+                            const achievements = allAchievements[game.appid] || [];
+                            const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
+                            const totalAchievements = achievements.length;
+                            return {
+                              ...game,
+                              earnedAchievements,
+                              totalAchievements
+                            };
+                          })
+                          .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
+                          .map((game, index) => (
+                            <tr key={game.appid} >
+                              <td className="avatar">
+                                <div className="mask rounded-md h-[107.5px] w-[230px]">
+                                  <img
+                                    src={game.image}
+                                    alt="Game image" />
+                                </div>
+                              </td>
+                              <td>{game.name}</td>
+                              <td>
+                                {game.totalAchievements > 0 ? (
+                                  `${game.earnedAchievements} / ${game.totalAchievements}`
+                                ) : (
+                                  'No achievements'
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )
+              )
+            )}
             {activeTab === 'Achievements' && (
               isDemo ? renderDemoAchievements() : (
                 <div className='flex flex-col justify-center items-center m-5'>
@@ -918,55 +976,55 @@ export default function App() {
                         <th>Unlocked</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-primary bg-opacity-5">
-                      {filteredAchievements.currentAchievements.length > 0 ? (
-                        filteredAchievements.currentAchievements.map((achievement, index) => (
-                          <tr key={`${achievement.appId}-${achievement.apiname}`}>
-                            <td className="avatar">
-                              <div className="rounded-xl h-[64px] w-[64px]">
-                                {achievement.icon ? (
-                                  <img
-                                    src={achievement.icon}
-                                    alt={achievement.displayName || achievement.name || 'Achievement icon'}
-                                  />
-                                ) : (
-                                  <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Icon</div>
-                                )}
-                              </div>
-                            </td>
-                            <td>{achievement.displayName || achievement.name || 'Unknown Achievement'}</td>
-                            <td>{achievement.description || 'No description available'}</td>
-                            <td>{achievement.unlockTime ? new Date(achievement.unlockTime * 1000).toLocaleString() : 'Unknown'}</td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan="4" className="text-center">No achievements match your search</td>
+                  <tbody className="bg-primary bg-opacity-5">
+                    {filteredAchievements.currentAchievements.length > 0 ? (
+                      filteredAchievements.currentAchievements.map((achievement, index) => (
+                        <tr key={`${achievement.appId}-${achievement.apiname}`}>
+                          <td className="avatar">
+                            <div className="rounded-xl h-[64px] w-[64px]">
+                              {achievement.icon ? (
+                                <img
+                                  src={achievement.icon}
+                                  alt={achievement.displayName || achievement.name || 'Achievement icon'}
+                                />
+                              ) : (
+                                <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Icon</div>
+                              )}
+                            </div>
+                          </td>
+                          <td>{achievement.displayName || achievement.name || 'Unknown Achievement'}</td>
+                          <td>{achievement.description || 'No description available'}</td>
+                          <td>{achievement.unlockTime ? new Date(achievement.unlockTime * 1000).toLocaleString() : 'Unknown'}</td>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
-                  <div className="join mt-4">
-                    <button
-                      className="join-item btn"
-                      onClick={prevPage}
-                      disabled={currentPage === 1}
-                    >
-                      «
-                    </button>
-                    <button className="join-item btn">
-                      Page {currentPage} of {filteredAchievements.totalPages}
-                    </button>
-                    <button
-                      className="join-item btn"
-                      onClick={nextPage}
-                      disabled={currentPage === filteredAchievements.totalPages}
-                    >
-                      »
-                    </button>
-                  </div>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="text-center">No achievements match your search</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+                <div className="join mt-4">
+                  <button
+                    className="join-item btn"
+                    onClick={prevPage}
+                    disabled={currentPage === 1}
+                  >
+                    «
+                  </button>
+                  <button className="join-item btn">
+                    Page {currentPage} of {filteredAchievements.totalPages}
+                  </button>
+                  <button
+                    className="join-item btn"
+                    onClick={nextPage}
+                    disabled={currentPage === filteredAchievements.totalPages}
+                  >
+                    »
+                  </button>
                 </div>
-              ))}
+              </div>
+            ))}
 
             {activeTab === 'Stats' && (
               isDemo ? renderDemoStats() : (
