@@ -72,7 +72,7 @@ const LoadingScreen = () => {
         <span className="loading loading-spinner loading-lg text-accent"></span>
         <div className="flex flex-row items-center justify-center bg-base-300 rounded-lg p-1 mt-2">
           <p className="text-gray-500 pr-1"> &gt; </p>
-          <p className="text-gray-300"> 
+          <p className="text-gray-300">
             {displayedText}
             <span className={`${showCursor ? 'opacity-100' : 'opacity-0'}`}>|</span>
           </p>
@@ -376,7 +376,7 @@ export default function App() {
         <table className="table table-sm w-[95%]">
           <thead>
             <tr>
-              <th> </th>
+              <th> </th>
               <th>Game Name</th>
               <th>Achievements Earned</th>
             </tr>
@@ -764,75 +764,81 @@ export default function App() {
               isDemo ? renderDemoOverview() : (
                 <div>
 
-                  <div className='flex flex-row justify-evenly items-center mt-5'>
-                    <p>Recent Games</p>
-                    <p>Recent Achievements</p>
+                  <div className='flex flex-row w-[100%] justify-center items-center mt-5'>
+                    <p className='text-center text-2xl flex-1'>Recent Games</p>
+                    <p className='text-center text-2xl flex-1'>Recent Achievements</p>
                   </div>
 
                   <div className="container mx-auto w-full flex flex-row justify-between items-start gap-4 p-4">
-                    <table className="table table-sm w-[48%]">
-                      <thead>
-                        <tr>
-                          <th className="w-1/3"> </th>
-                          <th>Game Name</th>
-                          <th>Achievements</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-primary bg-opacity-5">
+                    <div className="w-[50%]">
+                      <div className="grid grid-cols-1 gap-4">
                         {Array.isArray(overviewGames) && overviewGames.length > 0 ? overviewGames.slice(0, 5).map((game) => (
-                          <tr key={game.appid}>
-                            <td className="w-1/3">
-                              <div className="aspect-[460/215] w-full overflow-hidden">
-                                {game.image ? (
-                                  <img src={game.image} alt={`${game.name || 'Game'} image`} className="w-full h-full object-cover" />
-                                ) : (
-                                  <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Image</div>
-                                )}
-                              </div>
-                            </td>
-                            <td className="w-1/2">{game.name || `Game ID: ${game.appid}`}</td>
-                            <td className="w-1/6 text-center">
-                              {game.achievements && game.achievements.length > 0
-                                ? `${game.achievements.filter(a => a.achieved).length} / ${game.achievements.length}`
-                                : 'N/A'}
-                            </td>
-                          </tr>
-                        )) : <tr><td colSpan="3" className="text-center">No games to display</td></tr>}
-                      </tbody>
-                    </table>
-
-                    <table className="table table-sm w-[48%]">
-                      <thead>
-                        <tr>
-                          <th> </th>
-                          <th>Achievement</th>
-                          <th>Date Earned</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-primary bg-opacity-5">
-                        {recentAchievements && recentAchievements.length > 0 ? (
-                          recentAchievements.map((achievement) => (
-                            <tr key={`${achievement.appId}-${achievement.apiname}`}>
-                              <td className="w-1/6">
-                                <div className="w-12 h-12 overflow-hidden">
-                                  {achievement.icon ? (
-                                    <img src={achievement.icon} alt={achievement.displayName || achievement.name} className="w-full h-full object-cover" />
-                                  ) : (
-                                    <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Icon</div>
-                                  )}
+                          <div key={game.appid} className="bg-base-100 rounded-xl p-4 shadow-xl">
+                            <div className="flex items-center space-x-4">
+                              <div className="avatar">
+                                <div className="rounded-xl h-[107.5px] w-[230px]">
+                                  <img
+                                    src={game.image}
+                                    alt="Game image"
+                                    className="object-cover" />
                                 </div>
-                              </td>
-                              <td className='w-1/3'>{achievement.displayName || achievement.name}</td>
-                              <td className='w-1/4'>{new Date(achievement.unlockTime * 1000).toLocaleString()}</td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan="3" className="text-center">No recent achievements to display.</td>
-                          </tr>
+                              </div>
+                              <div className="flex-grow space-y-2">
+                                <div className="font-bold text-xl">{game.name || `Game ID: ${game.appid}`}</div>
+                                <div className="flex items-center flex-col space-x-2">
+                                  <progress
+                                    className="progress progress-accent w-56"
+                                    value={game.achievements ? (game.achievements.filter(a => a.achieved).length / game.achievements.length) * 100 : 0}
+                                    max="100"
+                                  ></progress>
+                                  <span className="text-sm">
+                                    {game.achievements ? `${game.achievements.filter(a => a.achieved).length} / ${game.achievements.length}` : 'N/A'}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )) : (
+                          <div className="text-center p-4">No games to display</div>
                         )}
-                      </tbody>
-                    </table>
+                      </div>
+                    </div>
+
+                    <div className="card bg-base-100 shadow-xl">
+                      <div className="card-body p-2">
+                        <div className="grid grid-cols-1 gap-2">
+                          {recentAchievements.length > 0 ? (
+                            recentAchievements.map((achievement) => (
+                              <div key={`${achievement.appId}-${achievement.apiname}`} className="bg-base-200 rounded-xl p-4">
+                                <div className="flex items-center space-x-4">
+                                  <div className="avatar">
+                                    <div className="rounded-xl h-[64px] w-[64px]">
+                                      {achievement.icon ? (
+                                        <img
+                                          src={achievement.icon}
+                                          alt={achievement.displayName || achievement.name || 'Achievement icon'}
+                                        />
+                                      ) : (
+                                        <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Icon</div>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex-grow">
+                                    <div className="font-bold">{achievement.displayName || achievement.name || 'Unknown Achievement'}</div>
+                                    <div className="text-sm mt-1">
+                                      <span className="text-accent">{achievement.gameName}</span> •
+                                      <span className="ml-2">{achievement.unlockTime ? new Date(achievement.unlockTime * 1000).toLocaleString() : 'Unknown'}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-center p-4">No recent achievements</div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -843,49 +849,88 @@ export default function App() {
               isDemo ? renderDemoGames() : (
                 !isFullySynced ? (
                   <div>
-                    <table className="table table-sm w-[95%]">
-                      <thead>
-                        <tr>
-                          <th> </th>
-                          <th>Game Name</th>
-                          <th>Achievements Earned</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-primary bg-opacity-5">
-                        {gamesToDisplay
-                          .filter(game => game.playtime_forever > 0)
-                          .map(game => {
-                            const achievements = allAchievements[game.appid] || [];
-                            const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
-                            const totalAchievements = achievements.length;
-                            return {
-                              ...game,
-                              earnedAchievements,
-                              totalAchievements
-                            };
-                          })
-                          .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
-                          .map((game, index) => (
-                            <tr key={game.appid} >
-                              <td className="avatar">
-                                <div className="mask rounded-md h-[107.5px] w-[230px]">
+
+                    <div className="flex flex-row justify-center items-center mt-4">
+                      <label className="input input-bordered flex items-center gap-2 w-[50%]">
+                        <input
+                          type="text"
+                          className="grow"
+                          placeholder="Search Games"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <svg
+                          xmlns="https://www.w3.org/2000/svg"
+                          viewBox="0 0 16 16"
+                          fill="currentColor"
+                          className="h-4 w-4 opacity-70">
+                          <path
+                            fillRule="evenodd"
+                            d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                            clipRule="evenodd" />
+                        </svg>
+                      </label>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 mx-5 mt-4">
+                      {gamesToDisplay
+                        .filter(game => game.playtime_forever > 0)
+                        .map(game => {
+                          const achievements = allAchievements[game.appid] || [];
+                          const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
+                          const totalAchievements = achievements.length;
+
+                          const totalGlobalPercentages = achievements.reduce((sum, a) => sum + (a.percentage || 0), 0);
+                          const averageGlobalPercentage = achievements.length > 0
+                            ? (totalGlobalPercentages / achievements.length).toFixed(1)
+                            : 0;
+
+                          return {
+                            ...game,
+                            earnedAchievements,
+                            totalAchievements,
+                            averageGlobalPercentage: Number(averageGlobalPercentage)
+                          };
+                        })
+                        .filter(game => {
+                          const searchString = `${game.name || ''} ${game.appid || ''}`.toLowerCase();
+                          return searchString.includes(searchTerm.toLowerCase());
+                        })
+                        .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
+                        .map((game, index) => (
+                          <div key={game.appid} className="bg-base-100 rounded-xl p-4 shadow-xl">
+                            <div className="flex items-center space-x-4">
+                              <div className="avatar">
+                                <div className="rounded-xl h-[107.5px] w-[230px]">
                                   <img
                                     src={gamePictures[game.appid]}
-                                    alt="Game image" />
+                                    alt="Game image"
+                                    className="object-cover" />
                                 </div>
-                              </td>
-                              <td>{game.name}</td>
-                              <td>
-                                {game.totalAchievements > 0 ? (
-                                  `${game.earnedAchievements} / ${game.totalAchievements}`
-                                ) : (
-                                  'No achievements'
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
+                              </div>
+                              <div className="flex-grow space-y-2">
+                                <div className="font-bold text-xl">{game.name}</div>
+                                <div className="flex items-center space-x-2">
+                                  <progress
+                                    className="progress progress-accent w-56"
+                                    value={game.totalAchievements ? (game.earnedAchievements / game.totalAchievements) * 100 : 0}
+                                    max="100"
+                                  ></progress>
+                                  <span className="text-sm">
+                                    {game.earnedAchievements}/{game.totalAchievements}
+                                  </span>
+                                </div>
+                                <div className="text-sm space-y-1">
+                                  Average Global Completion: <span className="text-accent">{game.averageGlobalPercentage}%</span>
+                                  <div>
+                                    Time Played: <span className="text-accent">{Math.round(game.playtime_forever / 60)} hours</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
                     <div className="flex justify-center items-center">
                       <button
                         className="btn btn-info min-h-0 h-8 m-5"
@@ -898,49 +943,88 @@ export default function App() {
                   </div>
                 ) : (
                   <div>
-                    <table className="table table-sm w-[95%]">
-                      <thead>
-                        <tr>
-                          <th> </th>
-                          <th>Game Name</th>
-                          <th>Achievements Earned</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-primary bg-opacity-5">
-                        {idbGames
-                          .filter(game => game.playtime_forever > 0)
-                          .map(game => {
-                            const achievements = allAchievements[game.appid] || [];
-                            const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
-                            const totalAchievements = achievements.length;
-                            return {
-                              ...game,
-                              earnedAchievements,
-                              totalAchievements
-                            };
-                          })
-                          .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
-                          .map((game, index) => (
-                            <tr key={game.appid} >
-                              <td className="avatar">
-                                <div className="mask rounded-md h-[107.5px] w-[230px]">
+
+                    <div className="flex flex-row justify-center items-center mt-4">
+                      <label className="input input-bordered flex items-center gap-2 w-[50%]">
+                        <input
+                          type="text"
+                          className="grow"
+                          placeholder="Search Games"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <svg
+                          xmlns="https://www.w3.org/2000/svg"
+                          viewBox="0 0 16 16"
+                          fill="currentColor"
+                          className="h-4 w-4 opacity-70">
+                          <path
+                            fillRule="evenodd"
+                            d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                            clipRule="evenodd" />
+                        </svg>
+                      </label>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 mx-5 mt-4">
+                      {idbGames
+                        .filter(game => game.playtime_forever > 0)
+                        .map(game => {
+                          const achievements = allAchievements[game.appid] || [];
+                          const earnedAchievements = achievements.filter(achievement => achievement.achieved).length;
+                          const totalAchievements = achievements.length;
+
+                          const totalGlobalPercentages = achievements.reduce((sum, a) => sum + (a.percentage || 0), 0);
+                          const averageGlobalPercentage = achievements.length > 0
+                            ? (totalGlobalPercentages / achievements.length).toFixed(1)
+                            : 0;
+
+                          return {
+                            ...game,
+                            earnedAchievements,
+                            totalAchievements,
+                            averageGlobalPercentage: Number(averageGlobalPercentage)
+                          };
+                        })
+                        .filter(game => {
+                          const searchString = `${game.name || ''} ${game.appid || ''}`.toLowerCase();
+                          return searchString.includes(searchTerm.toLowerCase());
+                        })
+                        .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
+                        .map((game, index) => (
+                          <div key={game.appid} className="bg-base-100 rounded-xl p-4 shadow-xl">
+                            <div className="flex items-center space-x-4">
+                              <div className="avatar">
+                                <div className="rounded-xl h-[107.5px] w-[230px]">
                                   <img
                                     src={game.image}
-                                    alt="Game image" />
+                                    alt="Game image"
+                                    className="object-cover" />
                                 </div>
-                              </td>
-                              <td>{game.name}</td>
-                              <td>
-                                {game.totalAchievements > 0 ? (
-                                  `${game.earnedAchievements} / ${game.totalAchievements}`
-                                ) : (
-                                  'No achievements'
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
+                              </div>
+                              <div className="flex-grow space-y-2">
+                                <div className="font-bold text-xl">{game.name}</div>
+                                <div className="flex items-center space-x-2">
+                                  <progress
+                                    className="progress progress-accent w-56"
+                                    value={game.totalAchievements ? (game.earnedAchievements / game.totalAchievements) * 100 : 0}
+                                    max="100"
+                                  ></progress>
+                                  <span className="text-sm">
+                                    {game.earnedAchievements}/{game.totalAchievements}
+                                  </span>
+                                </div>
+                                <div className="text-sm space-y-1">
+                                  Average Global Completion: <span className="text-accent">{game.averageGlobalPercentage}%</span>
+                                  <div className="flex items-center space-x-1">
+                                    <TimeClock className='w-4 h-4 fill-white mr-1' /> <span className="text-accent">{Math.round(game.playtime_forever / 60)} hours</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
                   </div>
                 )
               )
@@ -967,227 +1051,234 @@ export default function App() {
                         clipRule="evenodd" />
                     </svg>
                   </label>
-                  <table className="table table-lg w-[95%]">
-                    <thead>
-                      <tr>
-                        <th> </th>
-                        <th>Achievement</th>
-                        <th>Description</th>
-                        <th>Unlocked</th>
-                      </tr>
-                    </thead>
-                  <tbody className="bg-primary bg-opacity-5">
+                  <div className="grid grid-cols-1 gap-4 mx-5 mt-4">
                     {filteredAchievements.currentAchievements.length > 0 ? (
                       filteredAchievements.currentAchievements.map((achievement, index) => (
-                        <tr key={`${achievement.appId}-${achievement.apiname}`}>
-                          <td className="avatar">
-                            <div className="rounded-xl h-[64px] w-[64px]">
-                              {achievement.icon ? (
-                                <img
-                                  src={achievement.icon}
-                                  alt={achievement.displayName || achievement.name || 'Achievement icon'}
-                                />
-                              ) : (
-                                <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Icon</div>
-                              )}
+                        <div key={`${achievement.appId}-${achievement.apiname}`} className="bg-base-100 rounded-xl p-4 shadow-xl">
+                          <div className="flex items-center space-x-4">
+                            <div className="avatar">
+                              <div className="rounded-xl h-[64px] w-[64px]">
+                                {achievement.icon ? (
+                                  <img
+                                    src={achievement.icon}
+                                    alt={achievement.displayName || achievement.name || 'Achievement icon'}
+                                  />
+                                ) : (
+                                  <div className="bg-gray-300 h-full w-full flex items-center justify-center">No Icon</div>
+                                )}
+                              </div>
                             </div>
-                          </td>
-                          <td>{achievement.displayName || achievement.name || 'Unknown Achievement'}</td>
-                          <td>{achievement.description || 'No description available'}</td>
-                          <td>{achievement.unlockTime ? new Date(achievement.unlockTime * 1000).toLocaleString() : 'Unknown'}</td>
-                        </tr>
+                            <div className="flex-grow">
+                              <div className="font-bold">{achievement.displayName || achievement.name || 'Unknown Achievement'}</div>
+                              <div className="text-sm opacity-70">{achievement.description || 'No description available'}</div>
+                              <div className="text-sm mt-1">
+                                <span className="text-accent">{achievement.gameName}</span> •
+                                <span className="ml-2">{achievement.unlockTime ? new Date(achievement.unlockTime * 1000).toLocaleString() : 'Unknown'} •</span>
+                                <span className="ml-2 text-accent">Earned by {(achievement.percentage || 0).toFixed(1)}% of players</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       ))
                     ) : (
-                      <tr>
-                        <td colSpan="4" className="text-center">No achievements match your search</td>
-                      </tr>
+                      <div className="text-center p-4">No achievements match your search</div>
                     )}
-                  </tbody>
-                </table>
-                <div className="join mt-4">
-                  <button
-                    className="join-item btn"
-                    onClick={prevPage}
-                    disabled={currentPage === 1}
-                  >
-                    «
-                  </button>
-                  <button className="join-item btn">
-                    Page {currentPage} of {filteredAchievements.totalPages}
-                  </button>
-                  <button
-                    className="join-item btn"
-                    onClick={nextPage}
-                    disabled={currentPage === filteredAchievements.totalPages}
-                  >
-                    »
-                  </button>
-                </div>
-              </div>
-            ))}
-
-            {activeTab === 'Stats' && (
-              isDemo ? renderDemoStats() : (
-                <div className="container mx-auto">
-                  <div className="stats-page">
-                    <h1 className="text-2xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mt-5 mb-[10%]">Game Statistics</h1>
-
-                    <div className="chart-container h-[250px] w-[100%]">
-                      {chartData.genreChart.length > 0 ? renderGenreChart() : <p>Loading genre data...</p>}
-                    </div>
-
-                    <div className="chart-container h-[800px] w-[100%]">
-                      {chartData.playtimeChart.hourData.length > 0 && chartData.playtimeChart.dayData.length > 0 ?
-                        renderPlaytimeChart() :
-                        <p>Loading playtime data...</p>
-                      }
-                    </div>
-
-                    {mostPlayedGame ? (
-                      <div className='flex flex-row justify-center items-center mt-5 w-[100%]'>
-                        <div className="container flex flex-col justify-center items-center mr-0 w-[50%]">
-                          <p className='text-2xl'>{mostPlayedGame.name || 'Name not available'}</p>
-                          <p>Playtime: <span className='text-success font-bold'>{Math.round((mostPlayedGame.playtime_forever || 0) / 60)} hours</span></p>
-                        </div>
-
-                        <div className="container flex flex-row justify-center items-start mb-5 w-[50%]">
-                          {mostPlayedGame.image ? (
-                            <img src={mostPlayedGame.image} alt={mostPlayedGame.name || 'Most played game'} className="object-cover" />
-                          ) : (
-                            <p>Image not available</p>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <p>Loading most played game data...</p>
-                    )}
-                    <h2 className="text-xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mb-[10%]">Most Played Game</h2>
+                  </div>
+                  <div className="join mt-4 mb-4">
+                    <button
+                      className="join-item btn"
+                      onClick={prevPage}
+                      disabled={currentPage === 1}
+                    >
+                      «
+                    </button>
+                    <button className="join-item btn">
+                      Page {currentPage} of {filteredAchievements.totalPages}
+                    </button>
+                    <button
+                      className="join-item btn"
+                      onClick={nextPage}
+                      disabled={currentPage === filteredAchievements.totalPages}
+                    >
+                      »
+                    </button>
                   </div>
                 </div>
               ))}
 
+            {activeTab === 'Stats' && (
+              isDemo ? renderDemoStats() : (
+                isFullySynced ? (
+                  <div className="container mx-auto">
+                    <div className="stats-page">
+                      <h1 className="text-2xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mt-5 mb-[10%]">Game Statistics</h1>
+
+                      <div className="chart-container h-[250px] w-[100%]">
+                        {chartData.genreChart.length > 0 ? renderGenreChart() : <p>Loading genre data...</p>}
+                      </div>
+
+                      <div className="chart-container h-[800px] w-[100%]">
+                        {chartData.playtimeChart.hourData.length > 0 && chartData.playtimeChart.dayData.length > 0 ?
+                          renderPlaytimeChart() :
+                          <p>Loading playtime data...</p>
+                        }
+                      </div>
+
+                      {mostPlayedGame ? (
+                        <div className='flex flex-row justify-center items-center mt-5 w-[100%]'>
+                          <div className="container flex flex-col justify-center items-center mr-0 w-[50%]">
+                            <p className='text-2xl'>{mostPlayedGame.name || 'Name not available'}</p>
+                            <p>Playtime: <span className='text-success font-bold'>{Math.round((mostPlayedGame.playtime_forever || 0) / 60)} hours</span></p>
+                          </div>
+
+                          <div className="container flex flex-row justify-center items-start mb-5 w-[50%]">
+                            {mostPlayedGame.image ? (
+                              <img src={mostPlayedGame.image} alt={mostPlayedGame.name || 'Most played game'} className="object-cover" />
+                            ) : (
+                              <p>Image not available</p>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <p>Loading most played game data...</p>
+                      )}
+                      <h2 className="text-xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mb-[10%]">Most Played Game</h2>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <p className='text-2xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mt-5 mb-5'>Stats require a full sync to be accurate. Please hit the sync all button under your profile avatar above.</p>
+                  </div>
+                )
+              ))}
             {activeTab === 'Advisor' && (
               isDemo ? renderDemoAdvisor() : (
-                <div>
-                  <h1 className='text-2xl pt-2 pb-2 mr-5 ml-5 mt-5 mb-5'><span className='font-bold'>NEXT</span>GAMES:</h1>
-                  <div className="min-w-full flex flex-col bg-base-100 rounded-xl">
-                    <table className="w-full">
-                      <tbody>
-                        {idbGames
+                isFullySynced ? (
+                  <div>
+                    <h1 className='text-2xl pt-2 pb-2 mr-5 ml-5 mt-5 mb-5'><span className='font-bold'>NEXT</span>GAMES:</h1>
+                    <div className="min-w-full flex flex-col bg-base-100 rounded-xl">
+                      <table className="w-full">
+                        <tbody>
+                          {idbGames
+                            .filter(game => allAchievements[game.appid]?.length > 0)
+                            .map(game => {
+                              const achievements = allAchievements[game.appid] || [];
+                              const completedAchievements = achievements.filter(a => a.achieved).length;
+                              const totalAchievements = achievements.length;
+                              const completionRate = completedAchievements / totalAchievements;
+
+                              const totalGlobalPercentages = achievements.reduce((sum, a) => sum + (a.percentage || 0), 0);
+                              const averageGlobalPercentage = achievements.length > 0
+                                ? (totalGlobalPercentages / achievements.length).toFixed(1)
+                                : 0;
+
+                              return {
+                                ...game,
+                                completionRate,
+                                averageGlobalPercentage: Number(averageGlobalPercentage)
+                              };
+                            })
+                            .filter(game => game.completionRate < 1)
+                            .sort((a, b) => b.averageGlobalPercentage - a.averageGlobalPercentage)
+                            .slice((advisorPage - 1) * 10, advisorPage * 10)
+                            .map(game => (
+                              <tr key={game.appid} className="hover:bg-primary hover:bg-opacity-10 transition-colors">
+                                <td className="p-4">
+                                  <img
+                                    src={`https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appid}/header.jpg`}
+                                    alt={game.name}
+                                    className="w-full h-auto rounded-lg"
+                                  />
+                                </td>
+                                <td className="p-4">
+                                  <div className="font-semibold text-lg">{game.name}</div>
+                                  <div className="text-sm text-gray-500">
+                                    Average Global Completion: <span className="text-accent">{game.averageGlobalPercentage}%</span>
+                                  </div>
+                                </td>
+                                <td className="p-4">
+                                  <div className="flex items-center space-x-2">
+                                    <TimeClock className="w-4 h-4" />
+                                    <span>{game.playtime_forever ? Math.round(game.playtime_forever / 60) : 0} hours</span>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="flex justify-center mt-4 mb-4 space-x-2">
+                      <button
+                        onClick={() => setAdvisorPage(prev => Math.max(1, prev - 1))}
+                        disabled={advisorPage === 1}
+                        className="px-4 py-2 bg-primary text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Previous
+                      </button>
+                      <span className="px-4 py-2">
+                        Page {advisorPage}
+                      </span>
+                      <button
+                        onClick={() => setAdvisorPage(prev => prev + 1)}
+                        disabled={idbGames
                           .filter(game => allAchievements[game.appid]?.length > 0)
-                          .map(game => {
+                          .filter(game => {
                             const achievements = allAchievements[game.appid] || [];
                             const completedAchievements = achievements.filter(a => a.achieved).length;
                             const totalAchievements = achievements.length;
-                            const completionRate = completedAchievements / totalAchievements;
-                            
-                            const totalGlobalPercentages = achievements.reduce((sum, a) => sum + (a.percentage || 0), 0);
-                            const averageGlobalPercentage = achievements.length > 0 
-                              ? (totalGlobalPercentages / achievements.length).toFixed(1)
-                              : 0;
-                            
-                            return {
-                              ...game,
-                              completionRate,
-                              averageGlobalPercentage: Number(averageGlobalPercentage)
-                            };
-                          })
-                          .filter(game => game.completionRate < 1)
-                          .sort((a, b) => b.averageGlobalPercentage - a.averageGlobalPercentage)
-                          .slice((advisorPage - 1) * 10, advisorPage * 10)
-                          .map(game => (
-                            <tr key={game.appid} className="hover:bg-primary hover:bg-opacity-10 transition-colors">
-                              <td className="p-4">
-                                <img
-                                  src={`https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appid}/header.jpg`}
-                                  alt={game.name}
-                                  className="w-full h-auto rounded-lg"
-                                />
-                              </td>
-                              <td className="p-4">
-                                <div className="font-semibold text-lg">{game.name}</div>
-                                <div className="text-sm text-gray-500">
-                                  Average Global Completion: <span className="font-bold text-accent">{game.averageGlobalPercentage}%</span>
-                                </div>
-                              </td>
-                              <td className="p-4">
-                                <div className="flex items-center space-x-2">
-                                  <TimeClock className="w-4 h-4" />
-                                  <span>{game.playtime_forever ? Math.round(game.playtime_forever / 60) : 0} hours</span>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div className="flex justify-center mt-4 mb-4 space-x-2">
-                    <button
-                      onClick={() => setAdvisorPage(prev => Math.max(1, prev - 1))}
-                      disabled={advisorPage === 1}
-                      className="px-4 py-2 bg-primary text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Previous
-                    </button>
-                    <span className="px-4 py-2">
-                      Page {advisorPage}
-                    </span>
-                    <button
-                      onClick={() => setAdvisorPage(prev => prev + 1)}
-                      disabled={idbGames
-                        .filter(game => allAchievements[game.appid]?.length > 0)
-                        .filter(game => {
-                          const achievements = allAchievements[game.appid] || [];
-                          const completedAchievements = achievements.filter(a => a.achieved).length;
-                          const totalAchievements = achievements.length;
-                          return completedAchievements / totalAchievements < 1;
-                        }).length <= advisorPage * 10}
-                      className="px-4 py-2 bg-primary text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Next
-                    </button>
-                  </div>
+                            return completedAchievements / totalAchievements < 1;
+                          }).length <= advisorPage * 10}
+                        className="px-4 py-2 bg-primary text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Next
+                      </button>
+                    </div>
 
-                  <div className="container mx-auto mb-5">
-                    <h1 className='text-2xl pt-2 pb-2 mr-5 ml-5 mt-5 mb-5'><span className='font-bold'>NEXT</span>ACHIEVEMENTS:</h1>
-                    <div className="grid grid-cols-1 gap-4 mx-5">
-                      {(() => {
-                        const cachedGameDetails = JSON.parse(localStorage.getItem('cachedGameDetails') || '{}');
-                        return Object.entries(allAchievements)
-                          .flatMap(([appId, achievements]) => 
-                            achievements
-                              .filter(achievement => !achievement.achieved)
-                              .map(achievement => ({
-                                ...achievement,
-                                appId,
-                                gameName: cachedGameDetails[appId]?.data?.name || 'Unknown Game'
-                              }))
-                          )
-                          .sort((a, b) => b.percentage - a.percentage)
-                          .slice(0, 10)
-                          .map((achievement, index) => (
-                            <div key={`${achievement.appId}-${achievement.apiname}`} className="bg-base-100 rounded-xl p-4 shadow-xl">
-                              <div className="flex items-center space-x-4">
-                                <div className="avatar">
-                                  <div className="rounded-xl h-[64px] w-[64px]">
-                                    <img src={achievement.icon} alt={achievement.displayName} />
+                    <div className="container mx-auto mb-5">
+                      <h1 className='text-2xl pt-2 pb-2 mr-5 ml-5 mt-5 mb-5'><span className='font-bold'>NEXT</span>ACHIEVEMENTS:</h1>
+                      <div className="grid grid-cols-1 gap-4 mx-5">
+                        {(() => {
+                          const cachedGameDetails = JSON.parse(localStorage.getItem('cachedGameDetails') || '{}');
+                          return Object.entries(allAchievements)
+                            .flatMap(([appId, achievements]) =>
+                              achievements
+                                .filter(achievement => !achievement.achieved)
+                                .map(achievement => ({
+                                  ...achievement,
+                                  appId,
+                                  gameName: cachedGameDetails[appId]?.data?.name || 'Unknown Game'
+                                }))
+                            )
+                            .sort((a, b) => b.percentage - a.percentage)
+                            .slice(0, 10)
+                            .map((achievement, index) => (
+                              <div key={`${achievement.appId}-${achievement.apiname}`} className="bg-base-100 rounded-xl p-4 shadow-xl">
+                                <div className="flex items-center space-x-4">
+                                  <div className="avatar">
+                                    <div className="rounded-xl h-[64px] w-[64px]">
+                                      <img src={achievement.icon} alt={achievement.displayName} />
+                                    </div>
                                   </div>
-                                </div>
-                                <div className="flex-grow">
-                                  <div className="font-bold">{achievement.displayName}</div>
-                                  <div className="text-sm opacity-70">{achievement.description}</div>
-                                  <div className="text-sm mt-1">
-                                    <span className="text-accent">{achievement.gameName}</span> • 
-                                    <span className="ml-2">{(achievement.percentage || 0).toFixed(1)}% of players have this</span>
+                                  <div className="flex-grow">
+                                    <div className="font-bold">{achievement.displayName}</div>
+                                    <div className="text-sm opacity-70">{achievement.description}</div>
+                                    <div className="text-sm mt-1">
+                                      <span className="text-accent">{achievement.gameName}</span> •
+                                      <span className="ml-2">{(achievement.percentage || 0).toFixed(1)}% of players have this</span>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          ));
-                      })()}
+                            ));
+                        })()}
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div>
+                    <p className='text-2xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mt-5 mb-5'>Advisor requires fully synced data, hit the sync all button under your profile avatar above.</p>
+                  </div>
+                )
               ))
             }
           </div>
