@@ -12,16 +12,19 @@ Live Link: https://steam-tracker.netlify.app/
 - Recently played games
 - Profile overview
 - Recent games screenshots
-- A games tab with achievement trackers, with the ability to "load more" games dynamically without a full sync if you choose
+- A games tab with achievement trackers, with the ability to "load more" games dynamically without a full sync if you choose, includes a search bar
 - An achievements tab to show all your achievements, including a search bar
   (Requires a full sync to show all your achievements, otherwise it just shows whats available in the games tab)
 - A full sync button to sync all your games and achievements<br>
 - A stats tab that takes your information and displays cool stats based on it<br>
-- Steam authentication
+- Steam authentication<br>
+- Achievement/Game advisor
+- Changelog featuring app updates
 
 ## 📖 Planned features:
-- A "play next" feature that suggests what achievements and games to play next
-- A devlog/changelog that details future updates
+- Mobile friendliness
+- Full game pages with data from that game
+- "Ask AI" achievement guides
 - Social media / web creator to quickly come up with a "card" of an overview of your stats to share with your achievement hunting friends
 
 ## 🚀 Future endeavours:
