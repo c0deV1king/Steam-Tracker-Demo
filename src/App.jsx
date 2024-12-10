@@ -25,7 +25,15 @@ const LoadingScreen = () => {
     "taking a peak at your profile...",
     "deciding what screenshot you might like best...",
     "shouting at dragons...",
-    "taking an arrow to the knee..."
+    "taking an arrow to the knee...",
+    "downloading more ram...",
+    "loading battlestations...",
+    "system processing please wait...",
+    "creating codex...",
+    "assembling access points...",
+    "playing minesweeper...",
+    "booting up battleships...",
+    "visualizing vectors..."
   ];
 
   useEffect(() => {
@@ -765,8 +773,8 @@ export default function App() {
                 <div>
 
                   <div className='flex flex-row w-[100%] justify-center items-center mt-5'>
-                    <p className='text-center text-2xl flex-1'>Recent Games</p>
-                    <p className='text-center text-2xl flex-1'>Recent Achievements</p>
+                    <p className='text-center text-2xl flex-1'><span className='font-bold'>RECENT</span>GAMES</p>
+                    <p className='text-center text-2xl flex-1'><span className='font-bold'>RECENT</span>ACHIEVEMENTS</p>
                   </div>
 
                   <div className="container mx-auto w-full flex flex-row justify-between items-start gap-4 p-4">
