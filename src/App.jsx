@@ -282,6 +282,28 @@ export default function App() {
     loadGamesFromIdb();
   }, [isFullySynced]);
 
+  const [gamesData, setGamesData] = useState({});
+  useEffect(() => {
+    const loadGamesData = async () => {
+      if (isFullySynced) {
+        const games = await getAllData('games');
+        const gamesMap = games.reduce((acc, game) => {
+          acc[game.appid] = game;
+          return acc;
+        }, {});
+        setGamesData(gamesMap);
+      }
+    };
+    loadGamesData();
+  }, [isFullySynced]);
+
+  const getGameName = (appId) => {
+    if (!isFullySynced || !gamesData[appId]) {
+      return 'Unknown Game';
+    }
+    return gamesData[appId].name || 'Unknown Game';
+  };
+
   if (!isAuthenticated && !isDemo) {
     return <AuthPage onLogin={handleAuth} onDemoLogin={handleDemoLogin} />;
   }
@@ -795,7 +817,7 @@ export default function App() {
                                 <div className="font-bold text-xl">{game.name || `Game ID: ${game.appid}`}</div>
                                 <div className="flex items-center flex-col space-x-2">
                                   <progress
-                                    className="progress progress-accent w-56"
+                                    className="progress progress-accent w-[100%]"
                                     value={game.achievements ? (game.achievements.filter(a => a.achieved).length / game.achievements.length) * 100 : 0}
                                     max="100"
                                   ></progress>
@@ -834,7 +856,9 @@ export default function App() {
                                   <div className="flex-grow">
                                     <div className="font-bold">{achievement.displayName || achievement.name || 'Unknown Achievement'}</div>
                                     <div className="text-sm mt-1">
-                                      <span className="text-accent">{achievement.gameName}</span> •
+                                      <span className="text-accent">
+                                        {getGameName(achievement.appId)}
+                                      </span> •
                                       <span className="ml-2">{achievement.unlockTime ? new Date(achievement.unlockTime * 1000).toLocaleString() : 'Unknown'}</span>
                                     </div>
                                   </div>
@@ -1080,7 +1104,9 @@ export default function App() {
                               <div className="font-bold">{achievement.displayName || achievement.name || 'Unknown Achievement'}</div>
                               <div className="text-sm opacity-70">{achievement.description || 'No description available'}</div>
                               <div className="text-sm mt-1">
-                                <span className="text-accent">{achievement.gameName}</span> •
+                                <span className="text-accent">
+                                  {getGameName(achievement.appId)}
+                                </span> •
                                 <span className="ml-2">{achievement.unlockTime ? new Date(achievement.unlockTime * 1000).toLocaleString() : 'Unknown'} •</span>
                                 <span className="ml-2 text-accent">Earned by {(achievement.percentage || 0).toFixed(1)}% of players</span>
                               </div>
@@ -1271,7 +1297,9 @@ export default function App() {
                                     <div className="font-bold">{achievement.displayName}</div>
                                     <div className="text-sm opacity-70">{achievement.description}</div>
                                     <div className="text-sm mt-1">
-                                      <span className="text-accent">{achievement.gameName}</span> •
+                                      <span className="text-accent">
+                                        {getGameName(achievement.appId)}
+                                      </span> •
                                       <span className="ml-2">{(achievement.percentage || 0).toFixed(1)}% of players have this</span>
                                     </div>
                                   </div>
