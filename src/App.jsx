@@ -663,7 +663,7 @@ export default function App() {
     <>
       {isLoading && <LoadingScreen />}
       <div className=''>
-        <div className='container mx-auto bg-transparent h-15 w-[50%] flex justify-center items-center'>
+        <div className='container mx-auto flex flex-col lg:flex-row pb-5 pt-5 bg-transparent h-15 w-[50%] flex justify-center items-center'>
           <h1 className="container mx-auto text-center text-4xl"><b>STEAM</b>TRACKER</h1>
           {isDemo ? renderTopBannerDemo() : (
             playtime && gamesPlayed && (
@@ -732,7 +732,7 @@ export default function App() {
         <div className='header'>
           {isDemo ? renderDemoScreenshot() : (
             mostRecentGame && mostRecentGame.image && (
-              <div className='container mx-auto bg-black lg:w-[50%] sm:w-[90%] h-[300px] relative'>
+              <div className='container mx-auto bg-black lg:w-[75%] sm:w-[75%] h-[400px] relative'>
                 {/* banner */}
                 <img
                   src={mostRecentGame.image}
@@ -748,7 +748,7 @@ export default function App() {
           )}
         </div>
 
-        <div className='contaier mx-auto bg-base-200 sm:w-[75%] lg:w-[50%] '>
+        <div className='contaier mx-auto bg-base-200 sm:w-[75%] lg:w-[75%] '>
           {isDemo ? renderDemoProfile() : (
             profileData && (
               <div className='flex flex-col container mx-auto justify-center items-center'>
@@ -788,36 +788,32 @@ export default function App() {
             <a role="tab" className={`tab ${activeTab === 'Advisor' ? 'tab-active' : ''}`} onClick={() => handleTabChange('Advisor')}>Advisor</a>
           </div>
 
-          <div className="overflow-x-auto flex flex-row justify-center items-center">
+          <div className="overflow-x-auto flex flex-col lg:flex-row w-[100%] mx-auto self-center justify-center items-center">
 
             {activeTab === 'Overview' && (
               isDemo ? renderDemoOverview() : (
                 <div>
 
-                  <div className='flex flex-row w-[100%] justify-center items-center mt-5'>
-                    <p className='text-center text-2xl flex-1'><span className='font-bold'>RECENT</span>GAMES</p>
-                    <p className='text-center text-2xl flex-1'><span className='font-bold'>RECENT</span>ACHIEVEMENTS</p>
-                  </div>
-
-                  <div className="container mx-auto w-full flex flex-row justify-between items-start gap-4 p-4">
-                    <div className="w-[50%]">
+                  <div className="w-full flex flex-col lg:flex-row items-start gap-4 p-4">
+                    <div className="w-full lg:w-1/2">
                       <div className="grid grid-cols-1 gap-4">
+                      <p className='text-center text-2xl flex-1'><span className='font-bold'>RECENT</span>GAMES</p>
                         {Array.isArray(overviewGames) && overviewGames.length > 0 ? overviewGames.slice(0, 5).map((game) => (
                           <div key={game.appid} className="bg-base-100 rounded-xl p-4 shadow-xl">
-                            <div className="flex items-center space-x-4">
-                              <div className="avatar">
-                                <div className="rounded-xl h-[107.5px] w-[230px]">
+                            <div className="flex flex-row lg:flex-col items-center space-y-4">
+                              <div>
+                                <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
                                   <img
                                     src={game.image}
                                     alt="Game image"
-                                    className="object-cover" />
+                                    className="object-cover w-full h-full" />
                                 </div>
                               </div>
-                              <div className="flex-grow space-y-2">
+                              <div className="w-full text-center lg:text-left space-y-2">
                                 <div className="font-bold text-xl">{game.name || `Game ID: ${game.appid}`}</div>
-                                <div className="flex items-center flex-col space-x-2">
+                                <div className="flex flex-col items-center space-y-2">
                                   <progress
-                                    className="progress progress-accent w-[100%]"
+                                    className="progress progress-accent w-full"
                                     value={game.achievements ? (game.achievements.filter(a => a.achieved).length / game.achievements.length) * 100 : 0}
                                     max="100"
                                   ></progress>
@@ -834,7 +830,9 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="card bg-base-100 shadow-xl">
+                    <div className="w-full lg:w-1/2 card bg-base-100 shadow-xl">
+                      <p className='text-center text-2xl flex-1'><span className='font-bold'>RECENT</span>ACHIEVEMENTS</p>
+
                       <div className="card-body p-2">
                         <div className="grid grid-cols-1 gap-2">
                           {recentAchievements.length > 0 ? (
@@ -931,16 +929,16 @@ export default function App() {
                         .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
                         .map((game, index) => (
                           <div key={game.appid} className="bg-base-100 rounded-xl p-4 shadow-xl">
-                            <div className="flex items-center space-x-4">
-                              <div className="avatar">
-                                <div className="rounded-xl h-[107.5px] w-[230px]">
+                            <div className="flex flex-col items-center justify-center text-center lg:flex-row space-y-4">
+                              <div>
+                                <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
                                   <img
                                     src={gamePictures[game.appid]}
                                     alt="Game image"
-                                    className="object-cover" />
+                                    className="object-cover w-full h-full" />
                                 </div>
                               </div>
-                              <div className="flex-grow space-y-2">
+                              <div className="w-full text-center lg:text-left space-y-2">
                                 <div className="font-bold text-xl">{game.name}</div>
                                 <div className="flex items-center space-x-2">
                                   <progress
@@ -1025,18 +1023,18 @@ export default function App() {
                         .sort((a, b) => b.earnedAchievements - a.earnedAchievements)
                         .map((game, index) => (
                           <div key={game.appid} className="bg-base-100 rounded-xl p-4 shadow-xl">
-                            <div className="flex items-center space-x-4">
-                              <div className="avatar">
-                                <div className="rounded-xl h-[107.5px] w-[230px]">
+                            <div className="flex flex-col items-center lg:flex-row justify-center space-y-4">
+                              <div>
+                                <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
                                   <img
                                     src={game.image}
                                     alt="Game image"
-                                    className="object-cover" />
+                                    className="object-cover w-full h-full" />
                                 </div>
                               </div>
-                              <div className="flex-grow space-y-2">
+                              <div className="w-full text-center lg:pl-4 lg:text-left space-y-2">
                                 <div className="font-bold text-xl">{game.name}</div>
-                                <div className="flex items-center space-x-2">
+                                <div className="flex items-center justify-center lg:justify-start lg:pl-1 space-x-2">
                                   <progress
                                     className="progress progress-accent w-56"
                                     value={game.totalAchievements ? (game.earnedAchievements / game.totalAchievements) * 100 : 0}
@@ -1048,7 +1046,7 @@ export default function App() {
                                 </div>
                                 <div className="text-sm space-y-1">
                                   Average Global Completion: <span className="text-accent">{game.averageGlobalPercentage}%</span>
-                                  <div className="flex items-center space-x-1">
+                                  <div className="flex items-center justify-center lg:justify-start lg:pl-1 space-x-1">
                                     <TimeClock className='w-4 h-4 fill-white mr-1' /> <span className="text-accent">{Math.round(game.playtime_forever / 60)} hours</span>
                                   </div>
                                 </div>
@@ -1184,7 +1182,8 @@ export default function App() {
                     <p className='text-2xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mt-5 mb-5'>Stats require a full sync to be accurate. Please hit the sync all button under your profile avatar above.</p>
                   </div>
                 )
-              ))}
+              ))
+            }
             {activeTab === 'Advisor' && (
               isDemo ? renderDemoAdvisor() : (
                 isFullySynced ? (
