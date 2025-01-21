@@ -1,3 +1,3 @@
 [phases]
   build = { cmd = "npm install && npm run build" }
-  start = { cmd = "npx serve -s build" }
+  start = { cmd = "vite preview --port $PORT" }
