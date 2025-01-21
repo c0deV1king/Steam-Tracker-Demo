@@ -33,7 +33,7 @@ const LoadingScreen = () => {
     "assembling access points...",
     "playing minesweeper...",
     "booting up battleships...",
-    "visualizing vectors..."
+    "visualizing vectors...",
   ];
 
   useEffect(() => {
