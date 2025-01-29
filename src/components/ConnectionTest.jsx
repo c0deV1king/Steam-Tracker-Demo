@@ -11,20 +11,24 @@ function ConnectionTest() {
     setStatus('Testing...');
 
     try {
+      console.log("API URL:", apiURL);
       const response = await fetch(`${apiURL}/api/test-connection`);
       console.log("Getting request from backend");
-      const data = await response.json();
-      console.log("Data" + data);
 
-      return {
-        statusCode: 200,
-        body: JSON.stringify(data)
-      };
-    } catch (error) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: `Connection failed` })
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
+
+      const data = await response.json();
+      console.log("Data received:" + data);
+
+      setStatus(`Success: ${data.message}`);
+
+    } catch (error) {
+      console.error("Error:", error);
+      setStatus('Failed to connect to API');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -34,7 +38,7 @@ function ConnectionTest() {
         onClick={testConnection}
         disabled={loading}
       >
-        Test Connection
+        {loading ? "Testing..." : "Test Connection"}
       </button>
       <p>Status: {status}</p>
     </div>
