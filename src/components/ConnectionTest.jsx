@@ -12,7 +12,9 @@ function ConnectionTest() {
     
     try {
       const response = await fetch(`${apiURL}/api/test-connection`);
+      console.log("Getting request from backend");
       const data = await response.json();
+      console.log("Data" + data);
       
       if (data.status === 'success') {
         setStatus('✅ Everything is connected and working!');
