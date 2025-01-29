@@ -12,6 +12,7 @@ import DemoCharts from './components/demoCharts';
 import { AuthPage } from './components/AuthPage';
 import { clearAllStorage } from './utils/clearStorage';
 import { getAllData } from './utils/indexedDB';
+import { ConnectionTest } from './components/ConnectionTest'
 
 const LoadingScreen = () => {
   const [currentMessage, setCurrentMessage] = useState(0);
@@ -149,31 +150,6 @@ export default function App() {
     window.location.reload();
   };
 
-  function ConnectionTest() {
-    const [status, setStatus] = useState('Not tested');
-    const [loading, setLoading] = useState(false);
-
-    const testConnection = async () => {
-      setLoading(true);
-      setStatus('Testing...');
-
-      try {
-        // Make sure to replace this URL with your actual backend URL
-        const response = await fetch('https://your-backend-url.railway.app/api/test-connection');
-        const data = await response.json();
-
-        if (data.status === 'success') {
-          setStatus('✅ Everything is connected and working!');
-        } else {
-          setStatus('❌ Something went wrong: ' + data.message);
-        }
-      } catch (error) {
-        setStatus('❌ Connection failed: ' + error.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
 
   const apiTest = async () => {
     try {
@@ -714,15 +690,7 @@ export default function App() {
               )
             )}
 
-            <div>
-              <button
-                onClick={testConnection}
-                disabled={loading}
-              >
-                Test Connection
-              </button>
-              <p>Status: {status}</p>
-            </div>
+            <ConnectionTest />
 
 
             <button className="btn btn-accent" onClick={() => document.getElementById('my_modal_4').showModal()}>App Demo</button>
