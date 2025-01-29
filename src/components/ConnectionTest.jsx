@@ -9,28 +9,28 @@ function ConnectionTest() {
   const testConnection = async () => {
     setLoading(true);
     setStatus('Testing...');
-    
+
     try {
       const response = await fetch(`${apiURL}/api/test-connection`);
       console.log("Getting request from backend");
       const data = await response.json();
       console.log("Data" + data);
-      
-      if (data.status === 'success') {
-        setStatus('✅ Everything is connected and working!');
-      } else {
-        setStatus('❌ Something went wrong: ' + data.message);
-      }
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify(data)
+      };
     } catch (error) {
-      setStatus('❌ Connection failed: ' + error.message);
-    } finally {
-      setLoading(false);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: `Connection failed` })
+      }
     }
   };
 
   return (
     <div>
-      <button 
+      <button
         onClick={testConnection}
         disabled={loading}
       >
@@ -39,6 +39,6 @@ function ConnectionTest() {
       <p>Status: {status}</p>
     </div>
   );
-}
+};
 
 export default ConnectionTest;
