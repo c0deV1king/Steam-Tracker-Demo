@@ -12,7 +12,7 @@ import DemoCharts from './components/demoCharts';
 import { AuthPage } from './components/AuthPage';
 import { clearAllStorage } from './utils/clearStorage';
 import { getAllData } from './utils/indexedDB';
-import { ConnectionTest } from './components/ConnectionTest'
+import ConnectionTest from './components/ConnectionTest'
 
 const LoadingScreen = () => {
   const [currentMessage, setCurrentMessage] = useState(0);
