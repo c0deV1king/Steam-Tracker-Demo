@@ -308,6 +308,32 @@ export default function App() {
     return <AuthPage onLogin={handleAuth} onDemoLogin={handleDemoLogin} />;
   }
 
+  function ConnectionTest() {
+    const [status, setStatus] = useState('Not tested');
+    const [loading, setLoading] = useState(false);
+  
+    const testConnection = async () => {
+      setLoading(true);
+      setStatus('Testing...');
+      
+      try {
+        // Make sure to replace this URL with your actual backend URL
+        const response = await fetch('https://your-backend-url.railway.app/api/test-connection');
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          setStatus('✅ Everything is connected and working!');
+        } else {
+          setStatus('❌ Something went wrong: ' + data.message);
+        }
+      } catch (error) {
+        setStatus('❌ Connection failed: ' + error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+
   // DEMO LOGIC
   const renderDemoOverview = () => {
     return (
@@ -687,6 +713,17 @@ export default function App() {
             )
           )}
 
+          <div>
+            <button
+              onClick={testConnection}
+              disabled={loading}
+            >
+              Test Connection
+            </button>
+            <p>Status: {status}</p>
+          </div>
+          
+
           <button className="btn btn-accent" onClick={() => document.getElementById('my_modal_4').showModal()}>App Demo</button>
           <dialog id="my_modal_4" className="modal">
             <div className='flex flex-col justify-center items-center'>
@@ -797,7 +834,7 @@ export default function App() {
                   <div className="w-full flex flex-col lg:flex-row items-start gap-4 p-4">
                     <div className="w-full lg:w-1/2">
                       <div className="grid grid-cols-1 gap-4">
-                      <p className='text-center text-2xl flex-1'><span className='font-bold'>RECENT</span>GAMES</p>
+                        <p className='text-center text-2xl flex-1'><span className='font-bold'>RECENT</span>GAMES</p>
                         {Array.isArray(overviewGames) && overviewGames.length > 0 ? overviewGames.slice(0, 5).map((game) => (
                           <div key={game.appid} className="bg-base-100 rounded-xl p-4 shadow-xl">
                             <div className="flex flex-row lg:flex-col items-center space-y-4">
