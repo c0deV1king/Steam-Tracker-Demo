@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+const apiURL = process.env.BACKEND_APP_API_URL;
+
 function ConnectionTest() {
   const [status, setStatus] = useState('Not tested');
   const [loading, setLoading] = useState(false);
@@ -9,8 +11,7 @@ function ConnectionTest() {
     setStatus('Testing...');
     
     try {
-      // Make sure to replace this URL with your actual backend URL
-      const response = await fetch('https://your-backend-url.railway.app/api/test-connection');
+      const response = await fetch(`${apiURL}/api/test-connection`);
       const data = await response.json();
       
       if (data.status === 'success') {
