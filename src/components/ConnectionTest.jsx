@@ -12,6 +12,7 @@ function ConnectionTest() {
 
     try {
       console.log("API URL:", apiURL);
+      console.log("Full Request URL:", `${apiURL}/api/test-connection`);
       const response = await fetch(`${apiURL}/api/test-connection`);
       console.log("Getting request from backend");
 
