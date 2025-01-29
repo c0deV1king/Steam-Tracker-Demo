@@ -149,6 +149,32 @@ export default function App() {
     window.location.reload();
   };
 
+  function ConnectionTest() {
+    const [status, setStatus] = useState('Not tested');
+    const [loading, setLoading] = useState(false);
+
+    const testConnection = async () => {
+      setLoading(true);
+      setStatus('Testing...');
+
+      try {
+        // Make sure to replace this URL with your actual backend URL
+        const response = await fetch('https://your-backend-url.railway.app/api/test-connection');
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          setStatus('✅ Everything is connected and working!');
+        } else {
+          setStatus('❌ Something went wrong: ' + data.message);
+        }
+      } catch (error) {
+        setStatus('❌ Connection failed: ' + error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const apiTest = async () => {
     try {
       console.log("Starting API test...");
@@ -307,31 +333,6 @@ export default function App() {
   if (!isAuthenticated && !isDemo) {
     return <AuthPage onLogin={handleAuth} onDemoLogin={handleDemoLogin} />;
   }
-
-  function ConnectionTest() {
-    const [status, setStatus] = useState('Not tested');
-    const [loading, setLoading] = useState(false);
-
-    const testConnection = async () => {
-      setLoading(true);
-      setStatus('Testing...');
-
-      try {
-        // Make sure to replace this URL with your actual backend URL
-        const response = await fetch('https://your-backend-url.railway.app/api/test-connection');
-        const data = await response.json();
-
-        if (data.status === 'success') {
-          setStatus('✅ Everything is connected and working!');
-        } else {
-          setStatus('❌ Something went wrong: ' + data.message);
-        }
-      } catch (error) {
-        setStatus('❌ Connection failed: ' + error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
 
 
     // DEMO LOGIC
@@ -1371,4 +1372,3 @@ export default function App() {
       </>
     )
   };
-};
