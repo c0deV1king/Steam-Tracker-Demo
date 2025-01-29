@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const apiURL = process.env.VITE_API_URL;
+const apiURL = import.meta.env.VITE_API_URL;
 
 function ConnectionTest() {
   const [status, setStatus] = useState('Not tested');
