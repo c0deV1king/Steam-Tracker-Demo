@@ -8,7 +8,6 @@
     "start": "vite preview --host --port $PORT",
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint . --ext .ts,.tsx",
     "preview": "vite preview --host --port $PORT",
     "predeploy": "npm run build"
   },
@@ -16,26 +15,17 @@
     "node-fetch": "^2.6.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-svg": "^16.3.0",
     "recharts": "^2.13.0"
   },
   "devDependencies": {
-    "@eslint/js": "^8.38.0",
-    "@types/node": "^22.10.0",
-    "@types/node-fetch": "^2.6.12",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
     "daisyui": "^4.12.10",
-    "eslint": "^8.38.0",
-    "eslint-plugin-react": "^7.35.0",
-    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
-    "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
     "postcss": "^8.4.41",
-    "tailwindcss": "^3.4.9",
-    "typescript": "^5.7.2",
-    "vite": "^5.4.0",
-    "vite-plugin-svgr": "^4.2.0"
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.2.3",
+    "vite-plugin-svgr": "^4.3.0"
   }
 }

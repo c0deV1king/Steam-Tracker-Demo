@@ -5,7 +5,7 @@
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "allowJs": true,
-    "checkJs": true,
+    "checkJs": false,
     "resolveJsonModule": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"]
   },
