@@ -3,14 +3,15 @@ import React, { useEffect } from "react";
 const SteamLogin = ({ onSteamIdReceived }) => {
   const handleSteamLogin = () => {
     const baseUrl = window.location.origin;
-    const returnUrl = `${baseUrl}/api/validate-steam`;
+    const backendUrl = import.meta.env.VITE_API_URL;
+    const returnUrl = `${backendUrl}/api/validate-steam`;
 
     const steamOpenIdUrl = "https://steamcommunity.com/openid/login";
     const params = new URLSearchParams({
       "openid.ns": "http://specs.openid.net/auth/2.0",
       "openid.mode": "checkid_setup",
       "openid.return_to": returnUrl,
-      "openid.realm": baseUrl,
+      "openid.realm": backendUrl,
       "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
       "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select",
     });

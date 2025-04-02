@@ -1785,13 +1785,6 @@ export default function App() {
 
       <footer className="footer footer-center bg-primary text-primary-content p-10">
         <aside>
-          <a
-            href="https://github.com/c0dev1king"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <GithubSVG className="github-logo w-[64px] h-[64px] fill-black" />
-          </a>
           <p className="font-bold">
             Created with ♥️ by c0dev1king
             <br />
