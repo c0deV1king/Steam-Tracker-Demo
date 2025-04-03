@@ -680,16 +680,11 @@ export default function App() {
       <div className="flex flex-col container mx-auto justify-center items-center m-5">
         <div className="stats stats-vertical lg:stats-horizontal bg-transparent">
           <div className="stat flex justify-center items-center">
-            <div className="stat-title text-center">
-              <ControllerSVG className="w-6 h-6 fill-accent" />
-            </div>
+            <div className="stat-title text-center"></div>
             <div className="stat-value text-center text-info">27</div>
           </div>
 
           <div className="stat flex justify-center items-center">
-            <div className="stat-title text-center">
-              <TimeClock className="w-6 h-6 fill-accent" />
-            </div>
             <div className="stat-value text-center text-info">2683</div>
           </div>
         </div>
@@ -789,18 +784,13 @@ export default function App() {
                 <div className="flex flex-col container mx-auto justify-center items-center m-5">
                   <div className="stats stats-vertical lg:stats-horizontal bg-transparent">
                     <div className="stat flex justify-center items-center">
-                      <div className="stat-title text-center">
-                        <ControllerSVG className="w-6 h-6 fill-accent" />
-                      </div>
+                      <div className="stat-title text-center"></div>
                       <div className="stat-value text-center text-info">
                         {typeof gamesPlayed === "number" ? gamesPlayed : "N/A"}
                       </div>
                     </div>
 
                     <div className="stat flex justify-center items-center">
-                      <div className="stat-title text-center">
-                        <TimeClock className="w-6 h-6 fill-accent" />
-                      </div>
                       <div className="stat-value text-center text-info">
                         {typeof playtime === "number" ? playtime : "N/A"}
                       </div>
@@ -949,7 +939,6 @@ export default function App() {
                       }}
                       disabled={isSyncing || isFullySynced}
                     >
-                      <SyncSVG className="w-4 h-4 fill-black" />
                       {isSyncing
                         ? "Syncing..."
                         : isFullySynced
@@ -1381,7 +1370,6 @@ export default function App() {
                                   {game.averageGlobalPercentage}%
                                 </span>
                                 <div className="flex items-center justify-center lg:justify-start lg:pl-1 space-x-1">
-                                  <TimeClock className="w-4 h-4 fill-white mr-1" />{" "}
                                   <span className="text-accent">
                                     {Math.round(game.playtime_forever / 60)}{" "}
                                     hours
@@ -1658,7 +1646,6 @@ export default function App() {
                               </td>
                               <td className="p-4">
                                 <div className="flex items-center space-x-2">
-                                  <TimeClock className="w-4 h-4" />
                                   <span>
                                     {game.playtime_forever
                                       ? Math.round(game.playtime_forever / 60)
