@@ -47,124 +47,20 @@ export function useGamesData(steamId, isAuthenticated) {
     }
   }, [isAuthenticated, steamId]);
 
-  // Fetch recent games as well as some screenshot data based on the recent games
+  // Fetch recent games data from backend.
+  // Originally, this also grabbed screenshots and achievements for the dashboard.
+  // Now, it is grabbing the recentgames data for display.
+  // Later, i'll have screenshots to grab for the banner.
   useEffect(() => {
+    const fetchOverviewGames = async () => {
+      fetch(`http://localhost:3000/api/recentgames/${steamId}`)
+        .then((response) => response.json())
+        .then((data) => setOverviewGames(data))
+        .catch((error) => console.error("Error fetching recent games:", error));
+    };
     if (isAuthenticated && steamId) {
-      const fetchOverviewGames = async () => {
-        fetch(`http://localhost:3000/api/recentgames?steamid=${steamId}`)
-          .then((response) => response.json())
-          .then((data) => setOverviewGames(data))
-          .catch((error) =>
-            console.error("Error fetching recent games:", error)
-          );
-        const cachedOverviewGames = localStorage.getItem("cachedOverviewGames");
-        const cacheTimestampOverviewGames = localStorage.getItem(
-          "cacheTimestampOverviewGames"
-        );
-        const now = new Date().getTime();
-
-        if (
-          cachedOverviewGames &&
-          cacheTimestampOverviewGames &&
-          now - parseInt(cacheTimestampOverviewGames) < 12 * 60 * 60 * 1000
-        ) {
-          const parsedOverviewGames = JSON.parse(cachedOverviewGames);
-          setOverviewGames(parsedOverviewGames.games);
-
-          if (parsedOverviewGames.mostRecentGame?.screenshots?.length) {
-            const screenshots = parsedOverviewGames.mostRecentGame.screenshots;
-            const randomScreenshot =
-              screenshots[Math.floor(Math.random() * screenshots.length)]
-                .path_full;
-            setMostRecentGame({
-              ...parsedOverviewGames.mostRecentGame,
-              image:
-                randomScreenshot || parsedOverviewGames.mostRecentGame.image,
-            });
-          } else {
-            setMostRecentGame(parsedOverviewGames.mostRecentGame);
-          }
-          return;
-        }
-
-        try {
-          const res = await delayedFetch(
-            `/.netlify/functions/getRecentGames/?steamid=${steamId}`
-          );
-          const data = await res.json();
-          const recentGamesData = data.response.games || [];
-
-          const gamesWithDetails = await Promise.all(
-            recentGamesData.map(async (game) => {
-              const detailsRes = await delayedFetch(
-                `/.netlify/functions/getAppDetails/?appid=${game.appid}`
-              );
-              const detailsData = await detailsRes.json();
-              const gameDetails = detailsData[game.appid].data;
-              return {
-                ...game,
-                name: gameDetails.name,
-                image: gameDetails.header_image,
-                screenshots: gameDetails.screenshots || [],
-              };
-            })
-          );
-
-          const gamesWithAchievements = await fetchAchievementsForGames(
-            gamesWithDetails,
-            "cachedOverviewAchievements",
-            steamId,
-            isAuthenticated
-          );
-
-          let mostRecentGameData = null;
-
-          if (gamesWithDetails.length > 0) {
-            const randomIndex = Math.floor(
-              Math.random() * gamesWithDetails.length
-            );
-            mostRecentGameData = gamesWithDetails[randomIndex];
-            const randomScreenshot = mostRecentGameData.screenshots?.length
-              ? mostRecentGameData.screenshots[
-                  Math.floor(
-                    Math.random() * mostRecentGameData.screenshots.length
-                  )
-                ].path_full
-              : null;
-
-            mostRecentGameData = {
-              ...mostRecentGameData,
-              image: randomScreenshot || mostRecentGameData.image,
-            };
-
-            setMostRecentGame(mostRecentGameData);
-          }
-
-          setOverviewGames(gamesWithAchievements);
-          setOverviewAchievements(
-            gamesWithAchievements.reduce((acc, game) => {
-              if (game.achievements) {
-                acc[game.appid] = game.achievements;
-              }
-              return acc;
-            }, {})
-          );
-
-          localStorage.setItem(
-            "cachedOverviewGames",
-            JSON.stringify({
-              games: gamesWithAchievements,
-              mostRecentGame: mostRecentGameData,
-            })
-          );
-          localStorage.setItem("cacheTimestampOverviewGames", now.toString());
-        } catch (error) {
-          console.error("Error fetching overview games data:", error);
-          setOverviewGames([]);
-          setMostRecentGame(null);
-        }
-      };
       fetchOverviewGames();
+      console.log("Overview games fetched:", overviewGames);
     }
   }, [isAuthenticated, steamId]);
 
