@@ -29,24 +29,6 @@ export function useGamesData(steamId, isAuthenticated) {
     localStorage.setItem("isFullySynced", isFullySynced.toString());
   }, [isFullySynced]);
 
-  // load cached achievements on initial render
-  useEffect(() => {
-    if (isAuthenticated && steamId) {
-      const loadCachedAchievements = async () => {
-        const cachedAchievements = await getAllData("achievements");
-        if (cachedAchievements.length > 0) {
-          const achievementsObj = cachedAchievements.reduce((acc, item) => {
-            acc[item.appid] = item.achievements;
-            return acc;
-          }, {});
-          setAllAchievements(achievementsObj);
-        }
-      };
-
-      loadCachedAchievements();
-    }
-  }, [isAuthenticated, steamId]);
-
   // Fetch recent games data from backend.
   // Originally, this also grabbed screenshots and achievements for the dashboard.
   // Now, it is grabbing the recentgames data for display.
@@ -80,160 +62,46 @@ export function useGamesData(steamId, isAuthenticated) {
     }
   }, [overviewGames]);
 
-  //fetches all the owned games from the steam user as well as some additional data (playtime, ect)
-  // useEffect(() => {
-  //   if (isAuthenticated && steamId) {
-  //     const fetchGames = async () => {
-  //       const cachedGames = localStorage.getItem("cachedGames");
-  //       const cacheTimestamp = localStorage.getItem("cacheTimestampGames");
-  //       const cachedGamePictures = localStorage.getItem("cachedGamePictures");
-  //       const now = new Date().getTime();
+  // fetches all the owned games from the steam user as well as some additional data (playtime, ect)
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/games/${steamId}`
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("Fetched recent games data:", data);
+        setAllGamesList(data);
 
-  //       let allGamesList = [];
-  //       let gamePicturesObj = {};
+        // Calculate total playtime and games played
+        const totalPlaytime = Math.round(
+          data.reduce((acc, game) => acc + game.playtime_forever, 0) / 60
+        );
+        setPlaytime(totalPlaytime);
+        const totalGamesPlayed = data.filter(
+          (game) => game.playtime_forever > 0
+        ).length;
+        setGamesPlayed(totalGamesPlayed);
 
-  //       if (
-  //         cachedGames &&
-  //         cacheTimestamp &&
-  //         now - parseInt(cacheTimestamp) < 12 * 60 * 60 * 1000
-  //       ) {
-  //         allGamesList = JSON.parse(cachedGames);
-  //         setGames(allGamesList);
+        const firstTwenty = data.slice(0, 20);
+        setGamesToDisplay(firstTwenty);
+      } catch (error) {
+        console.error("Error fetching recent games:", error);
+      }
+    };
+    if (isAuthenticated && steamId) {
+      fetchGames();
+    }
+  }, [isAuthenticated, steamId]);
 
-  //         if (cachedGamePictures) {
-  //           gamePicturesObj = JSON.parse(cachedGamePictures);
-  //           setGamePictures(gamePicturesObj);
-  //         }
-  //       } else {
-  //         setIsLoading(true);
-  //         const res = await delayedFetch(
-  //           `/.netlify/functions/getOwnedGames/?steamid=${steamId}`
-  //         );
-  //         const data = await res.json();
-  //         allGamesList = data.response.games || [];
-  //         setGames(allGamesList);
-  //         setAllGamesList(allGamesList);
-
-  //         localStorage.setItem("cachedGames", JSON.stringify(allGamesList));
-  //         localStorage.setItem("cacheTimestampGames", now.toString());
-  //       }
-
-  //       // Calculate total playtime and games played
-  //       const totalPlaytime = Math.round(
-  //         allGamesList.reduce((acc, game) => acc + game.playtime_forever, 0) /
-  //           60
-  //       );
-  //       setPlaytime(totalPlaytime);
-  //       const totalGamesPlayed = allGamesList.filter(
-  //         (game) => game.playtime_forever > 0
-  //       ).length;
-  //       setGamesPlayed(totalGamesPlayed);
-
-  //       const firstTwenty = allGamesList.slice(0, 20);
-  //       let gamesWithDetails = await getGamesWithDetails(firstTwenty);
-
-  //       // If we didn't load game pictures from cache, update them now
-  //       if (Object.keys(gamePicturesObj).length === 0) {
-  //         gamesWithDetails.forEach((game) => {
-  //           if (game.image) {
-  //             gamePicturesObj[game.appid] = game.image;
-  //           }
-  //         });
-  //         setGamePictures(gamePicturesObj);
-  //         localStorage.setItem(
-  //           "cachedGamePictures",
-  //           JSON.stringify(gamePicturesObj)
-  //         );
-  //         localStorage.setItem("cacheTimestampGamePictures", now.toString());
-  //       }
-
-  //       // Load cached achievements from IndexedDB
-  //       const cachedAchievements = await getAllData("achievements");
-  //       let achievementsObj = {};
-  //       if (cachedAchievements.length > 0) {
-  //         achievementsObj = cachedAchievements.reduce((acc, item) => {
-  //           acc[item.appid] = item.achievements;
-  //           return acc;
-  //         }, {});
-  //         setAllAchievements(achievementsObj);
-  //       }
-
-  //       // Update gamesToDisplay with cached achievements from IndexedDB
-  //       let gamesWithCachedAchievements = gamesWithDetails.map((game) => ({
-  //         ...game,
-  //         achievements: achievementsObj[game.appid] || [],
-  //       }));
-
-  //       setGamesToDisplay(gamesWithCachedAchievements);
-
-  //       // Check localStorage for more recent cached achievements
-  //       const cachedAchievementsString = localStorage.getItem(
-  //         "cachedGamesAchievements"
-  //       );
-  //       const cacheTimestampAchievements = localStorage.getItem(
-  //         "cacheTimestampGamesAchievements"
-  //       );
-
-  //       if (
-  //         cachedAchievementsString &&
-  //         cacheTimestampAchievements &&
-  //         now - parseInt(cacheTimestampAchievements) < 12 * 60 * 60 * 1000
-  //       ) {
-  //         const localStorageAchievements = JSON.parse(cachedAchievementsString);
-
-  //         // Merge localStorage achievements with IndexedDB achievements
-  //         achievementsObj = { ...achievementsObj, ...localStorageAchievements };
-  //         setAllAchievements(achievementsObj);
-
-  //         // Update gamesToDisplay with merged achievements
-  //         gamesWithCachedAchievements = gamesWithDetails.map((game) => ({
-  //           ...game,
-  //           achievements: achievementsObj[game.appid] || [],
-  //         }));
-
-  //         setGamesToDisplay(gamesWithCachedAchievements);
-  //       } else {
-  //         // Fetch new achievements if localStorage cache is outdated or doesn't exist
-  //         const gamesWithAchievements = await fetchAchievementsForGames(
-  //           gamesWithDetails,
-  //           "cachedGamesAchievements",
-  //           steamId,
-  //           isAuthenticated
-  //         );
-
-  //         achievementsObj = gamesWithAchievements.reduce((acc, game) => {
-  //           if (game.achievements) {
-  //             acc[game.appid] = game.achievements;
-  //           }
-  //           return acc;
-  //         }, {});
-
-  //         setAllAchievements(achievementsObj);
-
-  //         const updatedGamesWithAchievements = gamesWithDetails.map((game) => ({
-  //           ...game,
-  //           achievements: achievementsObj[game.appid] || [],
-  //         }));
-
-  //         setGamesToDisplay(updatedGamesWithAchievements);
-
-  //         localStorage.setItem(
-  //           "cachedGamesAchievements",
-  //           JSON.stringify(achievementsObj)
-  //         );
-  //         localStorage.setItem(
-  //           "cacheTimestampGamesAchievements",
-  //           now.toString()
-  //         );
-
-  //         window.location.reload();
-  //       }
-  //       setIsLoading(false);
-  //     };
-
-  //     fetchGames();
-  //   }
-  // }, [isAuthenticated, steamId]);
+  useEffect(() => {
+    if (allGamesList.length > 0) {
+      console.log("Recent games state updated:", allGamesList);
+    }
+  }, [allGamesList]);
 
   const getGamesWithDetails = async (games) => {
     const cachedDetails = JSON.parse(

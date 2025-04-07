@@ -4,7 +4,7 @@ const SteamLogin = ({ onSteamIdReceived }) => {
   const handleSteamLogin = () => {
     const baseUrl = window.location.origin;
     const backendUrl = import.meta.env.VITE_API_URL;
-    const returnUrl = `${backendUrl}/api/validate-steam`;
+    const returnUrl = `${backendUrl}/api/validate-steam/`;
 
     const steamOpenIdUrl = "https://steamcommunity.com/openid/login";
     const params = new URLSearchParams({
