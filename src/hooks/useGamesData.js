@@ -29,6 +29,8 @@ export function useGamesData(steamId, isAuthenticated) {
     localStorage.setItem("isFullySynced", isFullySynced.toString());
   }, [isFullySynced]);
 
+  const apiUrl = import.meta.env.VITE_API_URL;
+
   // Fetch recent games data from backend.
   // Originally, this also grabbed screenshots and achievements for the dashboard.
   // Now, it is grabbing the recentgames data for display.
@@ -36,9 +38,7 @@ export function useGamesData(steamId, isAuthenticated) {
   useEffect(() => {
     const fetchOverviewGames = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3000/api/recentgames/${steamId}`
-        );
+        const response = await fetch(`${apiUrl}/api/recentgames/${steamId}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -66,14 +66,12 @@ export function useGamesData(steamId, isAuthenticated) {
   useEffect(() => {
     const fetchGames = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3000/api/games/${steamId}`
-        );
+        const response = await fetch(`${apiUrl}/api/games/${steamId}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("Fetched recent games data:", data);
+        console.log("Fetched all owned games data:", data);
         setAllGamesList(data);
 
         // Calculate total playtime and games played
@@ -89,7 +87,7 @@ export function useGamesData(steamId, isAuthenticated) {
         const firstTwenty = data.slice(0, 20);
         setGamesToDisplay(firstTwenty);
       } catch (error) {
-        console.error("Error fetching recent games:", error);
+        console.error("Error fetching owned games:", error);
       }
     };
     if (isAuthenticated && steamId) {
@@ -99,7 +97,7 @@ export function useGamesData(steamId, isAuthenticated) {
 
   useEffect(() => {
     if (allGamesList.length > 0) {
-      console.log("Recent games state updated:", allGamesList);
+      console.log("All owned games state updated:", allGamesList);
     }
   }, [allGamesList]);
 

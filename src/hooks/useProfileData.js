@@ -11,9 +11,11 @@ export const useProfileData = (steamId, isAuthenticated, isDemo) => {
       setLoading(true);
       setError(null);
 
+      const apiUrl = import.meta.env.VITE_API_URL;
+
       console.log("Fetching authenticated profile data");
       try {
-        const response = await fetch(`http://localhost:3000/api/profiles/`);
+        const response = await fetch(`${apiUrl}/api/profiles/`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
