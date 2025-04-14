@@ -2,6 +2,7 @@ import "./styles.css";
 import React, { useState, useEffect, useMemo } from "react";
 import { useSteamData } from "./hooks/useSteamData";
 import { achievementPages } from "./utils/achievementPages";
+import { gamePages } from "./utils/gamePages";
 import TimeClock from "./img/clock-history.svg";
 import ControllerSVG from "./img/controller.svg";
 import GithubSVG from "./img/github.svg";
@@ -134,6 +135,17 @@ export default function App() {
     goToPage,
     getTotalPages,
   } = achievementPages(allAchievements);
+
+  const {
+    currentGamePage,
+    setCurrentGamePage,
+    gamesPerPage,
+    getCurrentPageGames,
+    nextGamePage,
+    prevGamePage,
+    goToGamePage,
+    getTotalGamePages,
+  } = gamePages(gamesToDisplay);
 
   const { chartData, renderGenreChart, renderPlaytimeChart } = useCharts();
 
@@ -273,33 +285,7 @@ export default function App() {
     console.log("Most played game:", mostPlayedGame);
   }, [mostPlayedGame]);
 
-  const [idbGames, setIdbGames] = useState([]);
   const [advisorPage, setAdvisorPage] = useState(1);
-
-  useEffect(() => {
-    const fetchIdbGames = async () => {
-      try {
-        const games = await getAllData("games");
-        setIdbGames(games);
-      } catch (error) {
-        console.error("Error fetching games from IndexedDB:", error);
-      }
-    };
-
-    if (isAuthenticated) {
-      fetchIdbGames();
-    }
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    const loadGamesFromIdb = async () => {
-      if (isFullySynced) {
-        const storedGames = await getAllData("games");
-        setIdbGames(storedGames);
-      }
-    };
-    loadGamesFromIdb();
-  }, [isFullySynced]);
 
   const [gamesData, setGamesData] = useState({});
   useEffect(() => {
@@ -907,19 +893,20 @@ export default function App() {
         <div className="contaier mx-auto bg-base-200 sm:w-[75%] lg:w-[75%] ">
           {isDemo
             ? renderDemoProfile()
-            : profileData && (
+            : profileData &&
+              profileData.length > 0 && (
                 <div className="flex flex-col container mx-auto justify-center items-center">
                   <img
                     className="rounded-xl m-2"
-                    src={profileData.avatarfull}
+                    src={profileData[0]?.avatarFull}
                     width="256"
                     height="256"
                     alt="profile image"
                   />
-                  <h2 className="text-4xl">{profileData.personaname}</h2>
+                  <h2 className="text-4xl">{profileData[0]?.personaName}</h2>
                   <div className="flex flex-row justify-center items-center">
                     <a
-                      href={profileData.profileurl}
+                      href={profileData[0]?.profileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -1018,7 +1005,7 @@ export default function App() {
                                 <div>
                                   <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
                                     <img
-                                      src={game.image}
+                                      src={game.headerImage}
                                       alt="Game image"
                                       className="object-cover w-full h-full"
                                     />
@@ -1191,7 +1178,7 @@ export default function App() {
                         };
                       })
                       .filter((game) => {
-                        const searchString = `${game.name || ""} ${
+                        const searchString = `${game.gameName || ""} ${
                           game.appid || ""
                         }`.toLowerCase();
                         return searchString.includes(searchTerm.toLowerCase());
@@ -1208,7 +1195,7 @@ export default function App() {
                             <div>
                               <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
                                 <img
-                                  src={gamePictures[game.appid]}
+                                  src={game.headerImage}
                                   alt="Game image"
                                   className="object-cover w-full h-full"
                                 />
@@ -1216,7 +1203,7 @@ export default function App() {
                             </div>
                             <div className="w-full text-center lg:text-left space-y-2">
                               <div className="font-bold text-xl">
-                                {game.name}
+                                {game.gameName}
                               </div>
                               <div className="flex items-center space-x-2">
                                 <progress
@@ -1252,15 +1239,28 @@ export default function App() {
                           </div>
                         </div>
                       ))}
-                  </div>
-                  <div className="flex justify-center items-center">
-                    <button
-                      className="btn btn-info min-h-0 h-8 m-5"
-                      onClick={handleLoadMore}
-                      disabled={isSyncing}
-                    >
-                      Load More
-                    </button>
+                    <div className="join mt-4 mb-4">
+                      <button
+                        className="join-item btn"
+                        onClick={prevGamePage}
+                        disabled={currentGamePage === 1}
+                      >
+                        «
+                      </button>
+                      <button className="join-item btn">
+                        Page {currentGamePage} of{" "}
+                        {gamesToDisplay.totalGamePages}
+                      </button>
+                      <button
+                        className="join-item btn"
+                        onClick={nextGamePage}
+                        disabled={
+                          currentGamePage === gamesToDisplay.totalGamePages
+                        }
+                      >
+                        »
+                      </button>
+                    </div>
                   </div>
                 </div>
               ) : (

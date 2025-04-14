@@ -84,8 +84,7 @@ export function useGamesData(steamId, isAuthenticated) {
         ).length;
         setGamesPlayed(totalGamesPlayed);
 
-        const firstTwenty = data.slice(0, 20);
-        setGamesToDisplay(firstTwenty);
+        setGamesToDisplay(data);
       } catch (error) {
         console.error("Error fetching owned games:", error);
       }
