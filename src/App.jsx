@@ -166,22 +166,6 @@ export default function App() {
     window.location.reload();
   };
 
-  const apiTest = async () => {
-    try {
-      console.log("Starting API test...");
-      const response = await fetch(
-        `/.netlify/functions/getApiTest?appId=1915380`
-      );
-      const data = await response.json();
-      console.log("API Response:", data);
-      console.log("Response status:", response.status);
-      console.log("Response headers:", response.headers);
-    } catch (error) {
-      console.error("API Error:", error);
-    }
-  };
-  window.apiTest = apiTest;
-
   // Check for stored credentials on component mount
   useEffect(() => {
     const storedSteamId = localStorage.getItem("steamId");
@@ -207,33 +191,29 @@ export default function App() {
 
   // sorting the achievements by date achieved
   const sortedAchievements = useMemo(() => {
-    // console.log("Calculating sortedAchievements");
-    // console.log("allAchievements:", allAchievements);
-
-    const allAchievementsList = [];
-    Object.entries(allAchievements).forEach(([appId, achievements]) => {
-      //  console.log(`Processing appId: ${appId}, achievements:`, achievements);
-      if (Array.isArray(achievements)) {
-        achievements.forEach((achievement) => {
-          if (achievement.achieved) {
-            allAchievementsList.push({
+    const achievementsArray = Object.entries(allAchievements).flatMap(
+      ([appId, achievements]) => {
+        if (Array.isArray(achievements)) {
+          return achievements
+            .filter((achievement) => achievement.achieved)
+            .map((achievement) => ({
               ...achievement,
               appId,
               gameName:
                 gamesToDisplay.find((game) => game.appid.toString() === appId)
                   ?.name || "Unknown Game",
-            });
-          }
-        });
-      } else {
-        console.warn(
-          `Achievements for appId ${appId} is not an array:`,
-          achievements
-        );
+            }));
+        } else {
+          console.warn(
+            `Achievements for appId ${appId} is not an array:`,
+            achievements
+          );
+          return [];
+        }
       }
-    });
-    // console.log("Final allAchievementsList:", allAchievementsList);
-    return allAchievementsList.sort((a, b) => b.unlockTime - a.unlockTime);
+    );
+
+    return achievementsArray.sort((a, b) => b.unlockTime - a.unlockTime);
   }, [allAchievements, gamesToDisplay]);
 
   // logging all sorted achievements, important to make sure achievements are being passed to the dom

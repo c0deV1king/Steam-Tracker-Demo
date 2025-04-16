@@ -100,6 +100,50 @@ export function useGamesData(steamId, isAuthenticated) {
     }
   }, [allGamesList]);
 
+  useEffect(() => {
+    const fetchAchievements = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/api/achievements/`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+          console.log("Fetched all achievement data:", data);
+          setAllAchievements(data);
+        } else {
+          console.log(
+            "No achievements found, fetching achievement data from steam..."
+          );
+          const populateAchievements = await fetch(
+            `${apiUrl}/api/achievements/update/${steamId}`,
+            {
+              method: "PATCH", // Use PATCH method
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          if (!populateAchievements.ok) {
+            throw new Error(
+              `HTTP error! status: ${populateAchievements.status}`
+            );
+          }
+          const achievementData = await populateAchievements.json();
+          console.log("Fetched achievement data:", achievementData);
+          setAllAchievements(achievementData);
+        }
+      } catch (error) {
+        console.error("Error fetching achievements:", error);
+      }
+    };
+
+    if (isAuthenticated && steamId) {
+      fetchAchievements();
+    }
+  }, [isAuthenticated, steamId]);
+
   const getGamesWithDetails = async (games) => {
     const cachedDetails = JSON.parse(
       localStorage.getItem("cachedGameDetails") || "{}"
