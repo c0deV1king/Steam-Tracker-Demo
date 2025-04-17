@@ -189,33 +189,6 @@ export default function App() {
     setActiveTab(tab);
   };
 
-  // sorting the achievements by date achieved
-  const sortedAchievements = useMemo(() => {
-    const achievementsArray = Object.entries(allAchievements).flatMap(
-      ([appId, achievements]) => {
-        if (Array.isArray(achievements)) {
-          return achievements
-            .filter((achievement) => achievement.achieved)
-            .map((achievement) => ({
-              ...achievement,
-              appId,
-              gameName:
-                gamesToDisplay.find((game) => game.appid.toString() === appId)
-                  ?.name || "Unknown Game",
-            }));
-        } else {
-          console.warn(
-            `Achievements for appId ${appId} is not an array:`,
-            achievements
-          );
-          return [];
-        }
-      }
-    );
-
-    return achievementsArray.sort((a, b) => b.unlockTime - a.unlockTime);
-  }, [allAchievements, gamesToDisplay]);
-
   // logging all sorted achievements, important to make sure achievements are being passed to the dom
   // console.log("sortedAchievements:", sortedAchievements);
 
@@ -232,7 +205,12 @@ export default function App() {
 
   // filtering the achievements based on the search term
   const filteredAchievements = useMemo(() => {
-    const filtered = sortedAchievements.filter((achievement) => {
+    if (!Array.isArray(allAchievements)) {
+      console.error("allAchievements is not an array");
+      return { filtered: [], currentAchievements: [], totalPages: 0 };
+    }
+
+    const filtered = allAchievements.filter((achievement) => {
       const searchString = `${
         achievement.displayName || achievement.name || ""
       } ${achievement.description || ""} ${new Date(
@@ -254,7 +232,7 @@ export default function App() {
     );
 
     return { filtered, currentAchievements, totalPages };
-  }, [sortedAchievements, searchTerm, currentPage, achievementsPerPage]);
+  }, [allAchievements, searchTerm, currentPage, achievementsPerPage]);
 
   // resetting the current page to 1 when the search term changes
   useEffect(() => {
@@ -1131,7 +1109,10 @@ export default function App() {
                     {gamesToDisplay
                       .filter((game) => game.playtime_forever > 0)
                       .map((game) => {
-                        const achievements = allAchievements[game.appid] || [];
+                        const achievements = allAchievements.filter(
+                          (achievement) =>
+                            achievement.gameName === game.gameName
+                        );
                         const earnedAchievements = achievements.filter(
                           (achievement) => achievement.achieved
                         ).length;
@@ -1400,7 +1381,13 @@ export default function App() {
                             <div className="flex items-center space-x-4">
                               <div className="avatar">
                                 <div className="rounded-xl h-[64px] w-[64px]">
-                                  {achievement.icon ? (
+                                  {achievement.achieved === 0 ? (
+                                    <img
+                                      src={achievement.icongray}
+                                      style={{ opacity: "0.5" }}
+                                      alt="Locked Achievement"
+                                    />
+                                  ) : achievement.icon ? (
                                     <img
                                       src={achievement.icon}
                                       alt={
@@ -1428,15 +1415,15 @@ export default function App() {
                                 </div>
                                 <div className="text-sm mt-1">
                                   <span className="text-accent">
-                                    {getGameName(achievement.appId)}
+                                    {achievement.gameName}
                                   </span>{" "}
                                   •
                                   <span className="ml-2">
-                                    {achievement.unlockTime
+                                    {achievement.unlocktime
                                       ? new Date(
-                                          achievement.unlockTime * 1000
+                                          achievement.unlocktime * 1000
                                         ).toLocaleString()
-                                      : "Unknown"}{" "}
+                                      : "Locked Achievement"}{" "}
                                     •
                                   </span>
                                   <span className="ml-2 text-accent">
