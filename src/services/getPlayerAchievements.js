@@ -7,9 +7,17 @@ export async function handler(event, context) {
   const appid = event.queryStringParameters.appid;
   const backendUrl = process.env.VITE_API_URL;
 
+  const token = event.headers.Authorization || event.headers.authorization;
+
   try {
     const response = await fetch(
-      `${backendUrl}/api/achievements/update/${steamid}`
+      `${backendUrl}/api/achievements/update/${steamid}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     const data = await response.json();
 

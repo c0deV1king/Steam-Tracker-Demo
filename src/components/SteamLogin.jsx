@@ -23,10 +23,12 @@ const SteamLogin = ({ onSteamIdReceived }) => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const steamId = urlParams.get("steamId");
+    const token = urlParams.get("token");
     const error = urlParams.get("error");
 
-    if (steamId) {
+    if (steamId && token) {
       localStorage.setItem("steamId", steamId);
+      localStorage.setItem("token", token);
       onSteamIdReceived(steamId);
 
       // Clear the URL parameters

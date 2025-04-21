@@ -40,7 +40,7 @@ export function useGamesData(steamId, isAuthenticated) {
       try {
         const response = await fetch(`${apiUrl}/api/recentgames/${steamId}`);
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`HTTP error! status: ${response.status}`); // error here. Look into it later.
         }
         const data = await response.json();
         console.log("Fetched recent games data:", data);

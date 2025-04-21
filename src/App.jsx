@@ -743,8 +743,6 @@ export default function App() {
                 </div>
               )}
 
-          <ConnectionTest />
-
           <button
             className="btn btn-accent"
             onClick={() => document.getElementById("my_modal_4").showModal()}
