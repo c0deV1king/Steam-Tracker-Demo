@@ -952,53 +952,60 @@ export default function App() {
                         </p>
                         {Array.isArray(overviewGames) &&
                         overviewGames.length > 0 ? (
-                          overviewGames.slice(0, 5).map((game) => (
-                            <div
-                              key={game.appid}
-                              className="bg-base-100 rounded-xl p-4 shadow-xl"
-                            >
-                              <div className="flex flex-row lg:flex-col items-center space-y-4">
-                                <div>
-                                  <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
-                                    <img
-                                      src={game.headerImage}
-                                      alt="Game image"
-                                      className="object-cover w-full h-full"
-                                    />
+                          overviewGames.slice(0, 5).map((game) => {
+                            const achievements = Array.isArray(allAchievements)
+                              ? allAchievements.filter(
+                                  (achievement) =>
+                                    achievement.gameName === game.name
+                                )
+                              : [];
+                            const earnedAchievements = achievements.filter(
+                              (achievement) => achievement.achieved === 1
+                            ).length;
+                            const totalAchievements = achievements.length;
+
+                            return (
+                              <div
+                                key={game.appid}
+                                className="bg-base-100 rounded-xl p-4 shadow-xl"
+                              >
+                                <div className="flex flex-row lg:flex-col items-center space-y-4">
+                                  <div>
+                                    <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
+                                      <img
+                                        src={game.headerImage}
+                                        alt="Game image"
+                                        className="object-cover w-full h-full"
+                                      />
+                                    </div>
                                   </div>
-                                </div>
-                                <div className="w-full text-center lg:text-left space-y-2">
-                                  <div className="font-bold text-xl">
-                                    {game.name || `Game ID: ${game.appid}`}
-                                  </div>
-                                  <div className="flex flex-col items-center space-y-2">
-                                    <progress
-                                      className="progress progress-accent w-full"
-                                      value={
-                                        game.achievements
-                                          ? (game.achievements.filter(
-                                              (a) => a.achieved
-                                            ).length /
-                                              game.achievements.length) *
-                                            100
-                                          : 0
-                                      }
-                                      max="100"
-                                    ></progress>
-                                    <span className="text-sm">
-                                      {game.achievements
-                                        ? `${
-                                            game.achievements.filter(
-                                              (a) => a.achieved
-                                            ).length
-                                          } / ${game.achievements.length}`
-                                        : "N/A"}
-                                    </span>
+                                  <div className="w-full text-center lg:text-left space-y-2">
+                                    <div className="font-bold text-xl">
+                                      {game.name || `Game ID: ${game.appid}`}
+                                    </div>
+                                    <div className="flex flex-col items-center space-y-2">
+                                      <progress
+                                        className="progress progress-accent w-full"
+                                        value={
+                                          totalAchievements > 0
+                                            ? (earnedAchievements /
+                                                totalAchievements) *
+                                              100
+                                            : 0
+                                        }
+                                        max="100"
+                                      ></progress>
+                                      <span className="text-sm">
+                                        {totalAchievements > 0
+                                          ? `${earnedAchievements} / ${totalAchievements}`
+                                          : "No Achievements"}
+                                      </span>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          ))
+                            );
+                          })
                         ) : (
                           <div className="text-center p-4">
                             No games to display
@@ -1047,13 +1054,13 @@ export default function App() {
                                     </div>
                                     <div className="text-sm mt-1">
                                       <span className="text-accent">
-                                        {getGameName(achievement.appId)}
+                                        {achievement.gameName || "Unknown Game"}
                                       </span>{" "}
                                       •
                                       <span className="ml-2">
-                                        {achievement.unlockTime
+                                        {achievement.unlocktime
                                           ? new Date(
-                                              achievement.unlockTime * 1000
+                                              achievement.unlocktime * 1000
                                             ).toLocaleString()
                                           : "Unknown"}
                                       </span>

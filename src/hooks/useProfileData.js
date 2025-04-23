@@ -15,7 +15,15 @@ export const useProfileData = (steamId, isAuthenticated, isDemo) => {
 
       console.log("Fetching authenticated profile data");
       try {
-        const response = await fetch(`${apiUrl}/api/profiles/`);
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No auth token found");
+        }
+        const response = await fetch(`${apiUrl}/api/profiles/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

@@ -38,15 +38,35 @@ export function useGamesData(steamId, isAuthenticated) {
   useEffect(() => {
     const fetchOverviewGames = async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/recentgames/${steamId}`);
+        setIsLoading(true);
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No auth token found");
+        }
+        const response = await fetch(
+          `${apiUrl}/api/recentgames/update/${steamId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`); // error here. Look into it later.
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
         console.log("Fetched recent games data:", data);
-        setOverviewGames(data);
+        if (data.recentGames) {
+          setOverviewGames(data.recentGames);
+        } else {
+          console.error("No recentGames found in response:", data);
+        }
       } catch (error) {
         console.error("Error fetching recent games:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -66,7 +86,16 @@ export function useGamesData(steamId, isAuthenticated) {
   useEffect(() => {
     const fetchGames = async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/games/${steamId}`);
+        setIsLoading(true);
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No auth token found");
+        }
+        const response = await fetch(`${apiUrl}/api/games/${steamId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -87,6 +116,8 @@ export function useGamesData(steamId, isAuthenticated) {
         setGamesToDisplay(data);
       } catch (error) {
         console.error("Error fetching owned games:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     if (isAuthenticated && steamId) {
@@ -103,7 +134,16 @@ export function useGamesData(steamId, isAuthenticated) {
   useEffect(() => {
     const fetchAchievements = async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/achievements/`);
+        setIsLoading(true);
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No auth token found");
+        }
+        const response = await fetch(`${apiUrl}/api/achievements/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -113,29 +153,12 @@ export function useGamesData(steamId, isAuthenticated) {
           console.log("Fetched all achievement data:", data);
           setAllAchievements(data);
         } else {
-          console.log(
-            "No achievements found, fetching achievement data from steam..."
-          );
-          const populateAchievements = await fetch(
-            `${apiUrl}/api/achievements/update/${steamId}`,
-            {
-              method: "PATCH", // Use PATCH method
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-          if (!populateAchievements.ok) {
-            throw new Error(
-              `HTTP error! status: ${populateAchievements.status}`
-            );
-          }
-          const achievementData = await populateAchievements.json();
-          console.log("Fetched achievement data:", achievementData);
-          setAllAchievements(achievementData);
+          console.log("No achievements found in the database.");
         }
       } catch (error) {
         console.error("Error fetching achievements:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -424,28 +447,24 @@ export function useGamesData(steamId, isAuthenticated) {
 
   const getRecentAchievements = useCallback(() => {
     if (isAuthenticated && steamId) {
-      const allAchievementsList = [];
-      Object.entries(allAchievements).forEach(([appId, achievements]) => {
-        if (Array.isArray(achievements)) {
-          achievements.forEach((achievement) => {
-            if (achievement.achieved) {
-              allAchievementsList.push({
-                ...achievement,
-                appId,
-                gameName:
-                  games.find((game) => game.appid.toString() === appId)?.name ||
-                  "Unknown Game",
-              });
-            }
-          });
-        }
-      });
-      const sortedAchievements = allAchievementsList.sort(
-        (a, b) => b.unlockTime - a.unlockTime
+      // Flatten all achievements into a single array
+      const allAchievementsList = Object.values(allAchievements).flat();
+
+      // Filter achievements that are achieved
+      const achievedList = allAchievementsList.filter(
+        (achievement) => achievement.achieved === 1
       );
+
+      // Sort by unlock time in descending order
+      const sortedAchievements = achievedList.sort(
+        (a, b) => b.unlocktime - a.unlocktime
+      );
+
+      // Return the top 10 most recent achievements
       return sortedAchievements.slice(0, 10);
     }
-  }, [isAuthenticated, steamId, allAchievements, games]);
+    return [];
+  }, [isAuthenticated, steamId, allAchievements]);
 
   // recentAchievements when allAchievements changes
   useEffect(() => {
@@ -454,6 +473,13 @@ export function useGamesData(steamId, isAuthenticated) {
       setRecentAchievements(achievements);
     }
   }, [allAchievements, getRecentAchievements]);
+
+  // log the recentAchievements state
+  useEffect(() => {
+    if (recentAchievements.length > 0) {
+      console.log("Recent achievements state updated:", recentAchievements);
+    }
+  }, [recentAchievements]);
 
   // return functions and states to useSteamData
   return {
