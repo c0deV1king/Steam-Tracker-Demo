@@ -873,7 +873,7 @@ export default function App() {
                     <button
                       className="btn btn-accent h-5 min-h-0 m-2 mb-3"
                       onClick={() => {
-                        //  console.log("Sync button clicked");
+                        console.log("Sync button clicked");
                         if (syncAllData) {
                           syncAllData();
                         } else {

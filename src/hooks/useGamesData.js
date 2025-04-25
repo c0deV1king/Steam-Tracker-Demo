@@ -380,70 +380,97 @@ export function useGamesData(steamId, isAuthenticated) {
       setIsFullySynced(false);
       setIsLoading(true);
 
+      console.time("Syncing all data");
       try {
-        const res = await delayedFetch(
-          `/.netlify/functions/getOwnedGames/?steamid=${steamId}`
-        );
-        const data = await res.json();
-        const allGames = data.response.games || [];
-
-        const gamesWithDetails = await getGamesWithDetails(allGames);
-        const gamesWithAchievements = await fetchAchievementsForGames(
-          gamesWithDetails,
-          "cachedGamesAchievements",
-          steamId,
-          isAuthenticated
-        );
-
-        setGames(gamesWithAchievements);
-        setGamesToDisplay(gamesWithAchievements.slice(0, 20));
-
-        const newGamePictures = gamesWithAchievements.reduce((acc, game) => {
-          if (game.image) {
-            acc[game.appid] = game.image;
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No auth token found");
+        }
+        console.log("Syncing all data for Steam ID:", steamId);
+        console.log("fetching games data...");
+        console.time("Fetching games data");
+        const gamesResponse = await fetch(
+          `${apiUrl}/api/games/update/${steamId}`,
+          {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-          return acc;
-        }, {});
-        setGamePictures(newGamePictures);
-
-        await Promise.all(
-          gamesWithAchievements.map((game) => storeData("games", game))
         );
+        if (!gamesResponse.ok) {
+          throw new Error(`HTTP error! status: ${gamesResponse.status}`);
+        }
+        const gamesData = await gamesResponse.json();
+        console.log("Fetched all owned games data:", gamesData);
 
-        const allAchievementsData = await getAllData("achievements");
-        const updatedAchievements = allAchievementsData.reduce((acc, item) => {
-          acc[item.appid] = item.achievements;
-          return acc;
-        }, {});
+        if (!gamesData.games || !Array.isArray(gamesData.games)) {
+          throw new Error(
+            "Unexpected response format: gamesData.games is not an array"
+          );
+        }
 
-        setAllAchievements(updatedAchievements);
+        const gamesArray = gamesData.games;
 
-        const updatedGamesToDisplay = gamesToDisplay.map((game) => ({
-          ...game,
-          achievements: updatedAchievements[game.appid] || [],
-        }));
-        setGamesToDisplay(updatedGamesToDisplay);
+        setAllGamesList(gamesData);
 
-        setIsSyncing(false);
-        setIsLoading(false);
+        // Calculate total playtime and games played
+        console.log("Calculating total playtime and games played...");
+        const totalPlaytime = Math.round(
+          gamesArray.reduce((acc, game) => acc + game.playtime_forever, 0) / 60
+        );
+        setPlaytime(totalPlaytime);
+        const totalGamesPlayed = gamesArray.filter(
+          (game) => game.playtime_forever > 0
+        ).length;
+        setGamesPlayed(totalGamesPlayed);
+        console.log("Gathered playtime and games played data.");
+
+        setGamesToDisplay(gamesArray);
+        console.log("Displayed games updated.");
+        console.timeEnd("Fetching games data");
+
+        // Fetch achievements for all games
+        console.log(
+          "Fetching achievements for all games... this will take a while."
+        );
+        console.time("Fetching achievements data");
+        const achievementsResponse = await fetch(
+          `${apiUrl}/api/achievements/update/${steamId}`,
+          {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (!achievementsResponse.ok) {
+          throw new Error(`HTTP error! status: ${achievementsResponse.status}`);
+        }
+        const achievementData = await achievementsResponse.json();
+
+        if (achievementData && achievementData.length > 0) {
+          console.log("Fetched all achievement data:", achievementData);
+          setAllAchievements(achievementData);
+          console.timeEnd("Fetching achievements data");
+        } else {
+          console.log("No achievements found");
+        }
 
         await new Promise((resolve) => setTimeout(resolve, 100));
         window.location.reload();
 
         setIsFullySynced(true);
         localStorage.setItem("isFullySynced", "true");
-        // After setting fully synced, load all games
-        if (games.length > 0) {
-          const allGamesWithDetails = await getGamesWithDetails(games);
-          setGamesToDisplay(allGamesWithDetails);
-        }
       } catch (error) {
         console.error("Failed to sync all data:", error);
+      } finally {
+        console.timeEnd("Syncing all data");
         setIsSyncing(false);
         setIsLoading(false);
       }
     }
-  }, [isAuthenticated, steamId, getGamesWithDetails, gamesToDisplay]);
+  }, [isAuthenticated, steamId, gamesToDisplay]);
 
   const getRecentAchievements = useCallback(() => {
     if (isAuthenticated && steamId) {
