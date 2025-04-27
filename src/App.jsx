@@ -1084,7 +1084,7 @@ export default function App() {
             {activeTab === "Games" &&
               (isDemo ? (
                 renderDemoGames()
-              ) : !isFullySynced ? (
+              ) : (
                 <div>
                   <div className="flex flex-row justify-center items-center mt-4">
                     <label className="input input-bordered flex items-center gap-2 w-[50%]">
@@ -1229,126 +1229,8 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-              ) : (
-                <div>
-                  <div className="flex flex-row justify-center items-center mt-4">
-                    <label className="input input-bordered flex items-center gap-2 w-[50%]">
-                      <input
-                        type="text"
-                        className="grow"
-                        placeholder="Search Games"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
-                      <svg
-                        xmlns="https://www.w3.org/2000/svg"
-                        viewBox="0 0 16 16"
-                        fill="currentColor"
-                        className="h-4 w-4 opacity-70"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </label>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4 mx-5 mt-4">
-                    {idbGames
-                      .filter((game) => game.playtime_forever > 0)
-                      .map((game) => {
-                        const achievements = allAchievements[game.appid] || [];
-                        const earnedAchievements = achievements.filter(
-                          (achievement) => achievement.achieved
-                        ).length;
-                        const totalAchievements = achievements.length;
-
-                        const totalGlobalPercentages = achievements.reduce(
-                          (sum, a) => sum + (a.percentage || 0),
-                          0
-                        );
-                        const averageGlobalPercentage =
-                          achievements.length > 0
-                            ? (
-                                totalGlobalPercentages / achievements.length
-                              ).toFixed(1)
-                            : 0;
-
-                        return {
-                          ...game,
-                          earnedAchievements,
-                          totalAchievements,
-                          averageGlobalPercentage: Number(
-                            averageGlobalPercentage
-                          ),
-                        };
-                      })
-                      .filter((game) => {
-                        const searchString = `${game.name || ""} ${
-                          game.appid || ""
-                        }`.toLowerCase();
-                        return searchString.includes(searchTerm.toLowerCase());
-                      })
-                      .sort(
-                        (a, b) => b.earnedAchievements - a.earnedAchievements
-                      )
-                      .map((game, index) => (
-                        <div
-                          key={game.appid}
-                          className="bg-base-100 rounded-xl p-4 shadow-xl"
-                        >
-                          <div className="flex flex-col items-center lg:flex-row justify-center space-y-4">
-                            <div>
-                              <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
-                                <img
-                                  src={game.image}
-                                  alt="Game image"
-                                  className="object-cover w-full h-full"
-                                />
-                              </div>
-                            </div>
-                            <div className="w-full text-center lg:pl-4 lg:text-left space-y-2">
-                              <div className="font-bold text-xl">
-                                {game.name}
-                              </div>
-                              <div className="flex items-center justify-center lg:justify-start lg:pl-1 space-x-2">
-                                <progress
-                                  className="progress progress-accent w-56"
-                                  value={
-                                    game.totalAchievements
-                                      ? (game.earnedAchievements /
-                                          game.totalAchievements) *
-                                        100
-                                      : 0
-                                  }
-                                  max="100"
-                                ></progress>
-                                <span className="text-sm">
-                                  {game.earnedAchievements}/
-                                  {game.totalAchievements}
-                                </span>
-                              </div>
-                              <div className="text-sm space-y-1">
-                                Average Global Completion:{" "}
-                                <span className="text-accent">
-                                  {game.averageGlobalPercentage}%
-                                </span>
-                                <div className="flex items-center justify-center lg:justify-start lg:pl-1 space-x-1">
-                                  <span className="text-accent">
-                                    {Math.round(game.playtime_forever / 60)}{" "}
-                                    hours
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                </div>
               ))}
+
             {activeTab === "Achievements" &&
               (isDemo ? (
                 renderDemoAchievements()

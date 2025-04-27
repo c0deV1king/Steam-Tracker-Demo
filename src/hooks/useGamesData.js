@@ -430,7 +430,30 @@ export function useGamesData(steamId, isAuthenticated) {
         console.log("Displayed games updated.");
         console.timeEnd("Fetching games data");
 
-        // Fetch achievements for all games
+        window.location.reload();
+
+        setIsFullySynced(true);
+        localStorage.setItem("isFullySynced", "true");
+      } catch (error) {
+        console.error("Failed to sync all data:", error);
+      } finally {
+        console.timeEnd("Syncing all data");
+        setIsSyncing(false);
+        setIsLoading(false);
+      }
+    }
+  }, [isAuthenticated, steamId, gamesToDisplay]);
+
+  const syncAllAchievements = useCallback(async () => {
+    if (isAuthenticated && steamId) {
+      setIsSyncing(true);
+      setIsLoading(true);
+      // Fetch achievements for all games
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No auth token found");
+        }
         console.log(
           "Fetching achievements for all games... this will take a while."
         );
@@ -456,21 +479,14 @@ export function useGamesData(steamId, isAuthenticated) {
         } else {
           console.log("No achievements found");
         }
-
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        window.location.reload();
-
-        setIsFullySynced(true);
-        localStorage.setItem("isFullySynced", "true");
       } catch (error) {
-        console.error("Failed to sync all data:", error);
+        console.error("Failed to sync all achievement data:", error);
       } finally {
-        console.timeEnd("Syncing all data");
         setIsSyncing(false);
         setIsLoading(false);
       }
     }
-  }, [isAuthenticated, steamId, gamesToDisplay]);
+  }, [isAuthenticated, steamId]);
 
   const getRecentAchievements = useCallback(() => {
     if (isAuthenticated && steamId) {
