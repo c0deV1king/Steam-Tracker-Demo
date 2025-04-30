@@ -959,11 +959,6 @@ export default function App() {
                                     achievement.gameName === game.name
                                 )
                               : [];
-                            const earnedAchievements = achievements.filter(
-                              (achievement) => achievement.achieved === 1
-                            ).length;
-                            const totalAchievements = achievements.length;
-
                             return (
                               <div
                                 key={game.appid}
@@ -982,24 +977,6 @@ export default function App() {
                                   <div className="w-full text-center lg:text-left space-y-2">
                                     <div className="font-bold text-xl">
                                       {game.name || `Game ID: ${game.appid}`}
-                                    </div>
-                                    <div className="flex flex-col items-center space-y-2">
-                                      <progress
-                                        className="progress progress-accent w-full"
-                                        value={
-                                          totalAchievements > 0
-                                            ? (earnedAchievements /
-                                                totalAchievements) *
-                                              100
-                                            : 0
-                                        }
-                                        max="100"
-                                      ></progress>
-                                      <span className="text-sm">
-                                        {totalAchievements > 0
-                                          ? `${earnedAchievements} / ${totalAchievements}`
-                                          : "No Achievements"}
-                                      </span>
                                     </div>
                                   </div>
                                 </div>
@@ -1201,6 +1178,11 @@ export default function App() {
                                   </span>
                                 </div>
                               </div>
+                            </div>
+                            <div>
+                              <button className="btn bg-accent btn-xs text-black">
+                                Sync
+                              </button>
                             </div>
                           </div>
                         </div>
