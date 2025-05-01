@@ -524,6 +524,43 @@ export function useGamesData(steamId, isAuthenticated) {
     }
   }, [recentAchievements]);
 
+  // sync individual game data achievements
+  const syncIndividualGameAchievements = useCallback(
+    async (appid) => {
+      if (isAuthenticated && steamId) {
+        setIsSyncing(true);
+        setIsLoading(true);
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) {
+            throw new Error("No auth token found");
+          }
+          console.log(`Syncing achievements for game ${appid}...`);
+          const response = await fetch(
+            `${apiUrl}/api/achievements/update/${steamId}/${appid}`,
+            {
+              method: "PATCH",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          console.log("Fetched game achievement data:", data);
+        } catch (error) {
+          console.error("Failed to sync game achievements:", error);
+        } finally {
+          setIsSyncing(false);
+          setIsLoading(false);
+        }
+      }
+    },
+    [isAuthenticated, steamId]
+  );
+
   // return functions and states to useSteamData
   return {
     games,

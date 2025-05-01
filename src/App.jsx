@@ -1101,7 +1101,8 @@ export default function App() {
                         const totalAchievements = achievements.length;
 
                         const totalGlobalPercentages = achievements.reduce(
-                          (sum, a) => sum + (a.percentage || 0),
+                          (sum, a) =>
+                            sum + (a.percent ? parseFloat(a.percent) : 0),
                           0
                         );
                         const averageGlobalPercentage =
@@ -1115,9 +1116,7 @@ export default function App() {
                           ...game,
                           earnedAchievements,
                           totalAchievements,
-                          averageGlobalPercentage: Number(
-                            averageGlobalPercentage
-                          ),
+                          //percent: Number(averageGlobalPercentage),
                         };
                       })
                       .filter((game) => {
@@ -1144,7 +1143,7 @@ export default function App() {
                                 />
                               </div>
                             </div>
-                            <div className="w-full text-center lg:text-left space-y-2">
+                            <div className="w-full text-center lg:text-left space-y-2 m-4">
                               <div className="font-bold text-xl">
                                 {game.gameName}
                               </div>
@@ -1168,7 +1167,7 @@ export default function App() {
                               <div className="text-sm space-y-1">
                                 Average Global Completion:{" "}
                                 <span className="text-accent">
-                                  {game.averageGlobalPercentage}%
+                                  {/*{game.percent}*/}%
                                 </span>
                                 <div>
                                   Time Played:{" "}
@@ -1297,8 +1296,10 @@ export default function App() {
                                   </span>
                                   <span className="ml-2 text-accent">
                                     Earned by{" "}
-                                    {(achievement.percentage || 0).toFixed(1)}%
-                                    of players
+                                    {parseFloat(
+                                      achievement.percent || 0
+                                    ).toFixed(1)}
+                                    % of players
                                   </span>
                                 </div>
                               </div>
