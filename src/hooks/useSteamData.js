@@ -1,20 +1,17 @@
-import { useGamesData } from './useGamesData'
-import { useProfileData } from './useProfileData'
-import { fetchAchievementsForGames } from '../utils/fetchAchievementsForGames'
-import { useEffect, useState } from 'react';
-
-
+import { useGamesData } from "./useGamesData";
+import { useProfileData } from "./useProfileData";
+import { fetchAchievementsForGames } from "../utils/fetchAchievementsForGames";
+import { useEffect, useState } from "react";
 
 export const useSteamData = () => {
-
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [steamId, setSteamId] = useState(null);
   const [isDemo, setIsDemo] = useState(false);
 
   useEffect(() => {
-    const storedSteamId = localStorage.getItem('steamId');
-    const storedIsDemo = localStorage.getItem('isDemo') === 'true';
-    
+    const storedSteamId = localStorage.getItem("steamId");
+    const storedIsDemo = localStorage.getItem("isDemo") === "true";
+
     if (storedSteamId) {
       setSteamId(storedSteamId);
       setIsAuthenticated(true);
@@ -28,31 +25,30 @@ export const useSteamData = () => {
   const setIsAuthenticatedAndSave = (value) => {
     setIsAuthenticated(value);
     if (!value) {
-      localStorage.removeItem('steamId');
+      localStorage.removeItem("steamId");
     }
   };
 
   const setIsDemoAndSave = (value) => {
     setIsDemo(value);
-    localStorage.setItem('isDemo', value);
+    localStorage.setItem("isDemo", value);
     if (value) {
-      localStorage.removeItem('steamId');
+      localStorage.removeItem("steamId");
       setIsAuthenticated(false);
     } else {
-      localStorage.removeItem('isDemo');
+      localStorage.removeItem("isDemo");
     }
   };
 
   // transferring code to be used in App.jsx
-  const {
-    profileData
-  } = useProfileData(steamId, isAuthenticated, isDemo)
+  const { profileData } = useProfileData(steamId, isAuthenticated, isDemo);
+
+  const { gamesWithAchievements } = fetchAchievementsForGames(
+    steamId,
+    isAuthenticated
+  );
 
   const {
-    gamesWithAchievements
-  } = fetchAchievementsForGames(steamId, isAuthenticated)
-
-  const { 
     games,
     gamesToDisplay,
     allAchievements,
@@ -71,7 +67,8 @@ export const useSteamData = () => {
     mostPlayedGame,
     allGamesList,
     isLoading,
-    setIsLoading
+    setIsLoading,
+    syncIndividualGameAchievements,
   } = useGamesData(steamId, isAuthenticated) || {};
 
   return {
@@ -100,6 +97,7 @@ export const useSteamData = () => {
     setIsDemo: setIsDemoAndSave,
     setIsAuthenticated: setIsAuthenticatedAndSave,
     isLoading,
-    setIsLoading
+    setIsLoading,
+    syncIndividualGameAchievements,
   }; // returning the arrays and functions to be used in App.jsx
 };

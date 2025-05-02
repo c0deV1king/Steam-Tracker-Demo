@@ -122,6 +122,7 @@ export default function App() {
     mostPlayedGame,
     isLoading,
     setIsLoading,
+    syncIndividualGameAchievements,
   } = useSteamData();
 
   const {
@@ -1178,7 +1179,12 @@ export default function App() {
                               </div>
                             </div>
                             <div>
-                              <button className="btn bg-accent btn-xs text-black">
+                              <button
+                                className="btn bg-accent btn-xs text-black"
+                                onClick={() =>
+                                  syncIndividualGameAchievements(game.appid)
+                                }
+                              >
                                 Sync
                               </button>
                             </div>

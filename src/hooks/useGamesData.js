@@ -220,7 +220,7 @@ export function useGamesData(steamId, isAuthenticated) {
   //     }
   //   }
 
-    // Update cache and return updated games
+  // Update cache and return updated games
   //   const updatedCache = { ...cachedDetails };
   //   newDetails.forEach((detail) => {
   //     if (detail) {
@@ -294,33 +294,33 @@ export function useGamesData(steamId, isAuthenticated) {
   //         return game;
   //       });
 
-        // Only fetch achievements for games that don't have cached achievements
-        // const gamesNeedingAchievements = gamesWithAchievements.filter(
-        //   (game) => !game.achievements
-        // );
-        // if (gamesNeedingAchievements.length > 0) {
-        //   const newAchievements = await fetchAchievementsForGames(
-        //     gamesNeedingAchievements,
-        //     "cachedGamesAchievements",
-        //     steamId,
-        //     isAuthenticated
-        //   );
-        //   newAchievements.forEach((game) => {
-        //     const index = gamesWithAchievements.findIndex(
-        //       (g) => g.appid === game.appid
-        //     );
-        //     if (index !== -1) {
-        //       gamesWithAchievements[index] = game;
-        //     }
-        //   });
-        // }
+  // Only fetch achievements for games that don't have cached achievements
+  // const gamesNeedingAchievements = gamesWithAchievements.filter(
+  //   (game) => !game.achievements
+  // );
+  // if (gamesNeedingAchievements.length > 0) {
+  //   const newAchievements = await fetchAchievementsForGames(
+  //     gamesNeedingAchievements,
+  //     "cachedGamesAchievements",
+  //     steamId,
+  //     isAuthenticated
+  //   );
+  //   newAchievements.forEach((game) => {
+  //     const index = gamesWithAchievements.findIndex(
+  //       (g) => g.appid === game.appid
+  //     );
+  //     if (index !== -1) {
+  //       gamesWithAchievements[index] = game;
+  //     }
+  //   });
+  // }
 
-        // setGamesToDisplay((prevGames) => [
-        //   ...prevGames,
-        //   ...gamesWithAchievements,
-        // ]);
+  // setGamesToDisplay((prevGames) => [
+  //   ...prevGames,
+  //   ...gamesWithAchievements,
+  // ]);
 
-        // Update allAchievements state
+  // Update allAchievements state
   //       setAllAchievements((prevAchievements) => {
   //         const updatedAchievements = { ...prevAchievements };
   //         gamesWithAchievements.forEach((game) => {
@@ -535,9 +535,13 @@ export function useGamesData(steamId, isAuthenticated) {
           if (!token) {
             throw new Error("No auth token found");
           }
-          console.log(`Syncing achievements for game ${appid}...`);
+
+          // Make sure appid is a string or number, not an object
+          const gameId = typeof appid === "object" ? appid.appid : appid;
+
+          console.log(`Syncing achievements for game ${gameId}...`);
           const response = await fetch(
-            `${apiUrl}/api/achievements/update/${steamId}/${appid}`,
+            `${apiUrl}/api/achievements/update/${steamId}/appid/${gameId}`,
             {
               method: "PATCH",
               headers: {
@@ -582,5 +586,6 @@ export function useGamesData(steamId, isAuthenticated) {
     steamId,
     isLoading,
     setIsLoading,
+    syncIndividualGameAchievements,
   };
 }
