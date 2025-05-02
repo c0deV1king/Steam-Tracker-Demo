@@ -113,7 +113,6 @@ export default function App() {
     gamePictures,
     overviewGames,
     recentGames,
-    handleLoadMore,
     mostRecentGame,
     syncAllData,
     isSyncing,

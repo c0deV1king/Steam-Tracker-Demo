@@ -167,212 +167,212 @@ export function useGamesData(steamId, isAuthenticated) {
     }
   }, [isAuthenticated, steamId]);
 
-  const getGamesWithDetails = async (games) => {
-    const cachedDetails = JSON.parse(
-      localStorage.getItem("cachedGameDetails") || "{}"
-    );
-    const now = new Date().getTime();
+  // const getGamesWithDetails = async (games) => {
+  //   const cachedDetails = JSON.parse(
+  //     localStorage.getItem("cachedGameDetails") || "{}"
+  //   );
+  //   const now = new Date().getTime();
 
-    const gamesNeedingDetails = games.filter(
-      (game) =>
-        !cachedDetails[game.appid] ||
-        now - cachedDetails[game.appid].timestamp >= 12 * 60 * 60 * 1000
-    );
+  //   const gamesNeedingDetails = games.filter(
+  //     (game) =>
+  //       !cachedDetails[game.appid] ||
+  //       now - cachedDetails[game.appid].timestamp >= 12 * 60 * 60 * 1000
+  //   );
 
-    if (gamesNeedingDetails.length === 0) {
-      return games.map((game) => ({
-        ...game,
-        ...(cachedDetails[game.appid] ? cachedDetails[game.appid].data : {}),
-      }));
-    }
+  //   if (gamesNeedingDetails.length === 0) {
+  //     return games.map((game) => ({
+  //       ...game,
+  //       ...(cachedDetails[game.appid] ? cachedDetails[game.appid].data : {}),
+  //     }));
+  //   }
 
-    const newDetails = [];
+  //   const newDetails = [];
 
-    if (isAuthenticated && steamId) {
-      for (const game of gamesNeedingDetails) {
-        try {
-          const detailsRes = await delayedFetch(
-            `/.netlify/functions/getAppDetails/?appid=${game.appid}`
-          );
-          const detailsData = await detailsRes.json();
+  //   if (isAuthenticated && steamId) {
+  //     for (const game of gamesNeedingDetails) {
+  //       try {
+  //         const detailsRes = await delayedFetch(
+  //           `/.netlify/functions/getAppDetails/?appid=${game.appid}`
+  //         );
+  //         const detailsData = await detailsRes.json();
 
-          if (detailsData[game.appid].success) {
-            const gameDetails = detailsData[game.appid].data;
-            newDetails.push({
-              appid: game.appid,
-              data: {
-                name: gameDetails.name,
-                image: gameDetails.header_image,
-                genres: gameDetails.genres,
-                developers: gameDetails.developers,
-                metacritic: gameDetails.metacritic,
-                type: gameDetails.type,
-              },
-              timestamp: now,
-            });
-          }
-        } catch (error) {
-          console.error(
-            `Error fetching details for game ${game.appid}:`,
-            error
-          );
-        }
-      }
-    }
+  //         if (detailsData[game.appid].success) {
+  //           const gameDetails = detailsData[game.appid].data;
+  //           newDetails.push({
+  //             appid: game.appid,
+  //             data: {
+  //               name: gameDetails.name,
+  //               image: gameDetails.header_image,
+  //               genres: gameDetails.genres,
+  //               developers: gameDetails.developers,
+  //               metacritic: gameDetails.metacritic,
+  //               type: gameDetails.type,
+  //             },
+  //             timestamp: now,
+  //           });
+  //         }
+  //       } catch (error) {
+  //         console.error(
+  //           `Error fetching details for game ${game.appid}:`,
+  //           error
+  //         );
+  //       }
+  //     }
+  //   }
 
     // Update cache and return updated games
-    const updatedCache = { ...cachedDetails };
-    newDetails.forEach((detail) => {
-      if (detail) {
-        updatedCache[detail.appid] = {
-          data: detail.data,
-          timestamp: detail.timestamp,
-        };
-      }
-    });
-    localStorage.setItem("cachedGameDetails", JSON.stringify(updatedCache));
+  //   const updatedCache = { ...cachedDetails };
+  //   newDetails.forEach((detail) => {
+  //     if (detail) {
+  //       updatedCache[detail.appid] = {
+  //         data: detail.data,
+  //         timestamp: detail.timestamp,
+  //       };
+  //     }
+  //   });
+  //   localStorage.setItem("cachedGameDetails", JSON.stringify(updatedCache));
 
-    return games.map((game) => ({
-      ...game,
-      ...(updatedCache[game.appid] ? updatedCache[game.appid].data : {}),
-    }));
-  };
+  //   return games.map((game) => ({
+  //     ...game,
+  //     ...(updatedCache[game.appid] ? updatedCache[game.appid].data : {}),
+  //   }));
+  // };
 
-  useEffect(() => {
-    if (isAuthenticated && steamId) {
-      const updateMostPlayedGame = async () => {
-        if (games.length > 0) {
-          const highestPlayedGame = games.reduce(
-            (max, game) =>
-              game.playtime_forever > max.playtime_forever ? game : max,
-            games[0]
-          );
+  // useEffect(() => {
+  //   if (isAuthenticated && steamId) {
+  //     const updateMostPlayedGame = async () => {
+  //       if (games.length > 0) {
+  //         const highestPlayedGame = games.reduce(
+  //           (max, game) =>
+  //             game.playtime_forever > max.playtime_forever ? game : max,
+  //           games[0]
+  //         );
 
-          // Fetch details for the most played game if not already available
-          if (!highestPlayedGame.name || !highestPlayedGame.image) {
-            const gamesWithDetails = await getGamesWithDetails([
-              highestPlayedGame,
-            ]);
-            if (gamesWithDetails.length > 0) {
-              setMostPlayedGame(gamesWithDetails[0]);
-            }
-          } else {
-            setMostPlayedGame(highestPlayedGame);
-          }
-        }
-      };
+  //         // Fetch details for the most played game if not already available
+  //         if (!highestPlayedGame.name || !highestPlayedGame.image) {
+  //           const gamesWithDetails = await getGamesWithDetails([
+  //             highestPlayedGame,
+  //           ]);
+  //           if (gamesWithDetails.length > 0) {
+  //             setMostPlayedGame(gamesWithDetails[0]);
+  //           }
+  //         } else {
+  //           setMostPlayedGame(highestPlayedGame);
+  //         }
+  //       }
+  //     };
 
-      updateMostPlayedGame();
-    }
-  }, [isAuthenticated, steamId, games]);
+  //     updateMostPlayedGame();
+  //   }
+  // }, [isAuthenticated, steamId, games]);
 
-  const handleLoadMore = useCallback(async () => {
-    if (isAuthenticated && steamId) {
-      setIsLoading(true);
-      try {
-        const currentLength = gamesToDisplay.length;
-        const newGames = games.slice(currentLength, currentLength + 20);
+  // const handleLoadMore = useCallback(async () => {
+  //   if (isAuthenticated && steamId) {
+  //     setIsLoading(true);
+  //     try {
+  //       const currentLength = gamesToDisplay.length;
+  //       const newGames = games.slice(currentLength, currentLength + 20);
 
-        const gamesWithDetails = await getGamesWithDetails(newGames);
+  //       const gamesWithDetails = await getGamesWithDetails(newGames);
 
-        // Check if we have cached achievements
-        const cachedGamesAchievements = localStorage.getItem(
-          "cachedGamesAchievements"
-        );
-        let cachedAchievementsObj = {};
-        if (cachedGamesAchievements) {
-          cachedAchievementsObj = JSON.parse(cachedGamesAchievements);
-        }
+  //       // Check if we have cached achievements
+  //       const cachedGamesAchievements = localStorage.getItem(
+  //         "cachedGamesAchievements"
+  //       );
+  //       let cachedAchievementsObj = {};
+  //       if (cachedGamesAchievements) {
+  //         cachedAchievementsObj = JSON.parse(cachedGamesAchievements);
+  //       }
 
-        const gamesWithAchievements = gamesWithDetails.map((game) => {
-          if (cachedAchievementsObj[game.appid]) {
-            return {
-              ...game,
-              achievements: cachedAchievementsObj[game.appid],
-            };
-          }
-          return game;
-        });
+  //       const gamesWithAchievements = gamesWithDetails.map((game) => {
+  //         if (cachedAchievementsObj[game.appid]) {
+  //           return {
+  //             ...game,
+  //             achievements: cachedAchievementsObj[game.appid],
+  //           };
+  //         }
+  //         return game;
+  //       });
 
         // Only fetch achievements for games that don't have cached achievements
-        const gamesNeedingAchievements = gamesWithAchievements.filter(
-          (game) => !game.achievements
-        );
-        if (gamesNeedingAchievements.length > 0) {
-          const newAchievements = await fetchAchievementsForGames(
-            gamesNeedingAchievements,
-            "cachedGamesAchievements",
-            steamId,
-            isAuthenticated
-          );
-          newAchievements.forEach((game) => {
-            const index = gamesWithAchievements.findIndex(
-              (g) => g.appid === game.appid
-            );
-            if (index !== -1) {
-              gamesWithAchievements[index] = game;
-            }
-          });
-        }
+        // const gamesNeedingAchievements = gamesWithAchievements.filter(
+        //   (game) => !game.achievements
+        // );
+        // if (gamesNeedingAchievements.length > 0) {
+        //   const newAchievements = await fetchAchievementsForGames(
+        //     gamesNeedingAchievements,
+        //     "cachedGamesAchievements",
+        //     steamId,
+        //     isAuthenticated
+        //   );
+        //   newAchievements.forEach((game) => {
+        //     const index = gamesWithAchievements.findIndex(
+        //       (g) => g.appid === game.appid
+        //     );
+        //     if (index !== -1) {
+        //       gamesWithAchievements[index] = game;
+        //     }
+        //   });
+        // }
 
-        setGamesToDisplay((prevGames) => [
-          ...prevGames,
-          ...gamesWithAchievements,
-        ]);
+        // setGamesToDisplay((prevGames) => [
+        //   ...prevGames,
+        //   ...gamesWithAchievements,
+        // ]);
 
         // Update allAchievements state
-        setAllAchievements((prevAchievements) => {
-          const updatedAchievements = { ...prevAchievements };
-          gamesWithAchievements.forEach((game) => {
-            if (game.achievements) {
-              updatedAchievements[game.appid] = game.achievements;
-            }
-          });
-          return updatedAchievements;
-        });
+  //       setAllAchievements((prevAchievements) => {
+  //         const updatedAchievements = { ...prevAchievements };
+  //         gamesWithAchievements.forEach((game) => {
+  //           if (game.achievements) {
+  //             updatedAchievements[game.appid] = game.achievements;
+  //           }
+  //         });
+  //         return updatedAchievements;
+  //       });
 
-        // Update gamePictures state
-        setGamePictures((prevPictures) => {
-          const updatedPictures = { ...prevPictures };
-          gamesWithAchievements.forEach((game) => {
-            if (game.image) {
-              updatedPictures[game.appid] = game.image;
-            }
-          });
-          return updatedPictures;
-        });
-      } catch (error) {
-        console.error("Error loading more games:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  }, [isAuthenticated, steamId, games, gamesToDisplay, getGamesWithDetails]);
+  //       // Update gamePictures state
+  //       setGamePictures((prevPictures) => {
+  //         const updatedPictures = { ...prevPictures };
+  //         gamesWithAchievements.forEach((game) => {
+  //           if (game.image) {
+  //             updatedPictures[game.appid] = game.image;
+  //           }
+  //         });
+  //         return updatedPictures;
+  //       });
+  //     } catch (error) {
+  //       console.error("Error loading more games:", error);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   }
+  // }, [isAuthenticated, steamId, games, gamesToDisplay, getGamesWithDetails]);
 
   // Update achievements for recent games
-  useEffect(() => {
-    if (isAuthenticated && steamId) {
-      const updateRecentGamesAchievements = async () => {
-        if (recentGames.length > 0) {
-          const recentGamesWithDetails = await getGamesWithDetails(recentGames);
-          await fetchAchievementsForGames(
-            recentGamesWithDetails,
-            "cachedGamesAchievements",
-            steamId,
-            isAuthenticated
-          );
-          setRecentGames([...recentGamesWithDetails]);
-        }
-      };
-      updateRecentGamesAchievements();
-    }
-  }, [
-    isAuthenticated,
-    steamId,
-    recentGames,
-    getGamesWithDetails,
-    fetchAchievementsForGames,
-  ]);
+  // useEffect(() => {
+  //   if (isAuthenticated && steamId) {
+  //     const updateRecentGamesAchievements = async () => {
+  //       if (recentGames.length > 0) {
+  //         const recentGamesWithDetails = await getGamesWithDetails(recentGames);
+  //         await fetchAchievementsForGames(
+  //           recentGamesWithDetails,
+  //           "cachedGamesAchievements",
+  //           steamId,
+  //           isAuthenticated
+  //         );
+  //         setRecentGames([...recentGamesWithDetails]);
+  //       }
+  //     };
+  //     updateRecentGamesAchievements();
+  //   }
+  // }, [
+  //   isAuthenticated,
+  //   steamId,
+  //   recentGames,
+  //   getGamesWithDetails,
+  //   fetchAchievementsForGames,
+  // ]);
 
   const syncAllData = useCallback(async () => {
     if (isAuthenticated && steamId) {
@@ -572,7 +572,6 @@ export function useGamesData(steamId, isAuthenticated) {
     gamePictures,
     overviewGames,
     recentGames,
-    handleLoadMore,
     mostRecentGame,
     isSyncing,
     isFullySynced,
