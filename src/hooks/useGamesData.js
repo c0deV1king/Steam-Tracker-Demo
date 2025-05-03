@@ -554,6 +554,33 @@ export function useGamesData(steamId, isAuthenticated) {
           }
           const data = await response.json();
           console.log("Fetched game achievement data:", data);
+
+          // Update the allAchievements state with the new data
+          setAllAchievements((prevAchievements) => {
+            // Remove any existing achievements for this game by appid property
+            const filteredAchievements = prevAchievements.filter(
+              (achievement) => achievement.appid !== Number(gameId)
+            );
+
+            // Process the new achievements data
+            let gameAchievements = [];
+            if (data.achievements && Array.isArray(data.achievements)) {
+              gameAchievements = data.achievements;
+            } else if (Array.isArray(data)) {
+              gameAchievements = data;
+            } else if (typeof data === "object" && data !== null) {
+              gameAchievements = [data];
+            }
+
+            // Add the new achievements to the filtered list
+            return [...filteredAchievements, ...gameAchievements];
+          });
+
+          // Trigger update of recentAchievements if needed
+          const achievements = getRecentAchievements();
+          if (achievements) {
+            setRecentAchievements(achievements);
+          }
         } catch (error) {
           console.error("Failed to sync game achievements:", error);
         } finally {
@@ -562,10 +589,15 @@ export function useGamesData(steamId, isAuthenticated) {
         }
       }
     },
-    [isAuthenticated, steamId]
-  );
-
-  // return functions and states to useSteamData
+    [
+      isAuthenticated,
+      steamId,
+      apiUrl,
+      setAllAchievements,
+      getRecentAchievements,
+      setRecentAchievements,
+    ]
+  ); // return functions and states to useSteamData
   return {
     games,
     gamesToDisplay,
