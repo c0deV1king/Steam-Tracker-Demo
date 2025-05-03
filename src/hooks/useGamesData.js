@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { fetchAchievementsForGames } from "../utils/fetchAchievementsForGames";
 import { delayedFetch } from "../utils/rateLimitingAPI";
 import { storeData, getAllData } from "../utils/indexedDB";
+import fallbackImage from "../img/capsule404.png";
 
 export function useGamesData(steamId, isAuthenticated) {
   const [games, setGames] = useState([]);
@@ -597,7 +598,14 @@ export function useGamesData(steamId, isAuthenticated) {
       getRecentAchievements,
       setRecentAchievements,
     ]
-  ); // return functions and states to useSteamData
+  );
+  const handleImageError = (e, appId) => {
+    // Set a default/fallback image
+    e.target.src = fallbackImage;
+    console.log(`Failed to load image for app ${appId}`);
+  };
+
+  // return functions and states to useSteamData
   return {
     games,
     gamesToDisplay,
@@ -619,5 +627,6 @@ export function useGamesData(steamId, isAuthenticated) {
     isLoading,
     setIsLoading,
     syncIndividualGameAchievements,
+    handleImageError,
   };
 }

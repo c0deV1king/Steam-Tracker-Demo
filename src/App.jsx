@@ -123,6 +123,7 @@ export default function App() {
     isLoading,
     setIsLoading,
     syncIndividualGameAchievements,
+    handleImageError,
   } = useSteamData();
 
   const {
@@ -1005,6 +1006,9 @@ export default function App() {
                                     <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
                                       <img
                                         src={game.headerImage}
+                                        onError={(e) =>
+                                          handleImageError(e, game.appid)
+                                        }
                                         alt="Game image"
                                         className="object-cover w-full h-full"
                                       />
@@ -1174,6 +1178,9 @@ export default function App() {
                               <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
                                 <img
                                   src={game.headerImage}
+                                  onError={(e) =>
+                                    handleImageError(e, game.appid)
+                                  }
                                   alt="Game image"
                                   className="object-cover w-full h-full"
                                 />
@@ -1517,6 +1524,9 @@ export default function App() {
                                     `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appid}/header.jpg`
                                   }
                                   alt={game.gameName}
+                                  onError={(e) =>
+                                    handleImageError(e, game.appid)
+                                  }
                                   className="w-full h-auto rounded-lg"
                                 />
                               </td>
