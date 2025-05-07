@@ -148,7 +148,13 @@ export default function App() {
     getTotalGamePages,
   } = gamePages(gamesToDisplay);
 
-  const { chartData, renderGenreChart, renderPlaytimeChart } = useCharts();
+  const { chartData, renderGenreChart, renderPlaytimeChart, refreshChartData } =
+    useCharts();
+
+  const handleSyncAllData = async () => {
+    await syncAllData();
+    refreshChartData();
+  };
 
   const handleAuth = () => {
     setIsAuthenticated(true);
@@ -914,7 +920,7 @@ export default function App() {
                       onClick={() => {
                         console.log("Sync button clicked");
                         if (syncAllData) {
-                          syncAllData();
+                          handleSyncAllData();
                         } else {
                           console.error("syncAllData is undefined");
                         }

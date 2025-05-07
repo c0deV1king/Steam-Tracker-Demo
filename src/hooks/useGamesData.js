@@ -431,8 +431,6 @@ export function useGamesData(steamId, isAuthenticated) {
         console.log("Displayed games updated.");
         console.timeEnd("Fetching games data");
 
-        window.location.reload();
-
         setIsFullySynced(true);
         localStorage.setItem("isFullySynced", "true");
       } catch (error) {
