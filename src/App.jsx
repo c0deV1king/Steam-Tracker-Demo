@@ -10,6 +10,7 @@ import SyncSVG from "./img/arrow-repeat.svg?url";
 import InfoSVG from "./img/info-square.svg?url";
 import SteamSVG from "./img/steam.svg?url";
 import LogoutSVG from "./img/box-arrow-left.svg?url";
+import AwardSVG from "./img/award.svg?url";
 import { useCharts } from "./hooks/useCharts";
 import DemoCharts from "./components/demoCharts";
 import { AuthPage } from "./components/AuthPage";
@@ -1115,6 +1116,145 @@ export default function App() {
                           )}
                         </div>
                       </div>
+                    </div>
+                  </div>
+                  <p className="text-center text-2xl flex-1 pb-4">
+                    <span className="font-bold">PERFECT</span>GAMES
+                  </p>
+
+                  {/* Perfect Games section */}
+                  <div className="w-[50%] mx-auto">
+                    <div className="grid grid-cols-1 gap-4">
+                      {isDemo ? (
+                        <div className="bg-base-100 rounded-xl p-4 shadow-xl">
+                          <div className="flex flex-row lg:flex-col items-center space-y-4">
+                            <div>
+                              <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
+                                <img
+                                  src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/header.jpg?t=1711626984"
+                                  alt="Game image"
+                                  className="object-cover w-full h-full"
+                                />
+                              </div>
+                            </div>
+                            <div className="w-full text-center lg:text-left space-y-2">
+                              <div className="font-bold text-xl">
+                                ELDEN RING
+                              </div>
+                              <div className="text-sm">
+                                Achievements:{" "}
+                                <span className="text-success font-bold">
+                                  42/42
+                                </span>
+                              </div>
+                              <div className="text-sm">
+                                Time Played:{" "}
+                                <span className="text-accent">157 hours</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        Array.isArray(gamesToDisplay) &&
+                        gamesToDisplay
+                          .filter((game) => {
+                            const achievements = Array.isArray(allAchievements)
+                              ? allAchievements.filter(
+                                  (achievement) =>
+                                    achievement.gameName === game.gameName
+                                )
+                              : [];
+
+                            const earnedAchievements = achievements.filter(
+                              (achievement) => achievement.achieved
+                            ).length;
+                            const totalAchievements = achievements.length;
+
+                            return (
+                              totalAchievements > 0 &&
+                              earnedAchievements === totalAchievements
+                            );
+                          })
+                          .map((game) => {
+                            const achievements = Array.isArray(allAchievements)
+                              ? allAchievements.filter(
+                                  (achievement) =>
+                                    achievement.gameName === game.gameName
+                                )
+                              : [];
+
+                            const totalAchievements = achievements.length;
+
+                            return (
+                              <div
+                                key={`perfect-${game.appid}`}
+                                className="bg-base-100 rounded-xl p-4 shadow-xl border-2 border-accent"
+                              >
+                                <div className="flex flex-row lg:flex-col items-center space-y-4">
+                                  <div>
+                                    <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
+                                      <img
+                                        src={game.headerImage}
+                                        onError={(e) =>
+                                          handleImageError(e, game.appid)
+                                        }
+                                        alt="Game image"
+                                        className="object-cover w-full h-full"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="w-full text-center lg:text-left space-y-2">
+                                    <div className="font-bold text-xl flex items-center justify-center">
+                                      {game.name ||
+                                        game.gameName ||
+                                        `Game ID: ${game.appid}`}
+                                      <img
+                                        src={AwardSVG}
+                                        alt="award"
+                                        className="w-8 h-8 ml-2 svg-accent"
+                                      />
+                                    </div>
+                                    <div className="text-sm flex items-center justify-center">
+                                      Achievements:{" "}
+                                      <span className="text-success font-bold ">
+                                        {totalAchievements}/{totalAchievements}
+                                      </span>
+                                    </div>
+                                    <div className="text-sm flex items-center justify-center">
+                                      Time Played:{" "}
+                                      <span className="text-accent">
+                                        {Math.round(game.playtime_forever / 60)}{" "}
+                                        hours
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })
+                      )}
+                      {!isDemo &&
+                        (!Array.isArray(gamesToDisplay) ||
+                          !gamesToDisplay.some((game) => {
+                            const achievements = Array.isArray(allAchievements)
+                              ? allAchievements.filter(
+                                  (achievement) =>
+                                    achievement.gameName === game.gameName
+                                )
+                              : [];
+                            const earnedAchievements = achievements.filter(
+                              (achievement) => achievement.achieved
+                            ).length;
+                            const totalAchievements = achievements.length;
+                            return (
+                              totalAchievements > 0 &&
+                              earnedAchievements === totalAchievements
+                            );
+                          })) && (
+                          <div className="text-center p-4">
+                            No perfect games yet. Keep going!
+                          </div>
+                        )}
                     </div>
                   </div>
                 </div>
