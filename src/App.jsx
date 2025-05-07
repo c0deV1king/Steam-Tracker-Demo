@@ -3,11 +3,13 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useSteamData } from "./hooks/useSteamData";
 import { achievementPages } from "./utils/achievementPages";
 import { gamePages } from "./utils/gamePages";
-import TimeClock from "./img/clock-history.svg";
-import ControllerSVG from "./img/controller.svg";
-import GithubSVG from "./img/github.svg";
-import SyncSVG from "./img/arrow-repeat.svg";
-import InfoSVG from "./img/info-square.svg";
+import TimeClockSVG from "./img/clock-history.svg?url";
+import JoystickSVG from "./img/joystick.svg?url";
+import GithubSVG from "./img/github.svg?url";
+import SyncSVG from "./img/arrow-repeat.svg?url";
+import InfoSVG from "./img/info-square.svg?url";
+import SteamSVG from "./img/steam.svg?url";
+import LogoutSVG from "./img/box-arrow-left.svg?url";
 import { useCharts } from "./hooks/useCharts";
 import DemoCharts from "./components/demoCharts";
 import { AuthPage } from "./components/AuthPage";
@@ -736,12 +738,22 @@ export default function App() {
                   <div className="stats stats-vertical lg:stats-horizontal bg-transparent">
                     <div className="stat flex justify-center items-center">
                       <div className="stat-title text-center"></div>
+                      <img
+                        src={JoystickSVG}
+                        alt="joystick"
+                        className="w-8 h-8 svg-accent"
+                      />
                       <div className="stat-value text-center text-info">
                         {typeof gamesPlayed === "number" ? gamesPlayed : "N/A"}
                       </div>
                     </div>
 
                     <div className="stat flex justify-center items-center">
+                      <img
+                        src={TimeClockSVG}
+                        alt="timeclock"
+                        className="w-8 h-8 svg-accent"
+                      />
                       <div className="stat-value text-center text-info">
                         {typeof playtime === "number" ? playtime : "N/A"}
                       </div>
@@ -754,6 +766,7 @@ export default function App() {
             className="btn btn-accent"
             onClick={() => document.getElementById("my_modal_4").showModal()}
           >
+            <img src={InfoSVG} alt="info" className="w-8 h-8" />
             App Demo
           </button>
           <dialog id="my_modal_4" className="modal">
@@ -904,7 +917,7 @@ export default function App() {
                     height="256"
                     alt="profile image"
                   />
-                  <h2 className="text-4xl">{profileData[0]?.personaName}</h2>
+                  <h2 className="text-4xl">{profileData[0]?.personaName} </h2>
                   <div className="flex flex-row justify-center items-center">
                     <a
                       href={profileData[0]?.profileUrl}
@@ -913,6 +926,7 @@ export default function App() {
                     >
                       <button className="btn btn-accent h-5 min-h-0 m-2 mb-3">
                         Steam
+                        <img src={SteamSVG} alt="steam" className="w-4 h-4" />
                       </button>
                     </a>
                     <button
@@ -932,12 +946,14 @@ export default function App() {
                         : isFullySynced
                         ? "Fully Synced"
                         : "Sync all data"}
+                      <img src={SyncSVG} alt="sync" className="w-4 h-4" />
                     </button>
                     <button
                       className="btn btn-warning h-5 min-h-0 m-2 mb-3"
                       onClick={handleLogout}
                     >
                       Logout
+                      <img src={LogoutSVG} alt="logout" className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -1037,12 +1053,12 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="w-full lg:w-1/2 card bg-base-100 shadow-xl">
-                      <p className="text-center text-2xl flex-1">
+                    <div className="w-full lg:w-1/2 card">
+                      <p className="text-center text-2xl flex-1 pb-4">
                         <span className="font-bold">RECENT</span>ACHIEVEMENTS
                       </p>
 
-                      <div className="card-body p-2">
+                      <div className="card-body p-4 bg-base-100 shadow-xl rounded-xl">
                         <div className="grid grid-cols-1 gap-2">
                           {recentAchievements.length > 0 ? (
                             recentAchievements.map((achievement) => (
@@ -1689,6 +1705,13 @@ export default function App() {
           {/* Close the overflow-x-auto div */}
           <footer className="footer footer-center bg-primary text-primary-content p-10">
             <aside>
+              <a href="https://github.com/c0deV1king">
+                <img
+                  src={GithubSVG}
+                  alt="github"
+                  className="w-[64px] h-[64px] github-logo"
+                />
+              </a>
               <p className="font-bold">
                 Created with ♥️ by c0dev1king
                 <br />

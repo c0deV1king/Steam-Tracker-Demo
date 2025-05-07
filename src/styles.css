@@ -21,3 +21,8 @@ body {
 .github-logo:hover {
   transform: scale(1.1) rotate(-45deg);
 }
+
+.svg-accent {
+  filter: invert(83%) sepia(61%) saturate(427%) hue-rotate(5deg) brightness(95%)
+    contrast(98%);
+}
