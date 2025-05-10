@@ -162,10 +162,6 @@ export function useGamesData(steamId, isAuthenticated) {
         setIsLoading(false);
       }
     };
-
-    if (isAuthenticated && steamId) {
-      fetchAchievements();
-    }
   }, [isAuthenticated, steamId]);
 
   // const getGamesWithDetails = async (games) => {

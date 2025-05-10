@@ -216,7 +216,7 @@ export default function App() {
   // filtering the achievements based on the search term
   const filteredAchievements = useMemo(() => {
     if (!Array.isArray(allAchievements)) {
-      console.error("allAchievements is not an array");
+      console.error("allAchievements is not an array", allAchievements);
       return { filtered: [], currentAchievements: [], totalPages: 0 };
     }
 
