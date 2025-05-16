@@ -7,7 +7,7 @@ import fallbackImage from "../img/capsule404.png";
 export function useGamesData(steamId, isAuthenticated) {
   const [games, setGames] = useState([]);
   const [gamesToDisplay, setGamesToDisplay] = useState([]);
-  const [allAchievements, setAllAchievements] = useState({});
+  const [allAchievements, setAllAchievements] = useState([]);
   const [recentGames, setRecentGames] = useState([]);
   const [mostRecentGame, setMostRecentGame] = useState(null);
   const [playtime, setPlaytime] = useState(0);
@@ -92,7 +92,8 @@ export function useGamesData(steamId, isAuthenticated) {
         if (!token) {
           throw new Error("No auth token found");
         }
-        const response = await fetch(`${apiUrl}/api/games/${steamId}`, {
+        const response = await fetch(`${apiUrl}/api/games/update/${steamId}`, {
+          method: "PATCH",
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -102,19 +103,20 @@ export function useGamesData(steamId, isAuthenticated) {
         }
         const data = await response.json();
         console.log("Fetched all owned games data:", data);
-        setAllGamesList(data);
+        const gamesArray = data.games;
+        setAllGamesList([data.games]);
 
         // Calculate total playtime and games played
         const totalPlaytime = Math.round(
-          data.reduce((acc, game) => acc + game.playtime_forever, 0) / 60
+          gamesArray.reduce((acc, game) => acc + game.playtime_forever, 0) / 60
         );
         setPlaytime(totalPlaytime);
-        const totalGamesPlayed = data.filter(
+        const totalGamesPlayed = gamesArray.filter(
           (game) => game.playtime_forever > 0
         ).length;
         setGamesPlayed(totalGamesPlayed);
 
-        setGamesToDisplay(data);
+        setGamesToDisplay(gamesArray);
       } catch (error) {
         console.error("Error fetching owned games:", error);
       } finally {
@@ -150,14 +152,16 @@ export function useGamesData(steamId, isAuthenticated) {
         }
         const data = await response.json();
 
-        if (data && data.length > 0) {
-          console.log("Fetched all achievement data:", data);
-          setAllAchievements(data);
-        } else {
-          console.log("No achievements found in the database.");
-        }
+        const achievementsArray = Array.isArray(data)
+          ? data
+          : Array.isArray(data.achievements)
+          ? data.achievements
+          : [];
+
+        setAllAchievements(achievementsArray);
       } catch (error) {
         console.error("Error fetching achievements:", error);
+        setAllAchievements([]);
       } finally {
         setIsLoading(false);
       }

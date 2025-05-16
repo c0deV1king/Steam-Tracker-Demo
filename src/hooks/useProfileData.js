@@ -16,21 +16,26 @@ export const useProfileData = (steamId, isAuthenticated, isDemo) => {
       console.log("Fetching authenticated profile data");
       try {
         const token = localStorage.getItem("token");
+        const localSteamId = localStorage.getItem("steamId");
         if (!token) {
           throw new Error("No auth token found");
         }
-        const response = await fetch(`${apiUrl}/api/profiles/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(
+          `${apiUrl}/api/profiles/update/${localSteamId}`,
+          {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
         console.log("Profile data response:", data);
 
-        setProfileData(data);
+        setProfileData([data.profile]);
       } catch (error) {
         console.error("Error fetching profile data:", error);
         setError(error.message);
