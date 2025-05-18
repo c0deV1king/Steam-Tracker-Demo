@@ -7,7 +7,7 @@ import fallbackImage from "../img/capsule404.png";
 export function useGamesData(steamId, isAuthenticated) {
   const [games, setGames] = useState([]);
   const [gamesToDisplay, setGamesToDisplay] = useState([]);
-  const [allAchievements, setAllAchievements] = useState({});
+  const [allAchievements, setAllAchievements] = useState([]);
   const [recentGames, setRecentGames] = useState([]);
   const [mostRecentGame, setMostRecentGame] = useState(null);
   const [playtime, setPlaytime] = useState(0);
@@ -92,7 +92,8 @@ export function useGamesData(steamId, isAuthenticated) {
         if (!token) {
           throw new Error("No auth token found");
         }
-        const response = await fetch(`${apiUrl}/api/games/${steamId}`, {
+        const response = await fetch(`${apiUrl}/api/games/update/${steamId}`, {
+          method: "PATCH",
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -102,19 +103,23 @@ export function useGamesData(steamId, isAuthenticated) {
         }
         const data = await response.json();
         console.log("Fetched all owned games data:", data);
-        setAllGamesList(data);
+        if (!data.games || !Array.isArray(data.games)) {
+          console.error("Unexpected response format:", data);
+          throw new Error("Invalid response format: games array not found");
+        }
+        setAllGamesList(data.games);
 
         // Calculate total playtime and games played
         const totalPlaytime = Math.round(
-          data.reduce((acc, game) => acc + game.playtime_forever, 0) / 60
+          data.games.reduce((acc, game) => acc + game.playtime_forever, 0) / 60
         );
         setPlaytime(totalPlaytime);
-        const totalGamesPlayed = data.filter(
+        const totalGamesPlayed = data.games.filter(
           (game) => game.playtime_forever > 0
         ).length;
         setGamesPlayed(totalGamesPlayed);
 
-        setGamesToDisplay(data);
+        setGamesToDisplay(data.games);
       } catch (error) {
         console.error("Error fetching owned games:", error);
       } finally {
@@ -140,24 +145,35 @@ export function useGamesData(steamId, isAuthenticated) {
         if (!token) {
           throw new Error("No auth token found");
         }
-        const response = await fetch(`${apiUrl}/api/achievements/`, {
+        console.log(
+          `Fetching achievements from: ${apiUrl}/api/achievements/${steamId}`
+        );
+
+        const response = await fetch(`${apiUrl}/api/achievements/${steamId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`API returned status ${response.status}: ${errorText}`);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        console.log("Achievements API response:", data);
 
-        if (data && data.length > 0) {
+        if (data && Array.isArray(data) && data.length > 0) {
           console.log("Fetched all achievement data:", data);
           setAllAchievements(data);
+          const recentAchievs = getRecentAchievements();
+          setRecentAchievements(recentAchievs);
         } else {
           console.log("No achievements found in the database.");
+          setAllAchievements([]);
         }
       } catch (error) {
         console.error("Error fetching achievements:", error);
+        setAllAchievements([]);
       } finally {
         setIsLoading(false);
       }
@@ -165,7 +181,7 @@ export function useGamesData(steamId, isAuthenticated) {
     if (isAuthenticated && steamId) {
       fetchAchievements();
     }
-  }, [isAuthenticated, steamId]);
+  }, [isAuthenticated, steamId, apiUrl]);
 
   // const getGamesWithDetails = async (games) => {
   //   const cachedDetails = JSON.parse(
@@ -412,7 +428,7 @@ export function useGamesData(steamId, isAuthenticated) {
 
         const gamesArray = gamesData.games;
 
-        setAllGamesList(gamesData);
+        setAllGamesList(gamesData.games);
 
         // Calculate total playtime and games played
         console.log("Calculating total playtime and games played...");
@@ -487,13 +503,20 @@ export function useGamesData(steamId, isAuthenticated) {
   }, [isAuthenticated, steamId]);
 
   const getRecentAchievements = useCallback(() => {
-    if (isAuthenticated && steamId) {
-      // Flatten all achievements into a single array
-      const allAchievementsList = Object.values(allAchievements).flat();
+    if (!isAuthenticated || !steamId || !allAchievements) {
+      return [];
+    }
 
-      // Filter achievements that are achieved
-      const achievedList = allAchievementsList.filter(
-        (achievement) => achievement.achieved === 1
+    try {
+      // Make sure we're working with an array
+      if (!Array.isArray(allAchievements)) {
+        console.error("allAchievements is not an array:", allAchievements);
+        return [];
+      }
+
+      const achievedList = allAchievements.filter(
+        (achievement) =>
+          achievement && achievement.achieved === 1 && achievement.unlocktime
       );
 
       // Sort by unlock time in descending order
@@ -503,17 +526,11 @@ export function useGamesData(steamId, isAuthenticated) {
 
       // Return the top 10 most recent achievements
       return sortedAchievements.slice(0, 10);
+    } catch (error) {
+      console.error("Error processing recent achievements:", error);
+      return [];
     }
-    return [];
   }, [isAuthenticated, steamId, allAchievements]);
-
-  // recentAchievements when allAchievements changes
-  useEffect(() => {
-    const achievements = getRecentAchievements();
-    if (achievements) {
-      setRecentAchievements(achievements);
-    }
-  }, [allAchievements, getRecentAchievements]);
 
   // log the recentAchievements state
   useEffect(() => {
@@ -555,6 +572,12 @@ export function useGamesData(steamId, isAuthenticated) {
 
           // Update the allAchievements state with the new data
           setAllAchievements((prevAchievements) => {
+            // Check if prevAchievements is an array
+            // Ensure prevAchievements is an array
+            const achievementsArray = Array.isArray(prevAchievements)
+              ? prevAchievements
+              : [];
+
             // Remove any existing achievements for this game by appid property
             const filteredAchievements = prevAchievements.filter(
               (achievement) => achievement.appid !== Number(gameId)
