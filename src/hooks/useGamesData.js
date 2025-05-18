@@ -92,8 +92,7 @@ export function useGamesData(steamId, isAuthenticated) {
         if (!token) {
           throw new Error("No auth token found");
         }
-        const response = await fetch(`${apiUrl}/api/games/update/${steamId}`, {
-          method: "PATCH",
+        const response = await fetch(`${apiUrl}/api/games/${steamId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -103,23 +102,23 @@ export function useGamesData(steamId, isAuthenticated) {
         }
         const data = await response.json();
         console.log("Fetched all owned games data:", data);
-        if (!data.games || !Array.isArray(data.games)) {
+        if (!data || !Array.isArray(data)) {
           console.error("Unexpected response format:", data);
           throw new Error("Invalid response format: games array not found");
         }
-        setAllGamesList(data.games);
+        setAllGamesList(data);
 
         // Calculate total playtime and games played
         const totalPlaytime = Math.round(
-          data.games.reduce((acc, game) => acc + game.playtime_forever, 0) / 60
+          data.reduce((acc, game) => acc + game.playtime_forever, 0) / 60
         );
         setPlaytime(totalPlaytime);
-        const totalGamesPlayed = data.games.filter(
+        const totalGamesPlayed = data.filter(
           (game) => game.playtime_forever > 0
         ).length;
         setGamesPlayed(totalGamesPlayed);
 
-        setGamesToDisplay(data.games);
+        setGamesToDisplay(data);
       } catch (error) {
         console.error("Error fetching owned games:", error);
       } finally {
