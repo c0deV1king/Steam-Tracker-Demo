@@ -20,6 +20,10 @@ export function useGamesData(steamId, isAuthenticated) {
     const stored = localStorage.getItem("isFullySynced");
     return stored === "true";
   });
+  const [isAchievementsSynced, setIsAchievementsSynced] = useState(() => {
+    const stored = localStorage.getItem("isAchievementsSynced");
+    return stored === "true";
+  });
   const [recentAchievements, setRecentAchievements] = useState([]);
   const [allGamesList, setAllGamesList] = useState([]);
   const [mostPlayedGame, setMostPlayedGame] = useState(null);
@@ -30,37 +34,37 @@ export function useGamesData(steamId, isAuthenticated) {
     localStorage.setItem("isFullySynced", isFullySynced.toString());
   }, [isFullySynced]);
 
+  // Update localStorage when isAchievementsSynced changes
+  useEffect(() => {
+    localStorage.setItem(
+      "isAchievementsSynced",
+      isAchievementsSynced.toString()
+    );
+  }, [isAchievementsSynced]);
+
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  // Fetch recent games data from backend.
-  // Originally, this also grabbed screenshots and achievements for the dashboard.
-  // Now, it is grabbing the recentgames data for display.
-  // Later, i'll have screenshots to grab for the banner.
   useEffect(() => {
-    const fetchOverviewGames = async () => {
+    const fetchStoredRecentGames = async () => {
       try {
         setIsLoading(true);
         const token = localStorage.getItem("token");
         if (!token) {
           throw new Error("No auth token found");
         }
-        const response = await fetch(
-          `${apiUrl}/api/recentgames/update/${steamId}`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${apiUrl}/api/recentgames/${steamId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
         console.log("Fetched recent games data:", data);
-        if (data.recentGames) {
-          setOverviewGames(data.recentGames);
+        if (data) {
+          setOverviewGames(data);
         } else {
           console.error("No recentGames found in response:", data);
         }
@@ -70,11 +74,48 @@ export function useGamesData(steamId, isAuthenticated) {
         setIsLoading(false);
       }
     };
-
     if (isAuthenticated && steamId) {
-      fetchOverviewGames();
+      fetchStoredRecentGames();
     }
-  }, [isAuthenticated, steamId]);
+  }, [steamId, apiUrl, isAuthenticated]);
+
+  // Fetch recent games data from backend.
+  // Originally, this also grabbed screenshots and achievements for the dashboard.
+  // Now, it is grabbing the recentgames data for display.
+  // Later, i'll have screenshots to grab for the banner.
+  const fetchOverviewGames = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No auth token found");
+      }
+      const response = await fetch(
+        `${apiUrl}/api/recentgames/update/${steamId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("Fetched recent games data:", data);
+      if (data.recentGames) {
+        setOverviewGames(data.recentGames);
+      } else {
+        console.error("No recentGames found in response:", data);
+      }
+    } catch (error) {
+      console.error("Error fetching recent games:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // check to see the updated recent games state
   useEffect(() => {
@@ -136,6 +177,36 @@ export function useGamesData(steamId, isAuthenticated) {
     }
   }, [allGamesList]);
 
+  // const getRecentAchievements = useCallback(() => {
+  //   if (!isAuthenticated || !steamId || !allAchievements) {
+  //     return [];
+  //   }
+
+  //   try {
+  //     // Make sure we're working with an array
+  //     if (!Array.isArray(allAchievements)) {
+  //       console.error("allAchievements is not an array:", allAchievements);
+  //       return [];
+  //     }
+
+  //     const achievedList = allAchievements.filter(
+  //       (achievement) =>
+  //         achievement && achievement.achieved === 1 && achievement.unlocktime
+  //     );
+
+  //     // Sort by unlock time in descending order
+  //     const sortedAchievements = achievedList.sort(
+  //       (a, b) => b.unlocktime - a.unlocktime
+  //     );
+
+  //     // Return the top 10 most recent achievements
+  //     return sortedAchievements.slice(0, 10);
+  //   } catch (error) {
+  //     console.error("Error processing recent achievements:", error);
+  //     return [];
+  //   }
+  // }, [isAuthenticated, steamId, allAchievements]);
+
   useEffect(() => {
     const fetchAchievements = async () => {
       try {
@@ -164,15 +235,26 @@ export function useGamesData(steamId, isAuthenticated) {
         if (data && Array.isArray(data) && data.length > 0) {
           console.log("Fetched all achievement data:", data);
           setAllAchievements(data);
-          const recentAchievs = getRecentAchievements();
-          setRecentAchievements(recentAchievs);
+          const achievedList = data.filter(
+            (achievement) =>
+              achievement &&
+              achievement.achieved === 1 &&
+              achievement.unlocktime
+          );
+          const sortedAchievements = achievedList.sort(
+            (a, b) => b.unlocktime - a.unlocktime
+          );
+          const recent = sortedAchievements.slice(0, 10);
+          setRecentAchievements(recent);
         } else {
           console.log("No achievements found in the database.");
           setAllAchievements([]);
+          setRecentAchievements([]);
         }
       } catch (error) {
         console.error("Error fetching achievements:", error);
         setAllAchievements([]);
+        setRecentAchievements([]);
       } finally {
         setIsLoading(false);
       }
@@ -460,6 +542,7 @@ export function useGamesData(steamId, isAuthenticated) {
   const syncAllAchievements = useCallback(async () => {
     if (isAuthenticated && steamId) {
       setIsSyncing(true);
+      setIsAchievementsSynced(false);
       setIsLoading(true);
       // Fetch achievements for all games
       try {
@@ -492,6 +575,8 @@ export function useGamesData(steamId, isAuthenticated) {
         } else {
           console.log("No achievements found");
         }
+        setIsFullySynced(true);
+        localStorage.setItem("isFullySynced", "true");
       } catch (error) {
         console.error("Failed to sync all achievement data:", error);
       } finally {
@@ -500,36 +585,6 @@ export function useGamesData(steamId, isAuthenticated) {
       }
     }
   }, [isAuthenticated, steamId]);
-
-  const getRecentAchievements = useCallback(() => {
-    if (!isAuthenticated || !steamId || !allAchievements) {
-      return [];
-    }
-
-    try {
-      // Make sure we're working with an array
-      if (!Array.isArray(allAchievements)) {
-        console.error("allAchievements is not an array:", allAchievements);
-        return [];
-      }
-
-      const achievedList = allAchievements.filter(
-        (achievement) =>
-          achievement && achievement.achieved === 1 && achievement.unlocktime
-      );
-
-      // Sort by unlock time in descending order
-      const sortedAchievements = achievedList.sort(
-        (a, b) => b.unlocktime - a.unlocktime
-      );
-
-      // Return the top 10 most recent achievements
-      return sortedAchievements.slice(0, 10);
-    } catch (error) {
-      console.error("Error processing recent achievements:", error);
-      return [];
-    }
-  }, [isAuthenticated, steamId, allAchievements]);
 
   // log the recentAchievements state
   useEffect(() => {
@@ -592,15 +647,26 @@ export function useGamesData(steamId, isAuthenticated) {
               gameAchievements = [data];
             }
 
-            // Add the new achievements to the filtered list
-            return [...filteredAchievements, ...gameAchievements];
-          });
+            const newAchievements = [
+              ...filteredAchievements,
+              ...gameAchievements,
+            ];
 
-          // Trigger update of recentAchievements if needed
-          const achievements = getRecentAchievements();
-          if (achievements) {
-            setRecentAchievements(achievements);
-          }
+            // Process recent achievements directly here
+            const achievedList = newAchievements.filter(
+              (achievement) =>
+                achievement &&
+                achievement.achieved === 1 &&
+                achievement.unlocktime
+            );
+            const sortedAchievements = achievedList.sort(
+              (a, b) => b.unlocktime - a.unlocktime
+            );
+            const recent = sortedAchievements.slice(0, 10);
+            setRecentAchievements(recent);
+
+            return newAchievements;
+          });
         } catch (error) {
           console.error("Failed to sync game achievements:", error);
         } finally {
@@ -609,14 +675,7 @@ export function useGamesData(steamId, isAuthenticated) {
         }
       }
     },
-    [
-      isAuthenticated,
-      steamId,
-      apiUrl,
-      setAllAchievements,
-      getRecentAchievements,
-      setRecentAchievements,
-    ]
+    [isAuthenticated, steamId, apiUrl, setAllAchievements]
   );
   const handleImageError = (e, appId) => {
     // Set a default/fallback image
@@ -634,11 +693,14 @@ export function useGamesData(steamId, isAuthenticated) {
     gamesPlayed,
     gamePictures,
     overviewGames,
+    fetchOverviewGames,
     recentGames,
     mostRecentGame,
     isSyncing,
     isFullySynced,
+    isAchievementsSynced,
     syncAllData,
+    syncAllAchievements,
     recentAchievements,
     mostPlayedGame,
     isAuthenticated,

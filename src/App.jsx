@@ -115,11 +115,14 @@ export default function App() {
     gamesPlayed,
     gamePictures,
     overviewGames,
+    fetchOverviewGames,
     recentGames,
     mostRecentGame,
     syncAllData,
+    syncAllAchievements,
     isSyncing,
     isFullySynced,
+    isAchievementsSynced,
     testSchema,
     recentAchievements,
     mostPlayedGame,
@@ -156,6 +159,11 @@ export default function App() {
 
   const handleSyncAllData = async () => {
     await syncAllData();
+    refreshChartData();
+  };
+
+  const handleSyncAllAchievements = async () => {
+    await syncAllAchievements();
     refreshChartData();
   };
 
@@ -945,8 +953,27 @@ export default function App() {
                       {isSyncing
                         ? "Syncing..."
                         : isFullySynced
-                        ? "Fully Synced"
-                        : "Sync all data"}
+                        ? "All Games Synced"
+                        : "Sync all games"}
+                      <img src={SyncSVG} alt="sync" className="w-4 h-4" />
+                    </button>
+                    <button
+                      className="btn btn-accent h-5 min-h-0 m-2 mb-3"
+                      onClick={() => {
+                        console.log("Sync achievements button clicked");
+                        if (syncAllAchievements) {
+                          handleSyncAllAchievements();
+                        } else {
+                          console.error("syncAllAchievements is undefined");
+                        }
+                      }}
+                      disabled={isSyncing || isAchievementsSynced}
+                    >
+                      {isSyncing
+                        ? "Syncing..."
+                        : isAchievementsSynced
+                        ? "Achievements Synced"
+                        : "Sync all achievements"}
                       <img src={SyncSVG} alt="sync" className="w-4 h-4" />
                     </button>
                     <button
@@ -1009,6 +1036,12 @@ export default function App() {
                       <div className="grid grid-cols-1 gap-4">
                         <p className="text-center text-2xl flex-1">
                           <span className="font-bold">RECENT</span>GAMES
+                          <button
+                            className="btn bg-white h-5 min-h-0 m-2"
+                            onClick={() => fetchOverviewGames()}
+                          >
+                            <img src={SyncSVG} alt="sync" className="w-4 h-4" />
+                          </button>
                         </p>
                         {Array.isArray(overviewGames) &&
                         overviewGames.length > 0 ? (
