@@ -11,8 +11,6 @@ import InfoSVG from "./img/info-square.svg?url";
 import SteamSVG from "./img/steam.svg?url";
 import LogoutSVG from "./img/box-arrow-left.svg?url";
 import AwardSVG from "./img/award.svg?url";
-import { useCharts } from "./hooks/useCharts";
-import DemoCharts from "./components/demoCharts";
 import { AuthPage } from "./components/AuthPage";
 import { clearAllStorage } from "./utils/clearStorage";
 import { getAllData } from "./utils/indexedDB";
@@ -154,17 +152,12 @@ export default function App() {
     getTotalGamePages,
   } = gamePages(gamesToDisplay);
 
-  const { chartData, renderGenreChart, renderPlaytimeChart, refreshChartData } =
-    useCharts();
-
   const handleSyncAllData = async () => {
     await syncAllData();
-    refreshChartData();
   };
 
   const handleSyncAllAchievements = async () => {
     await syncAllAchievements();
-    refreshChartData();
   };
 
   const handleAuth = () => {
@@ -597,46 +590,6 @@ export default function App() {
     );
   };
 
-  const renderDemoStats = () => {
-    return (
-      <div className="container mx-auto">
-        <div className="stats-page">
-          <h1 className="text-2xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mt-5 mb-[10%]">
-            Game Statistics
-          </h1>
-
-          <div className="chart-container">
-            <DemoCharts />
-          </div>
-
-          <div className="flex flex-row justify-center items-center mt-5 w-[100%]">
-            <div className="container flex flex-col justify-center items-center mr-0 w-[50%]">
-              <p className="text-2xl">Warframe</p>
-              <p>
-                Playtime:{" "}
-                <span className="text-success font-bold">1999 hours</span>
-              </p>
-            </div>
-
-            <div className="container flex flex-row justify-center items-start mb-5 w-[50%]">
-              <img
-                src={
-                  "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/230410/header.jpg?t=1729784957"
-                }
-                alt={"Most played game"}
-                className="object-cover"
-              />
-            </div>
-          </div>
-
-          <h2 className="text-xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mb-[10%]">
-            Most Played Game
-          </h2>
-        </div>
-      </div>
-    );
-  };
-
   const renderTopBannerDemo = () => {
     return (
       <div className="flex flex-col container mx-auto justify-center items-center m-5">
@@ -1009,13 +962,6 @@ export default function App() {
               onClick={() => handleTabChange("Achievements")}
             >
               Achievements
-            </a>
-            <a
-              role="tab"
-              className={`tab ${activeTab === "Stats" ? "tab-active" : ""}`}
-              onClick={() => handleTabChange("Stats")}
-            >
-              Stats
             </a>
             <a
               role="tab"
@@ -1575,70 +1521,6 @@ export default function App() {
                       »
                     </button>
                   </div>
-                </div>
-              ))}
-
-            {activeTab === "Stats" &&
-              (isDemo ? (
-                renderDemoStats()
-              ) : isFullySynced ? (
-                <div className="container mx-auto">
-                  <div className="stats-page">
-                    <h1 className="text-2xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mt-5 mb-[10%]">
-                      Game Statistics
-                    </h1>
-
-                    <div className="chart-container h-[250px] w-[100%]">
-                      {chartData.genreChart.length > 0 ? (
-                        renderGenreChart()
-                      ) : (
-                        <p>Loading genre data...</p>
-                      )}
-                    </div>
-
-                    {mostPlayedGame ? (
-                      <div className="flex flex-row justify-center items-center mt-5 w-[100%]">
-                        <div className="container flex flex-col justify-center items-center mr-0 w-[50%]">
-                          <p className="text-2xl">
-                            {mostPlayedGame.name || "Name not available"}
-                          </p>
-                          <p>
-                            Playtime:{" "}
-                            <span className="text-success font-bold">
-                              {Math.round(
-                                (mostPlayedGame.playtime_forever || 0) / 60
-                              )}{" "}
-                              hours
-                            </span>
-                          </p>
-                        </div>
-
-                        <div className="container flex flex-row justify-center items-start mb-5 w-[50%]">
-                          {mostPlayedGame.image ? (
-                            <img
-                              src={mostPlayedGame.image}
-                              alt={mostPlayedGame.name || "Most played game"}
-                              className="object-cover"
-                            />
-                          ) : (
-                            <p>Image not available</p>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <p>Loading most played game data...</p>
-                    )}
-                    <h2 className="text-xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mb-[10%]">
-                      Most Played Game
-                    </h2>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <p className="text-2xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mt-5 mb-5">
-                    Stats require a full sync to be accurate. Please hit the
-                    sync all button under your profile avatar above.
-                  </p>
                 </div>
               ))}
 
