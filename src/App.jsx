@@ -869,20 +869,19 @@ export default function App() {
         <div className="contaier mx-auto bg-base-200 sm:w-[75%] lg:w-[75%] ">
           {isDemo
             ? renderDemoProfile()
-            : profileData &&
-              profileData.length > 0 && (
+            : profileData && (
                 <div className="flex flex-col container mx-auto justify-center items-center">
                   <img
                     className="rounded-xl m-2"
-                    src={profileData[0]?.avatarFull}
+                    src={profileData[0].avatarFull}
                     width="256"
                     height="256"
                     alt="profile image"
                   />
-                  <h2 className="text-4xl">{profileData[0]?.personaName} </h2>
+                  <h2 className="text-4xl">{profileData[0].personaName} </h2>
                   <div className="flex flex-row justify-center items-center">
                     <a
-                      href={profileData[0]?.profileUrl}
+                      href={profileData[0].profileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

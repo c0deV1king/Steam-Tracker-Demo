@@ -19,7 +19,7 @@ export const useProfileData = (steamId, isAuthenticated, isDemo) => {
         if (!token) {
           throw new Error("No auth token found");
         }
-        const response = await fetch(`${apiUrl}/api/profiles/`, {
+        const response = await fetch(`${apiUrl}/api/profiles/${steamId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -30,7 +30,26 @@ export const useProfileData = (steamId, isAuthenticated, isDemo) => {
         const data = await response.json();
         console.log("Profile data response:", data);
 
-        setProfileData(data);
+        if (!data || Object.keys(data).length === 0) {
+          console.log("Profile data is null/empty, creating profile data...");
+          const updateProfile = await fetch(
+            `${apiUrl}/api/profiles/update/${steamId}`,
+            {
+              method: "PATCH",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (updateProfile.ok) {
+            const updatedProfile = await updateProfile.json();
+            setProfileData([updatedProfile.profile]);
+          } else {
+            setProfileData(null);
+          }
+        } else {
+          setProfileData(data);
+        }
       } catch (error) {
         console.error("Error fetching profile data:", error);
         setError(error.message);
