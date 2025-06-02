@@ -1,8 +1,10 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
+import { useSteamData } from "../hooks/useSteamData";
 
 const GamePage = ({ allAchievements, gamesToDisplay }) => {
   const { gameId } = useParams();
+  const { syncIndividualGameAchievements } = useSteamData();
 
   const game = gamesToDisplay.find((game) => game.appid.toString() === gameId);
 
@@ -25,25 +27,38 @@ const GamePage = ({ allAchievements, gamesToDisplay }) => {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <Link to="/" className="btn btn-accent mb-4">
-        ← Back to Home
-      </Link>
+    // TOP HEADER
+    <div className="container mx-auto p-2 mt-4 mb-4">
+      <div className="text-center mb-4 flex flex-row gap-4 items-center">
+        <Link to="/" className="btn btn-xs btn-accent">
+          ← Dashboard
+        </Link>
+        <h1 className="text-4xl">
+          <b>STEAM</b>TRACKER
+        </h1>
+        <button
+          className="btn bg-accent btn-xs text-black"
+          onClick={() => syncIndividualGameAchievements(game.appid)}
+        >
+          Sync
+        </button>
+      </div>
+      {/* GAME INFO */}
       <div className="">
-        <div className="bg-base-200 rounded-xl p-6 shadow-xl flex">
-          <div className="flex flex-col md:flex-row items-center gap-6">
+        <div className="bg-base-200 rounded-xl p-2 xl:p-6 shadow-xl flex">
+          <div className="flex flex-col lg:flex-col xl:flex-row items-center gap-4 w-full">
             <img
               src={game.headerImage}
               alt={game.name || game.gameName}
               className="w-[200px]"
             />
 
-            <div className="w-full md:w-2/3 flex flex-col justify-start">
+            <div className="w-full md:w-2/3 flex flex-col xl:justify-start items-center xl:items-start">
               <h1 className="text-xl font-bold">
                 {game.name || game.gameName}
               </h1>
 
-              <div className="bg-transparent flex justify-between mt-4 w-1/5 gap-2">
+              <div className="bg-transparent flex justify-between xl:mt-4 xl:w-1/5 gap-2">
                 <div className="text-sm flex flex-col p-0">
                   <div className="">Playtime</div>
                   <div className="text-accent font-bold text-lg">
@@ -60,7 +75,7 @@ const GamePage = ({ allAchievements, gamesToDisplay }) => {
                 </div>
               </div>
             </div>
-            <div>
+            <div className="flex flex-col items-center gap-1">
               <div className="flex items-center justify-center">
                 <p className="text-black bg-white rounded-xl text-xs p-0.5">
                   Adventure
@@ -72,10 +87,18 @@ const GamePage = ({ allAchievements, gamesToDisplay }) => {
                 </p>
               </div>
             </div>
+            <div className="flex flex-col items-center xl:ml-20 gap-5 whitespace-nowrap">
+              <p className="text-xs">
+                SUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUPER LONG DEVELOPER NAME
+              </p>
+              <p className="text-xs">PUBLISHER NAME</p>
+            </div>
           </div>
         </div>
 
         <div className="divider"></div>
+
+        {/* ACHIEVEMENTS SECTION */}
 
         <h2 className="text-2xl font-bold mb-4">Achievements</h2>
         <div className="grid grid-cols-1 gap-4">
