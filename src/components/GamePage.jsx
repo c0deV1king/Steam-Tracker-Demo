@@ -10,14 +10,6 @@ const GamePage = ({ allAchievements }) => {
     gamesToDisplay,
   } = useSteamData();
 
-  useEffect(() => {
-    console.log("gamesToDisplay changed:", gamesToDisplay.length);
-    console.log(
-      "Current game data:",
-      gamesToDisplay.find((g) => g.appid.toString() === gameId)
-    );
-  }, [gamesToDisplay, gameId]);
-
   const game = useMemo(() => {
     return gamesToDisplay.find((game) => game.appid.toString() === gameId);
   }, [gamesToDisplay, gameId]);

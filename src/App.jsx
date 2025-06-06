@@ -1071,8 +1071,13 @@ export default function App() {
                                         </div>
                                         <div className="w-full text-center lg:text-left space-y-2">
                                           <div className="font-bold text-xl">
-                                            {game.name ||
-                                              `Game ID: ${game.appid}`}
+                                            <Link
+                                              to={`/game/${game.appid}`}
+                                              className="hover:text-accent"
+                                            >
+                                              {game.name ||
+                                                `Game ID: ${game.appid}`}
+                                            </Link>
                                           </div>
                                         </div>
                                       </div>
@@ -1248,9 +1253,14 @@ export default function App() {
                                         </div>
                                         <div className="w-full text-center lg:text-left space-y-2">
                                           <div className="font-bold text-xl flex items-center justify-center">
-                                            {game.name ||
-                                              game.gameName ||
-                                              `Game ID: ${game.appid}`}
+                                            <Link
+                                              to={`/game/${game.appid}`}
+                                              className="hover:text-accent"
+                                            >
+                                              {game.name ||
+                                                game.gameName ||
+                                                `Game ID: ${game.appid}`}
+                                            </Link>
                                             <img
                                               src={AwardSVG}
                                               alt="award"
@@ -1704,7 +1714,12 @@ export default function App() {
                                     </td>
                                     <td className="p-4">
                                       <div className="font-semibold text-lg">
-                                        {game.gameName}
+                                        <Link
+                                          to={`/game/${game.appid}`}
+                                          className="hover:text-accent"
+                                        >
+                                          {game.gameName}
+                                        </Link>
                                       </div>
                                       <div className="text-sm text-gray-500">
                                         Average Global Completion:{" "}
