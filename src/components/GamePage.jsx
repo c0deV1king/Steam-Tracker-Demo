@@ -41,29 +41,31 @@ const GamePage = ({ allAchievements }) => {
   return (
     // TOP HEADER
     <div className="container mx-auto p-2 mt-4 mb-4">
-      <div className="text-center mb-4 flex flex-row gap-4 items-center">
+      <div className="text-center mb-4 flex flex-col md:flex-row gap-4 items-center">
         <Link to="/" className="btn btn-xs btn-accent">
           ← Dashboard
         </Link>
         <h1 className="text-4xl">
           <b>STEAM</b>TRACKER
         </h1>
-        <button
-          className="btn bg-accent btn-xs text-black"
-          onClick={() => syncIndividualGameAchievements(game.appid)}
-        >
-          Sync Achievements
-        </button>
-        <button
-          className="btn bg-accent btn-xs text-black"
-          onClick={handleSyncGameData}
-        >
-          Sync Game Data
-        </button>
+        <div className="flex flex-col lg:flex-row gap-2">
+          <button
+            className="btn bg-accent btn-xs text-black"
+            onClick={() => syncIndividualGameAchievements(game.appid)}
+          >
+            Sync Achievements
+          </button>
+          <button
+            className="btn bg-accent btn-xs text-black"
+            onClick={handleSyncGameData}
+          >
+            Sync Game Data
+          </button>
+        </div>
       </div>
       {/* GAME INFO */}
       <div className="">
-        <div className="bg-base-200 rounded-xl p-2 xl:p-6 shadow-xl flex">
+        <div className="bg-base-200 rounded-xl p-2 xl:p-6 shadow-xl flex flex-col">
           <div className="flex flex-col lg:flex-col xl:flex-row items-center gap-4 w-full">
             <img
               src={game.headerImage}
@@ -93,31 +95,38 @@ const GamePage = ({ allAchievements }) => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col items-center gap-1">
-              {game.genres && game.genres.length > 0 ? (
-                game.genres.map((genre, index) => (
-                  <div key={index} className="flex items-center justify-center">
-                    <p className="text-black bg-white rounded-xl text-xs p-0.5">
-                      {genre.description}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <div className="flex items-center justify-center">
-                  <p className="text-black bg-gray-300 rounded-xl text-xs p-0.5">
-                    No genres
-                  </p>
-                </div>
-              )}
-            </div>
-            <div className="flex flex-col items-center xl:ml-20 gap-5 whitespace-nowrap">
-              <p className="text-xs">
+
+            <div className="flex flex-col items-center xl:ml-20 gap-0 whitespace-nowrap">
+              <h6 className="bg-base-100 p-1 border border-base-300 text-sm font-semibold">
+                Developers
+              </h6>
+              <p className="text-xs mb-2">
                 {game.developers || "No developer info"}
               </p>
+              <h6 className="bg-base-100 p-1 border border-base-300 text-sm font-semibold">
+                Publishers
+              </h6>
               <p className="text-xs">
                 {game.publishers || "No publisher info"}
               </p>
             </div>
+          </div>
+          <div className="flex flex-row mt-3 xl:mt-1 items-center justify-center xl:justify-start gap-1">
+            {game.genres && game.genres.length > 0 ? (
+              game.genres.map((genre, index) => (
+                <div key={index} className="flex items-center justify-center">
+                  <p className="text-black bg-white rounded-xl text-xs p-0.5">
+                    {genre.description}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div className="flex items-center justify-center">
+                <p className="text-black bg-gray-300 rounded-xl text-xs p-0.5">
+                  N/A
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
