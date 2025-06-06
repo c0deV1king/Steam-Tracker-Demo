@@ -683,6 +683,79 @@ export function useGamesData(steamId, isAuthenticated) {
     console.log(`Failed to load image for app ${appId}`);
   };
 
+  const syncIndividualGameData = useCallback(
+    async (appid) => {
+      if (isAuthenticated && steamId) {
+        setIsSyncing(true);
+        setIsLoading(true);
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) {
+            throw new Error("No auth token found");
+          }
+
+          const gameId = typeof appid === "object" ? appid.appid : appid;
+
+          console.log(`Syncing extra data for game ${gameId}...`);
+          const response = await fetch(
+            `${apiUrl}/api/games/update/${gameId}/${steamId}`,
+            {
+              method: "PATCH",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          console.log("Fetched extra game data:", data);
+          const gameResponse = await fetch(`${apiUrl}/api/games/${steamId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (gameResponse.ok) {
+            const gamesData = await gameResponse.json();
+            const updatedGame = gamesData.find(
+              (game) => game.appid === Number(gameId)
+            );
+
+            if (updatedGame) {
+              setAllGamesList((prevGames) => {
+                return prevGames.map((game) => {
+                  if (game.appid === Number(gameId)) {
+                    return updatedGame;
+                  }
+                  return game;
+                });
+              });
+
+              setGamesToDisplay((prevGames) => {
+                return prevGames.map((game) => {
+                  if (game.appid === Number(gameId)) {
+                    return updatedGame;
+                  }
+                  return game;
+                });
+              });
+            }
+          }
+
+          console.log(`Extra data synced successfully for game ${gameId}`);
+        } catch (error) {
+          console.error("Failed to sync extra game data:", error);
+        } finally {
+          setIsSyncing(false);
+          setIsLoading(false);
+        }
+      }
+    },
+    [isAuthenticated, steamId, apiUrl]
+  );
+
   // return functions and states to useSteamData
   return {
     games,
@@ -708,6 +781,7 @@ export function useGamesData(steamId, isAuthenticated) {
     isLoading,
     setIsLoading,
     syncIndividualGameAchievements,
+    syncIndividualGameData,
     handleImageError,
   };
 }

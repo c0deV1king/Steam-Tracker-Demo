@@ -1,12 +1,32 @@
-import React from "react";
+import React, { useMemo, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useSteamData } from "../hooks/useSteamData";
 
-const GamePage = ({ allAchievements, gamesToDisplay }) => {
+const GamePage = ({ allAchievements }) => {
   const { gameId } = useParams();
-  const { syncIndividualGameAchievements } = useSteamData();
+  const {
+    syncIndividualGameAchievements,
+    syncIndividualGameData,
+    gamesToDisplay,
+  } = useSteamData();
 
-  const game = gamesToDisplay.find((game) => game.appid.toString() === gameId);
+  useEffect(() => {
+    console.log("gamesToDisplay changed:", gamesToDisplay.length);
+    console.log(
+      "Current game data:",
+      gamesToDisplay.find((g) => g.appid.toString() === gameId)
+    );
+  }, [gamesToDisplay, gameId]);
+
+  const game = useMemo(() => {
+    return gamesToDisplay.find((game) => game.appid.toString() === gameId);
+  }, [gamesToDisplay, gameId]);
+
+  const handleSyncGameData = async () => {
+    console.log("Syncing game data for:", game.appid);
+    await syncIndividualGameData(game.appid);
+    console.log("Sync completed");
+  };
 
   const gameAchievements = allAchievements.filter(
     (achievement) =>
@@ -40,7 +60,13 @@ const GamePage = ({ allAchievements, gamesToDisplay }) => {
           className="btn bg-accent btn-xs text-black"
           onClick={() => syncIndividualGameAchievements(game.appid)}
         >
-          Sync
+          Sync Achievements
+        </button>
+        <button
+          className="btn bg-accent btn-xs text-black"
+          onClick={handleSyncGameData}
+        >
+          Sync Game Data
         </button>
       </div>
       {/* GAME INFO */}
@@ -76,22 +102,29 @@ const GamePage = ({ allAchievements, gamesToDisplay }) => {
               </div>
             </div>
             <div className="flex flex-col items-center gap-1">
-              <div className="flex items-center justify-center">
-                <p className="text-black bg-white rounded-xl text-xs p-0.5">
-                  Adventure
-                </p>
-              </div>
-              <div className="bg-white rounded-xl flex items-center justify-center">
-                <p className="text-black text-xs p-0.5 whitespace-nowrap">
-                  Longer genre name test
-                </p>
-              </div>
+              {game.genres && game.genres.length > 0 ? (
+                game.genres.map((genre, index) => (
+                  <div key={index} className="flex items-center justify-center">
+                    <p className="text-black bg-white rounded-xl text-xs p-0.5">
+                      {genre.description}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <div className="flex items-center justify-center">
+                  <p className="text-black bg-gray-300 rounded-xl text-xs p-0.5">
+                    No genres
+                  </p>
+                </div>
+              )}
             </div>
             <div className="flex flex-col items-center xl:ml-20 gap-5 whitespace-nowrap">
               <p className="text-xs">
-                SUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUPER LONG DEVELOPER NAME
+                {game.developers || "No developer info"}
               </p>
-              <p className="text-xs">PUBLISHER NAME</p>
+              <p className="text-xs">
+                {game.publishers || "No publisher info"}
+              </p>
             </div>
           </div>
         </div>

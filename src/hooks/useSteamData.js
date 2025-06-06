@@ -72,6 +72,7 @@ export const useSteamData = () => {
     isLoading,
     setIsLoading,
     syncIndividualGameAchievements,
+    syncIndividualGameData,
     handleImageError,
   } = useGamesData(steamId, isAuthenticated) || {};
 
@@ -106,6 +107,7 @@ export const useSteamData = () => {
     isLoading,
     setIsLoading,
     syncIndividualGameAchievements,
+    syncIndividualGameData,
     handleImageError,
   }; // returning the arrays and functions to be used in App.jsx
 };
