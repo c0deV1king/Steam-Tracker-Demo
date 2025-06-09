@@ -81,9 +81,9 @@ const LoadingScreen = () => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-base-200 p-8 rounded-lg shadow-lg text-center">
+      <div className="bg-neutral p-8 rounded-lg shadow-lg text-center">
         <span className="loading loading-spinner loading-lg text-accent"></span>
-        <div className="flex flex-row items-center justify-center bg-base-300 rounded-lg p-1 mt-2">
+        <div className="flex flex-row items-center justify-center bg-neutral rounded-lg p-1 mt-2">
           <p className="text-gray-500 pr-1"> &gt; </p>
           <p className="text-gray-300">
             {displayedText}
@@ -706,7 +706,7 @@ export default function App() {
           path="/"
           element={
             <div className="">
-              <div className="container mx-auto flex flex-col lg:flex-row pb-5 pt-5 bg-transparent h-15 w-[50%] flex justify-center items-center">
+              <div className="container mx-auto flex flex-col sm:flex-row pb-5 pt-5 bg-transparent h-12 w-[100%] flex items-center mb-[180px] sm:mb-0">
                 <h1 className="container mx-auto text-center text-4xl">
                   <b>STEAM</b>TRACKER
                 </h1>
@@ -715,15 +715,15 @@ export default function App() {
                   : playtime &&
                     gamesPlayed && (
                       <div className="flex flex-col container mx-auto justify-center items-center m-5">
-                        <div className="stats stats-vertical lg:stats-horizontal bg-transparent">
+                        <div className="stats stats-horizontal bg-transparent">
                           <div className="stat flex justify-center items-center">
                             <div className="stat-title text-center"></div>
                             <img
                               src={JoystickSVG}
                               alt="joystick"
-                              className="w-8 h-8 svg-accent"
+                              className="w-8 h-8 svg-black"
                             />
-                            <div className="stat-value text-center text-info">
+                            <div className="stat-value text-center text-black">
                               {typeof gamesPlayed === "number"
                                 ? gamesPlayed
                                 : "N/A"}
@@ -734,9 +734,9 @@ export default function App() {
                             <img
                               src={TimeClockSVG}
                               alt="timeclock"
-                              className="w-8 h-8 svg-accent"
+                              className="w-8 h-8 svg-black"
                             />
-                            <div className="stat-value text-center text-info">
+                            <div className="stat-value text-center text-black">
                               {typeof playtime === "number" ? playtime : "N/A"}
                             </div>
                           </div>
@@ -745,13 +745,16 @@ export default function App() {
                     )}
 
                 <button
-                  className="btn btn-accent"
+                  className="btn btn-transparent btn-sm border-0"
                   onClick={() =>
                     document.getElementById("my_modal_4").showModal()
                   }
                 >
-                  <img src={InfoSVG} alt="info" className="w-8 h-8" />
-                  App Demo
+                  <img
+                    src={InfoSVG}
+                    alt="info"
+                    className="w-8 h-8 svg-accent"
+                  />
                 </button>
                 <dialog id="my_modal_4" className="modal">
                   <div className="flex flex-col justify-center items-center">
@@ -835,7 +838,7 @@ export default function App() {
                   ? renderDemoScreenshot()
                   : overviewGames &&
                     overviewGames.length > 0 && (
-                      <div className="container mx-auto bg-black lg:w-[75%] sm:w-[75%] h-[400px] relative">
+                      <div className="mx-auto bg-black p-0 m-0 h-[400px] w-full relative">
                         {/* banner with screenshot from recent games */}
                         <img
                           src={
@@ -896,11 +899,11 @@ export default function App() {
                       </div>
                     )}
               </div>{" "}
-              <div className="contaier mx-auto bg-base-200 sm:w-[75%] lg:w-[75%] ">
+              <div className="contaier mx-auto bg-base w-full">
                 {isDemo
                   ? renderDemoProfile()
                   : profileData && (
-                      <div className="flex flex-col container mx-auto justify-center items-center">
+                      <div className="flex flex-col container mx-auto w-full justify-center items-center">
                         <img
                           className="rounded-xl m-2"
                           src={profileData[0].avatarFull}
@@ -1054,7 +1057,7 @@ export default function App() {
                                   return (
                                     <div
                                       key={game.appid}
-                                      className="bg-base-100 rounded-xl p-4 shadow-xl"
+                                      className="bg-[#808F85] rounded-xl p-4 shadow-xl text-white"
                                     >
                                       <div className="flex flex-row lg:flex-col items-center space-y-4">
                                         <div>
@@ -1098,13 +1101,13 @@ export default function App() {
                               ACHIEVEMENTS
                             </p>
 
-                            <div className="card-body p-4 bg-base-100 shadow-xl rounded-xl">
+                            <div className="card-body p-4 rounded-xl">
                               <div className="grid grid-cols-1 gap-2">
                                 {recentAchievements.length > 0 ? (
                                   recentAchievements.map((achievement) => (
                                     <div
                                       key={`${achievement.appId}-${achievement.apiname}`}
-                                      className="bg-base-200 rounded-xl p-4"
+                                      className="bg-[#808F85] text-white rounded-xl shadow-xl p-4"
                                     >
                                       <div className="flex items-center space-x-4">
                                         <div className="avatar">
@@ -1167,7 +1170,7 @@ export default function App() {
                         <div className="w-[50%] mx-auto">
                           <div className="grid grid-cols-1 gap-4">
                             {isDemo ? (
-                              <div className="bg-base-100 rounded-xl p-4 shadow-xl">
+                              <div className="bg-[#808F85] rounded-xl p-4 shadow-xl">
                                 <div className="flex flex-row lg:flex-col items-center space-y-4">
                                   <div>
                                     <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
@@ -1236,7 +1239,7 @@ export default function App() {
                                   return (
                                     <div
                                       key={`perfect-${game.appid}`}
-                                      className="bg-base-100 rounded-xl p-4 shadow-xl border-2 border-accent"
+                                      className="bg-[#808F85] text-white rounded-xl p-4 shadow-xl border-2 border-accent"
                                     >
                                       <div className="flex flex-row lg:flex-col items-center space-y-4">
                                         <div>
@@ -1398,7 +1401,7 @@ export default function App() {
                             .map((game, index) => (
                               <div
                                 key={game.appid}
-                                className="bg-base-100 rounded-xl p-4 shadow-xl"
+                                className="bg-neutral rounded-xl p-4 shadow-xl"
                               >
                                 <div className="flex flex-col items-center justify-center text-center lg:flex-row space-y-4">
                                   <div>
@@ -1530,7 +1533,7 @@ export default function App() {
                               (achievement, index) => (
                                 <div
                                   key={`${achievement.appId}-${achievement.apiname}`}
-                                  className="bg-base-100 rounded-xl p-4 shadow-xl"
+                                  className="bg-neutral rounded-xl p-4 shadow-xl"
                                 >
                                   <div className="flex items-center space-x-4">
                                     <div className="avatar">
@@ -1635,7 +1638,7 @@ export default function App() {
                         <h1 className="text-2xl pt-2 pb-2 mr-5 ml-5 mt-5 mb-5">
                           <span className="font-bold">NEXT</span>GAMES:
                         </h1>
-                        <div className="min-w-full flex flex-col bg-base-100 rounded-xl">
+                        <div className="min-w-full flex flex-col bg-neutral rounded-xl">
                           <table className="w-full">
                             <tbody>
                               {gamesToDisplay
@@ -1803,7 +1806,7 @@ export default function App() {
                                   key={`${
                                     achievement.appId || achievement.gameId
                                   }-${achievement.apiname || achievement.name}`}
-                                  className="bg-base-100 rounded-xl p-4 shadow-xl"
+                                  className="bg-neutral rounded-xl p-4 shadow-xl"
                                 >
                                   <div className="flex items-center space-x-4">
                                     <div className="avatar">
@@ -1864,7 +1867,7 @@ export default function App() {
                       </div>
                     ) : (
                       <div>
-                        <p className="text-2xl text-center pt-2 pb-2 bg-base-100 mr-5 ml-5 rounded-xl mt-5 mb-5">
+                        <p className="text-2xl text-center pt-2 pb-2 bg-neutral mr-5 ml-5 rounded-xl mt-5 mb-5">
                           Advisor requires fully synced data, hit the sync all
                           button under your profile avatar above.
                         </p>
