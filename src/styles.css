@@ -9,7 +9,7 @@ html {
 }
 
 body {
-  background-color: #dce0d9;
+  background-color: #59595f;
 }
 
 .github-logo {
@@ -23,4 +23,8 @@ body {
 .svg-accent {
   filter: invert(83%) sepia(61%) saturate(427%) hue-rotate(5deg) brightness(95%)
     contrast(98%);
+}
+
+.svg-white {
+  filter: brightness(0) saturate(100%) invert(100%);
 }

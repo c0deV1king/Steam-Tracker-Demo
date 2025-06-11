@@ -80,19 +80,19 @@ const LoadingScreen = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-neutral p-8 rounded-lg shadow-lg text-center">
+    <div className="fixed inset-0 bg-primary bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-primary p-8 rounded-lg shadow-lg text-center">
         <span className="loading loading-spinner loading-lg text-accent"></span>
-        <div className="flex flex-row items-center justify-center bg-neutral rounded-lg p-1 mt-2">
-          <p className="text-gray-500 pr-1"> &gt; </p>
-          <p className="text-gray-300">
+        <div className="flex flex-row items-center justify-center bg-base-100 rounded-lg p-1 mt-2">
+          <p className="text-white pr-1"> &gt; </p>
+          <p className="text-white">
             {displayedText}
             <span className={`${showCursor ? "opacity-100" : "opacity-0"}`}>
               |
             </span>
           </p>
         </div>
-        <p className="mt-4 text-warning text-sm italic">
+        <p className="mt-4 text-white text-sm italic">
           {" "}
           Loading times depends on how big your steam library is{" "}
         </p>
@@ -187,31 +187,12 @@ export default function App() {
     }
   }, []);
 
-  //  console.log("App: allAchievements:", allAchievements);
-  // console.log("App: gamesToDisplay:", gamesToDisplay);
-
-  // console.log("syncAllData in App:", syncAllData);
-
-  // console.log("App received gamesToDisplay:", gamesToDisplay);
-
-  // state for the active tab
   const [activeTab, setActiveTab] = useState("Overview");
 
   // function for changing the active tab
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
-
-  // logging all sorted achievements, important to make sure achievements are being passed to the dom
-  // console.log("sortedAchievements:", sortedAchievements);
-
-  useEffect(() => {
-    //   console.log("allAchievements updated:", allAchievements);
-  }, [allAchievements]);
-
-  useEffect(() => {
-    //  console.log("allAchievements updated in App:", allAchievements);
-  }, [allAchievements]);
 
   // state for the search term
   const [searchTerm, setSearchTerm] = useState("");
@@ -706,7 +687,7 @@ export default function App() {
           path="/"
           element={
             <div className="">
-              <div className="container mx-auto flex flex-col sm:flex-row pb-5 pt-5 bg-transparent h-12 w-[100%] flex items-center mb-[180px] sm:mb-0">
+              <div className="container mx-auto flex flex-col sm:flex-row pb-5 pt-5 bg-primary h-12 w-[100%] flex items-center mb-[180px] sm:mb-0">
                 <h1 className="container mx-auto text-center text-4xl">
                   <b>STEAM</b>TRACKER
                 </h1>
@@ -721,9 +702,9 @@ export default function App() {
                             <img
                               src={JoystickSVG}
                               alt="joystick"
-                              className="w-8 h-8 svg-black"
+                              className="w-8 h-8 svg-accent"
                             />
-                            <div className="stat-value text-center text-black">
+                            <div className="stat-value text-center text-white">
                               {typeof gamesPlayed === "number"
                                 ? gamesPlayed
                                 : "N/A"}
@@ -734,9 +715,9 @@ export default function App() {
                             <img
                               src={TimeClockSVG}
                               alt="timeclock"
-                              className="w-8 h-8 svg-black"
+                              className="w-8 h-8 svg-accent"
                             />
-                            <div className="stat-value text-center text-black">
+                            <div className="stat-value text-center text-white">
                               {typeof playtime === "number" ? playtime : "N/A"}
                             </div>
                           </div>
@@ -745,9 +726,9 @@ export default function App() {
                     )}
 
                 <button
-                  className="btn btn-transparent btn-sm border-0"
+                  className="btn btn-transparent bg-transparent btn-sm border-0"
                   onClick={() =>
-                    document.getElementById("my_modal_4").showModal()
+                    document.getElementById("my_modal_2").showModal()
                   }
                 >
                   <img
@@ -756,80 +737,82 @@ export default function App() {
                     className="w-8 h-8 svg-accent"
                   />
                 </button>
-                <dialog id="my_modal_4" className="modal">
-                  <div className="flex flex-col justify-center items-center">
-                    <div className="modal-box w-12/12 max-w-5xl flex flex-col justify-center items-center">
-                      <p className="font-bold text-lg">
-                        Welcome to my app, SteamTracker! I am an aspiring
-                        software developer, currently a student at GetCoding on
-                        the east coast of Canada. The purpose of this project
-                        was to learn React and some more about APIs. I decided
-                        to tack on TailwindCSS for better styling and it seems
-                        to have been worth it. I made this an app for
-                        achievement hunters because I am an achievement hunter
-                        myself and I feel I could also benefit from a tool like
-                        this. There will be more features added to the project
-                        over time, for more info on that, visit the{" "}
-                        <a
-                          className="text-accent"
-                          href="https://github.com/c0deV1king/Steam-Tracker-Demo"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          repo
-                        </a>{" "}
-                        on GitHub. Thanks for checking out my project!
-                      </p>
-
-                      <div className="flex flex-row justify-center items-center gap-4 pt-5">
-                        <p className="font-bold text-lg">Tech Stack:</p>
-                        <img
-                          src="https://camo.githubusercontent.com/e88633b8cf461e3ec31845227bea9dcdc2105c978f85c33d1a25ab891b3ca290/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f77696b6970656469612f636f6d6d6f6e732f7468756d622f332f33302f52656163745f4c6f676f5f5356472e7376672f3139323070782d52656163745f4c6f676f5f5356472e7376672e706e67"
-                          alt="React Logo"
-                          className="w-8 h-8"
-                        />
-                        <img
-                          src="https://camo.githubusercontent.com/1253027a98fef1178fd945c4fe07490a4ef5820810ae26c184a7222602b8bb01/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f77696b6970656469612f636f6d6d6f6e732f7468756d622f392f39392f556e6f6666696369616c5f4a6176615363726970745f6c6f676f5f322e7376672f3132383070782d556e6f6666696369616c5f4a6176615363726970745f6c6f676f5f322e7376672e706e67"
-                          alt="JS logo"
-                          className="w-8 h-8"
-                        />
-                        <img
-                          src="https://camo.githubusercontent.com/866d3535e0157c035205e7a6a4b93cdf35ff21279ad5ad3ad0f9bfb956dcc7f9/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f77696b6970656469612f636f6d6d6f6e732f7468756d622f392f39352f5461696c77696e645f4353535f6c6f676f2e7376672f3235363070782d5461696c77696e645f4353535f6c6f676f2e7376672e706e67"
-                          alt="Tailwind logo"
-                          className="w-15 h-5"
-                        />
-                        <img
-                          src="https://dka575ofm4ao0.cloudfront.net/pages-transactional_logos/retina/29133/Netlify-Logo.png"
-                          alt="Netlify logo"
-                          className="w-15 h-8 bg-white rounded-xl"
-                        />
-                      </div>
-
-                      <div className="divider"></div>
-
-                      <video
-                        style={{
-                          borderRadius: "10px",
-                          border: "2px solid #fde047",
-                        }}
-                        width="100%"
-                        height="auto"
-                        controls
+                <dialog id="my_modal_2" className="modal">
+                  <div className="modal-box w-12/12 max-w-5xl flex flex-col justify-start items-center mt-0 max-h-[90vh] overflow-y-auto">
+                    <p className="font-bold text-lg mb-4">
+                      Welcome to my app, SteamTracker! I am an aspiring
+                      softwares developer, currently a student at GetCoding on
+                      the east coast of Canada. The purpose of this project was
+                      to learn React and some more about APIs. I decided to tack
+                      on TailwindCSS for better styling and it seems to have
+                      been worth it. I made this an app for achievement hunters
+                      because I am an achievement hunter myself and I feel I
+                      could also benefit from a tool like this. There will be
+                      more features added to the project over time, for more
+                      info on that, visit the{" "}
+                      <a
+                        className="text-accent"
+                        href="https://github.com/c0deV1king/Steam-Tracker-Demo"
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
-                        <source
-                          src="/Steam-Tracker-Tour-Compressed.mp4"
-                          type="video/mp4"
-                        />
-                      </video>
+                        repo
+                      </a>{" "}
+                      on GitHub. Thanks for checking out my project!
+                    </p>
+
+                    <div className="flex flex-row justify-center items-center gap-4 pt-5">
+                      <p className="font-bold text-lg">Tech Stack:</p>
+                      <img
+                        src="https://camo.githubusercontent.com/e88633b8cf461e3ec31845227bea9dcdc2105c978f85c33d1a25ab891b3ca290/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f77696b6970656469612f636f6d6d6f6e732f7468756d622f332f33302f52656163745f4c6f676f5f5356472e7376672f3139323070782d52656163745f4c6f676f5f5356472e7376672e706e67"
+                        alt="React Logo"
+                        className="w-8 h-8"
+                      />
+                      <img
+                        src="https://camo.githubusercontent.com/1253027a98fef1178fd945c4fe07490a4ef5820810ae26c184a7222602b8bb01/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f77696b6970656469612f636f6d6d6f6e732f7468756d622f392f39392f556e6f6666696369616c5f4a6176615363726970745f6c6f676f5f322e7376672f3132383070782d556e6f6666696369616c5f4a6176615363726970745f6c6f676f5f322e7376672e706e67"
+                        alt="JS logo"
+                        className="w-8 h-8"
+                      />
+                      <img
+                        src="https://camo.githubusercontent.com/866d3535e0157c035205e7a6a4b93cdf35ff21279ad5ad3ad0f9bfb956dcc7f9/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f77696b6970656469612f636f6d6d6f6e732f7468756d622f392f39352f5461696c77696e645f4353535f6c6f676f2e7376672f3235363070782d5461696c77696e645f4353535f6c6f676f2e7376672e706e67"
+                        alt="Tailwind logo"
+                        className="w-15 h-5"
+                      />
+                      <img
+                        src="https://dka575ofm4ao0.cloudfront.net/pages-transactional_logos/retina/29133/Netlify-Logo.png"
+                        alt="Netlify logo"
+                        className="w-15 h-8 bg-white rounded-xl"
+                      />
                     </div>
-                    <div className="flex flex-row justify-center items-center">
-                      <div className="modal-action">
-                        <form method="dialog">
-                          <button className="btn btn-accent">Close</button>
-                        </form>
-                      </div>
+
+                    <div className="divider"></div>
+
+                    <video
+                      style={{
+                        borderRadius: "10px",
+                        border: "2px solid #fde047",
+                      }}
+                      width="100%"
+                      height="auto"
+                      controls
+                    >
+                      <source
+                        src="/Steam-Tracker-Tour-Compressed.mp4"
+                        type="video/mp4"
+                      />
+                    </video>
+                  </div>
+                  <div className="flex flex-row justify-center items-center">
+                    <div className="modal-action">
+                      <form method="dialog">
+                        <button className="btn btn-accent">Close</button>
+                      </form>
                     </div>
                   </div>
+
+                  <form method="dialog" className="modal-backdrop">
+                    <button>close</button>
+                  </form>
                 </dialog>
               </div>
               {isDemo ? renderDemoWarningBanner() : <div></div>}
@@ -899,7 +882,7 @@ export default function App() {
                       </div>
                     )}
               </div>{" "}
-              <div className="contaier mx-auto bg-base w-full">
+              <div className="contaier mx-auto bg-base-100 w-full">
                 {isDemo
                   ? renderDemoProfile()
                   : profileData && (
@@ -914,7 +897,7 @@ export default function App() {
                         <h2 className="text-4xl">
                           {profileData[0].personaName}{" "}
                         </h2>
-                        <div className="flex flex-row justify-center items-center">
+                        <div className="flex flex-col md:flex-row justify-center items-center">
                           <a
                             href={profileData[0].profileUrl}
                             target="_blank"
@@ -970,24 +953,26 @@ export default function App() {
                             <img src={SyncSVG} alt="sync" className="w-4 h-4" />
                           </button>
                           <button
-                            className="btn btn-warning h-5 min-h-0 m-2 mb-3"
+                            className="btn btn-secondary h-5 min-h-0 m-2 mb-3"
                             onClick={handleLogout}
                           >
                             Logout
                             <img
                               src={LogoutSVG}
                               alt="logout"
-                              className="w-4 h-4"
+                              className="w-4 h-4 svg-white"
                             />
                           </button>
                         </div>
                       </div>
                     )}
-                <div role="tablist" className="tabs tabs-lifted">
+                <div role="tablist" className="tabs tabs-boxed">
                   <a
                     role="tab"
                     className={`tab ${
-                      activeTab === "Overview" ? "tab-active" : ""
+                      activeTab === "Overview"
+                        ? "tab-active"
+                        : "opacity-80 bg-primary bg-opacity-20 hover:bg-opacity-100"
                     }`}
                     onClick={() => handleTabChange("Overview")}
                   >
@@ -996,7 +981,9 @@ export default function App() {
                   <a
                     role="tab"
                     className={`tab ${
-                      activeTab === "Games" ? "tab-active" : ""
+                      activeTab === "Games"
+                        ? "tab-active"
+                        : "opacity-80 bg-primary bg-opacity-20 hover:bg-opacity-100"
                     }`}
                     onClick={() => handleTabChange("Games")}
                   >
@@ -1005,7 +992,9 @@ export default function App() {
                   <a
                     role="tab"
                     className={`tab ${
-                      activeTab === "Achievements" ? "tab-active" : ""
+                      activeTab === "Achievements"
+                        ? "tab-active"
+                        : "opacity-80 bg-primary bg-opacity-20 hover:bg-opacity-100"
                     }`}
                     onClick={() => handleTabChange("Achievements")}
                   >
@@ -1014,7 +1003,9 @@ export default function App() {
                   <a
                     role="tab"
                     className={`tab ${
-                      activeTab === "Advisor" ? "tab-active" : ""
+                      activeTab === "Advisor"
+                        ? "tab-active"
+                        : "opacity-80 bg-primary bg-opacity-20 hover:bg-opacity-100"
                     }`}
                     onClick={() => handleTabChange("Advisor")}
                   >
@@ -1026,14 +1017,14 @@ export default function App() {
                     (isDemo ? (
                       renderDemoOverview()
                     ) : (
-                      <div>
+                      <div className="flex flex-col xl:flex-row">
                         <div className="w-full flex flex-col lg:flex-row items-start gap-4 p-4">
                           <div className="w-full lg:w-1/2">
                             <div className="grid grid-cols-1 gap-4">
                               <p className="text-center text-2xl flex-1">
                                 <span className="font-bold">RECENT</span>GAMES
                                 <button
-                                  className="btn bg-white h-5 min-h-0 m-2"
+                                  className="btn bg-accent h-5 min-h-0 m-2"
                                   onClick={() => fetchOverviewGames()}
                                 >
                                   <img
@@ -1057,7 +1048,7 @@ export default function App() {
                                   return (
                                     <div
                                       key={game.appid}
-                                      className="bg-[#808F85] rounded-xl p-4 shadow-xl text-white"
+                                      className="bg-primary rounded-xl p-4 shadow-xl text-white"
                                     >
                                       <div className="flex flex-row lg:flex-col items-center space-y-4">
                                         <div>
@@ -1072,7 +1063,7 @@ export default function App() {
                                             />
                                           </div>
                                         </div>
-                                        <div className="w-full text-center lg:text-left space-y-2">
+                                        <div className="w-full text-center flex justify-center lg:text-left space-y-2">
                                           <div className="font-bold text-xl">
                                             <Link
                                               to={`/game/${game.appid}`}
@@ -1096,7 +1087,7 @@ export default function App() {
                           </div>
 
                           <div className="w-full lg:w-1/2 card">
-                            <p className="text-center text-2xl flex-1 pb-4">
+                            <p className="text-center text-2xl flex-1 pb-1">
                               <span className="font-bold">RECENT</span>
                               ACHIEVEMENTS
                             </p>
@@ -1107,7 +1098,7 @@ export default function App() {
                                   recentAchievements.map((achievement) => (
                                     <div
                                       key={`${achievement.appId}-${achievement.apiname}`}
-                                      className="bg-[#808F85] text-white rounded-xl shadow-xl p-4"
+                                      className="bg-primary text-white rounded-xl shadow-xl p-4"
                                     >
                                       <div className="flex items-center space-x-4">
                                         <div className="avatar">
@@ -1162,18 +1153,18 @@ export default function App() {
                             </div>
                           </div>
                         </div>
-                        <p className="text-center text-2xl flex-1 pb-4">
-                          <span className="font-bold">PERFECT</span>GAMES
-                        </p>
 
                         {/* Perfect Games section */}
-                        <div className="w-[50%] mx-auto">
+                        <div className="w-[100%] xl:w-[50%] mx-auto">
                           <div className="grid grid-cols-1 gap-4">
+                            <p className="text-center text-2xl flex-1 mt-4 mb-1">
+                              <span className="font-bold">PERFECT</span>GAMES
+                            </p>
                             {isDemo ? (
-                              <div className="bg-[#808F85] rounded-xl p-4 shadow-xl">
+                              <div className="bg-primary rounded-xl p-4 shadow-xl">
                                 <div className="flex flex-row lg:flex-col items-center space-y-4">
                                   <div>
-                                    <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
+                                    <div className="rounded-xl w-[100%] xl:w-[50%] max-w-[272px] aspect-[460/215] overflow-hidden">
                                       <img
                                         src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/header.jpg?t=1711626984"
                                         alt="Game image"
@@ -1239,11 +1230,11 @@ export default function App() {
                                   return (
                                     <div
                                       key={`perfect-${game.appid}`}
-                                      className="bg-[#808F85] text-white rounded-xl p-4 shadow-xl border-2 border-accent"
+                                      className="bg-primary text-white rounded-xl p-4 shadow-xl"
                                     >
                                       <div className="flex flex-row lg:flex-col items-center space-y-4">
                                         <div>
-                                          <div className="rounded-xl w-[100%] max-w-[272px] aspect-[460/215] overflow-hidden">
+                                          <div className="rounded-xl w-[100%] xl:[50%] max-w-[272px] aspect-[460/215] overflow-hidden">
                                             <img
                                               src={game.headerImage}
                                               onError={(e) =>
@@ -1272,14 +1263,14 @@ export default function App() {
                                           </div>
                                           <div className="text-sm flex items-center justify-center">
                                             Achievements:{" "}
-                                            <span className="text-success font-bold ">
+                                            <span className="text-success font-bold ml-1">
                                               {totalAchievements}/
                                               {totalAchievements}
                                             </span>
                                           </div>
                                           <div className="text-sm flex items-center justify-center">
                                             Time Played:{" "}
-                                            <span className="text-accent">
+                                            <span className="text-accent ml-1">
                                               {Math.round(
                                                 game.playtime_forever / 60
                                               )}{" "}
@@ -1334,7 +1325,11 @@ export default function App() {
                               className="grow"
                               placeholder="Search Games"
                               value={searchTerm}
-                              onChange={(e) => setSearchTerm(e.target.value)}
+                              onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setCurrentPage(1);
+                                setCurrentGamePage(1);
+                              }}
                             />
                             <svg
                               xmlns="https://www.w3.org/2000/svg"
@@ -1352,56 +1347,68 @@ export default function App() {
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 mx-5 mt-4">
-                          {gamesToDisplay
-                            .filter((game) => game.playtime_forever > 0)
-                            .map((game) => {
-                              const achievements = allAchievements.filter(
-                                (achievement) =>
-                                  achievement.gameName === game.gameName
-                              );
-                              const earnedAchievements = achievements.filter(
-                                (achievement) => achievement.achieved
-                              ).length;
-                              const totalAchievements = achievements.length;
-
-                              const totalGlobalPercentages =
-                                achievements.reduce(
-                                  (sum, a) =>
-                                    sum +
-                                    (a.percent ? parseFloat(a.percent) : 0),
-                                  0
+                          {(() => {
+                            // Filter and process games
+                            const processedGames = gamesToDisplay
+                              .filter((game) => game.playtime_forever > 0)
+                              .map((game) => {
+                                const achievements = allAchievements.filter(
+                                  (achievement) =>
+                                    achievement.gameName === game.gameName
                                 );
-                              const averageGlobalPercentage =
-                                achievements.length > 0
-                                  ? (
-                                      totalGlobalPercentages /
-                                      achievements.length
-                                    ).toFixed(1)
-                                  : 0;
+                                const earnedAchievements = achievements.filter(
+                                  (achievement) => achievement.achieved
+                                ).length;
+                                const totalAchievements = achievements.length;
 
-                              return {
-                                ...game,
-                                earnedAchievements,
-                                totalAchievements,
-                                //percent: Number(averageGlobalPercentage),
-                              };
-                            })
-                            .filter((game) => {
-                              const searchString = `${game.gameName || ""} ${
-                                game.appid || ""
-                              }`.toLowerCase();
-                              return searchString.includes(
-                                searchTerm.toLowerCase()
+                                const totalGlobalPercentages =
+                                  achievements.reduce(
+                                    (sum, a) =>
+                                      sum +
+                                      (a.percent ? parseFloat(a.percent) : 0),
+                                    0
+                                  );
+                                const averageGlobalPercentage =
+                                  achievements.length > 0
+                                    ? (
+                                        totalGlobalPercentages /
+                                        achievements.length
+                                      ).toFixed(1)
+                                    : 0;
+
+                                return {
+                                  ...game,
+                                  earnedAchievements,
+                                  totalAchievements,
+                                  percent: Number(averageGlobalPercentage),
+                                };
+                              })
+                              .filter((game) => {
+                                const searchString = `${game.gameName || ""} ${
+                                  game.appid || ""
+                                }`.toLowerCase();
+                                return searchString.includes(
+                                  searchTerm.toLowerCase()
+                                );
+                              })
+                              .sort(
+                                (a, b) =>
+                                  b.earnedAchievements - a.earnedAchievements
                               );
-                            })
-                            .sort(
-                              (a, b) =>
-                                b.earnedAchievements - a.earnedAchievements
-                            )
-                            .map((game, index) => (
+
+                            const totalGames = processedGames.length;
+                            const totalPages = Math.ceil(totalGames / 10); // 10 games per page
+                            const startIndex = (currentGamePage - 1) * 10;
+                            const endIndex = startIndex + 10;
+                            const currentPageGames = processedGames.slice(
+                              startIndex,
+                              endIndex
+                            );
+
+                            return currentPageGames.map((game, index) => (
                               <div
                                 key={game.appid}
-                                className="bg-neutral rounded-xl p-4 shadow-xl"
+                                className="bg-primary rounded-xl p-4 shadow-xl"
                               >
                                 <div className="flex flex-col items-center justify-center text-center lg:flex-row space-y-4">
                                   <div>
@@ -1425,7 +1432,7 @@ export default function App() {
                                         {game.gameName}
                                       </Link>
                                     </div>
-                                    <div className="flex items-center space-x-2">
+                                    <div className="flex items-center justify-center lg:justify-start space-x-2">
                                       <progress
                                         className="progress progress-accent w-56"
                                         value={
@@ -1445,7 +1452,7 @@ export default function App() {
                                     <div className="text-sm space-y-1">
                                       Average Global Completion:{" "}
                                       <span className="text-accent">
-                                        {/*{game.percent}*/}%
+                                        {game.percent}%
                                       </span>
                                       <div>
                                         Time Played:{" "}
@@ -1458,44 +1465,78 @@ export default function App() {
                                       </div>
                                     </div>
                                   </div>
-                                  <div>
+                                  <div className="flex flex-col gap-2">
                                     <button
-                                      className="btn bg-accent btn-xs text-black"
+                                      className="btn bg-accent btn-xs text-black whitespace-nowrap"
                                       onClick={() =>
                                         syncIndividualGameAchievements(
                                           game.appid
                                         )
                                       }
                                     >
-                                      Sync
+                                      Sync Achievements
+                                    </button>
+                                    <button className="btn bg-secondary btn-xs text-white">
+                                      <Link
+                                        to={`/game/${game.appid}`}
+                                        className="hover:text-accent"
+                                      >
+                                        Game Page →
+                                      </Link>
                                     </button>
                                   </div>
                                 </div>
                               </div>
-                            ))}
-                          <div className="join mt-4 mb-4">
-                            <button
-                              className="join-item btn"
-                              onClick={prevGamePage}
-                              disabled={currentGamePage === 1}
-                            >
-                              «
-                            </button>
-                            <button className="join-item btn">
-                              Page {currentGamePage} of{" "}
-                              {gamesToDisplay.totalGamePages}
-                            </button>
-                            <button
-                              className="join-item btn"
-                              onClick={nextGamePage}
-                              disabled={
-                                currentGamePage ===
-                                gamesToDisplay.totalGamePages
-                              }
-                            >
-                              »
-                            </button>
-                          </div>
+                            ));
+                          })()}
+                        </div>
+
+                        <div className="join mt-4 mb-4 flex justify-center">
+                          <button
+                            className="join-item btn"
+                            onClick={prevGamePage}
+                            disabled={currentGamePage === 1}
+                          >
+                            «
+                          </button>
+                          <button className="join-item btn">
+                            Page {currentGamePage} of{" "}
+                            {(() => {
+                              const filteredGames = gamesToDisplay
+                                .filter((game) => game.playtime_forever > 0)
+                                .filter((game) => {
+                                  const searchString = `${
+                                    game.gameName || ""
+                                  } ${game.appid || ""}`.toLowerCase();
+                                  return searchString.includes(
+                                    searchTerm.toLowerCase()
+                                  );
+                                });
+                              return Math.ceil(filteredGames.length / 10);
+                            })()}
+                          </button>
+                          <button
+                            className="join-item btn"
+                            onClick={nextGamePage}
+                            disabled={(() => {
+                              const filteredGames = gamesToDisplay
+                                .filter((game) => game.playtime_forever > 0)
+                                .filter((game) => {
+                                  const searchString = `${
+                                    game.gameName || ""
+                                  } ${game.appid || ""}`.toLowerCase();
+                                  return searchString.includes(
+                                    searchTerm.toLowerCase()
+                                  );
+                                });
+                              const totalPages = Math.ceil(
+                                filteredGames.length / 10
+                              );
+                              return currentGamePage >= totalPages;
+                            })()}
+                          >
+                            »
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -1533,7 +1574,7 @@ export default function App() {
                               (achievement, index) => (
                                 <div
                                   key={`${achievement.appId}-${achievement.apiname}`}
-                                  className="bg-neutral rounded-xl p-4 shadow-xl"
+                                  className="bg-primary rounded-xl p-4 shadow-xl"
                                 >
                                   <div className="flex items-center space-x-4">
                                     <div className="avatar">
@@ -1631,14 +1672,14 @@ export default function App() {
                     (isDemo ? (
                       renderDemoAdvisor()
                     ) : isFullySynced ? (
-                      <div>
+                      <div className="flex flex-col">
                         <h2 className="text-1xl text-center pt-2 pb-2 mr-5 ml-5 rounded-xl mt-5 mb-5 italic">
                           Advisor is based on your synced achievements
                         </h2>
                         <h1 className="text-2xl pt-2 pb-2 mr-5 ml-5 mt-5 mb-5">
                           <span className="font-bold">NEXT</span>GAMES:
                         </h1>
-                        <div className="min-w-full flex flex-col bg-neutral rounded-xl">
+                        <div className="min-w-full flex flex-col bg-primary rounded-xl">
                           <table className="w-full">
                             <tbody>
                               {gamesToDisplay
@@ -1724,21 +1765,23 @@ export default function App() {
                                           {game.gameName}
                                         </Link>
                                       </div>
-                                      <div className="text-sm text-gray-500">
+                                      <div className="text-sm text-white">
                                         Average Global Completion:{" "}
                                         <span className="text-accent">
                                           {game.averageGlobalPercentage}%
                                         </span>
                                       </div>
-                                      <div className="text-sm text-gray-500">
+                                      <div className="text-sm text-white">
                                         Your Completion:{" "}
-                                        {game.completedAchievements}/
-                                        {game.totalAchievements}
+                                        <span className="text-accent">
+                                          {game.completedAchievements}/
+                                          {game.totalAchievements}
+                                        </span>
                                       </div>
                                     </td>
                                     <td className="p-4">
                                       <div className="flex items-center space-x-2">
-                                        <span>
+                                        <span className="text-accent">
                                           {game.playtime_forever
                                             ? Math.round(
                                                 game.playtime_forever / 60
@@ -1806,7 +1849,7 @@ export default function App() {
                                   key={`${
                                     achievement.appId || achievement.gameId
                                   }-${achievement.apiname || achievement.name}`}
-                                  className="bg-neutral rounded-xl p-4 shadow-xl"
+                                  className="bg-primary rounded-xl p-4 shadow-xl"
                                 >
                                   <div className="flex items-center space-x-4">
                                     <div className="avatar">
@@ -1852,10 +1895,13 @@ export default function App() {
                                         </span>{" "}
                                         •
                                         <span className="ml-2">
-                                          {parseFloat(
-                                            achievement.percent || 0
-                                          ).toFixed(1)}
-                                          % of players have this
+                                          <span className="text-accent mr-1">
+                                            {parseFloat(
+                                              achievement.percent || 0
+                                            ).toFixed(1)}
+                                            %
+                                          </span>
+                                          of players have this
                                         </span>
                                       </div>
                                     </div>
@@ -1875,7 +1921,7 @@ export default function App() {
                     ))}
                 </div>{" "}
                 {/* Close the overflow-x-auto div */}
-                <footer className="footer footer-center bg-primary text-primary-content p-10">
+                <footer className="footer footer-center bg-primary text-primary-content p-10 mt-10">
                   <aside>
                     <a href="https://github.com/c0deV1king">
                       <img

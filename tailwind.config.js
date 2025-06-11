@@ -6,32 +6,21 @@ export default {
     container: {
       center: true,
     },
-    mytheme: {
-      primary: "#67e8f9",
-      secondary: "#6366f1",
-      accent: "#6B0F1A",
-      base: "808F85",
-      neutral: "#595959",
-      info: "#67e8f9",
-      success: "#4ade80",
-      warning: "#f59e0b",
-      error: "#ff0000",
-    },
   },
   plugins: [require("daisyui")],
   daisyui: {
     themes: [
       {
         mytheme: {
-          primary: "#67e8f9",
-          secondary: "#6366f1",
-          accent: "#6B0F1A",
-          base: "808F85",
-          neutral: "#595959",
-          info: "#67e8f9",
-          success: "#4ade80",
-          warning: "#f59e0b",
-          error: "#ff0000",
+          primary: "#59595F", // davy's gray -- no black
+          secondary: "#96031A", // carmine -- no black
+          accent: "#DFCC74", // citron -- no white
+          "base-100": "#394648", // outer space -- no black
+          neutral: "#000000", // x
+          info: "#000000", // x
+          success: "#000000", // x
+          warning: "#000000", // x
+          error: "#000000", // x
         },
       },
     ],
