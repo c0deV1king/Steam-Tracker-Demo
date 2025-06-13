@@ -687,7 +687,7 @@ export default function App() {
           path="/"
           element={
             <div className="">
-              <div className="container mx-auto flex flex-col sm:flex-row pb-5 pt-5 bg-primary h-12 w-[100%] flex items-center mb-[180px] sm:mb-0">
+              <div className="container mx-auto flex flex-col sm:flex-row pb-5 pt-5 bg-base-100 h-12 w-[100%] flex items-center mb-[180px] sm:mb-0">
                 <h1 className="container mx-auto text-center text-4xl">
                   <b>STEAM</b>TRACKER
                 </h1>
@@ -740,16 +740,13 @@ export default function App() {
                 <dialog id="my_modal_2" className="modal">
                   <div className="modal-box w-12/12 max-w-5xl flex flex-col justify-start items-center mt-0 max-h-[90vh] overflow-y-auto">
                     <p className="font-bold text-lg mb-4">
-                      Welcome to my app, SteamTracker! I am an aspiring
-                      softwares developer, currently a student at GetCoding on
-                      the east coast of Canada. The purpose of this project was
-                      to learn React and some more about APIs. I decided to tack
-                      on TailwindCSS for better styling and it seems to have
-                      been worth it. I made this an app for achievement hunters
-                      because I am an achievement hunter myself and I feel I
-                      could also benefit from a tool like this. There will be
-                      more features added to the project over time, for more
-                      info on that, visit the{" "}
+                      Welcome to my app, SteamTracker! I am a software
+                      developer, currently a student at GetBuilding on the east
+                      coast of Canada. The purpose of this project originally
+                      was to learn React and APIs, it then transformed into
+                      learning a full backend.I made this an app for achievement
+                      hunters because I am an achievement hunter myself and I
+                      feel I could also benefit from a tool like this. Visit the{" "}
                       <a
                         className="text-accent"
                         href="https://github.com/c0deV1king/Steam-Tracker-Demo"
@@ -774,15 +771,21 @@ export default function App() {
                         className="w-8 h-8"
                       />
                       <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Typescript_logo_2020.svg"
+                        alt="TS logo"
+                        className="w-8 h-8"
+                      />
+                      <img
                         src="https://camo.githubusercontent.com/866d3535e0157c035205e7a6a4b93cdf35ff21279ad5ad3ad0f9bfb956dcc7f9/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f77696b6970656469612f636f6d6d6f6e732f7468756d622f392f39352f5461696c77696e645f4353535f6c6f676f2e7376672f3235363070782d5461696c77696e645f4353535f6c6f676f2e7376672e706e67"
                         alt="Tailwind logo"
                         className="w-15 h-5"
                       />
                       <img
-                        src="https://dka575ofm4ao0.cloudfront.net/pages-transactional_logos/retina/29133/Netlify-Logo.png"
-                        alt="Netlify logo"
+                        src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Frailway.app%2Fbrand%2Flogo-light.png&f=1&nofb=1&ipt=626c3cdd78c0cf2a07cf1b2759921e84bc241b1285a438c034eaa2018777fe4a"
+                        alt="railway logo"
                         className="w-15 h-8 bg-white rounded-xl"
                       />
+                      <p>Express</p>
                     </div>
 
                     <div className="divider"></div>
@@ -888,13 +891,13 @@ export default function App() {
                   : profileData && (
                       <div className="flex flex-col container mx-auto w-full justify-center items-center">
                         <img
-                          className="rounded-xl m-2"
+                          className="rounded-xl m-2 mt-20"
                           src={profileData[0].avatarFull}
                           width="256"
                           height="256"
                           alt="profile image"
                         />
-                        <h2 className="text-4xl">
+                        <h2 className="text-4xl mb-5">
                           {profileData[0].personaName}{" "}
                         </h2>
                         <div className="flex flex-col md:flex-row justify-center items-center">
@@ -931,18 +934,12 @@ export default function App() {
                               : "Sync all games"}
                             <img src={SyncSVG} alt="sync" className="w-4 h-4" />
                           </button>
+
                           <button
                             className="btn btn-accent h-5 min-h-0 m-2 mb-3"
-                            onClick={() => {
-                              console.log("Sync achievements button clicked");
-                              if (syncAllAchievements) {
-                                handleSyncAllAchievements();
-                              } else {
-                                console.error(
-                                  "syncAllAchievements is undefined"
-                                );
-                              }
-                            }}
+                            onClick={() =>
+                              document.getElementById("my_modal_3").showModal()
+                            }
                             disabled={isSyncing || isAchievementsSynced}
                           >
                             {isSyncing
@@ -952,6 +949,48 @@ export default function App() {
                               : "Sync all achievements"}
                             <img src={SyncSVG} alt="sync" className="w-4 h-4" />
                           </button>
+                          <dialog id="my_modal_3" className="modal">
+                            <div className="modal-box">
+                              <p className="mb-4">
+                                <span className="text-secondary bg-black bold mr-1">
+                                  Warning!
+                                </span>
+                                Syncing all achievements will take a while. Each
+                                game will take 5-10 seconds each to sync. Do you
+                                want to continue?
+                              </p>
+                              <div className="flex flex-row justify-around items-center">
+                                <button
+                                  className="btn mt-5 bg-accent text-black"
+                                  onClick={() => {
+                                    console.log(
+                                      "Sync achievements button clicked"
+                                    );
+                                    if (syncAllAchievements) {
+                                      handleSyncAllAchievements();
+                                    } else {
+                                      console.error(
+                                        "syncAllAchievements is undefined"
+                                      );
+                                    }
+                                  }}
+                                >
+                                  {" "}
+                                  Yes, sync achievements
+                                </button>
+                                <div className="modal-action">
+                                  <form method="dialog">
+                                    <button className="btn btn-secondary text-white">
+                                      Close window
+                                    </button>
+                                  </form>
+                                </div>
+                              </div>
+                            </div>
+                            <form method="dialog" className="modal-backdrop">
+                              <button>close</button>
+                            </form>
+                          </dialog>
                           <button
                             className="btn btn-secondary h-5 min-h-0 m-2 mb-3"
                             onClick={handleLogout}
@@ -1263,7 +1302,7 @@ export default function App() {
                                           </div>
                                           <div className="text-sm flex items-center justify-center">
                                             Achievements:{" "}
-                                            <span className="text-success font-bold ml-1">
+                                            <span className="text-accent font-bold ml-1">
                                               {totalAchievements}/
                                               {totalAchievements}
                                             </span>

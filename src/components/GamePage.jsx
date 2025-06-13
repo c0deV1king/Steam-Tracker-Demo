@@ -42,7 +42,7 @@ const GamePage = ({ allAchievements }) => {
     // TOP HEADER
     <div className="container mx-auto p-2 mt-4 mb-4">
       <div className="text-center mb-4 flex flex-col md:flex-row gap-4 items-center">
-        <Link to="/" className="btn btn-xs btn-accent">
+        <Link to="/" className="btn btn-xs btn-secondary">
           ← Dashboard
         </Link>
         <h1 className="text-4xl">
@@ -65,7 +65,7 @@ const GamePage = ({ allAchievements }) => {
       </div>
       {/* GAME INFO */}
       <div className="">
-        <div className="bg-base-200 rounded-xl p-2 xl:p-6 shadow-xl flex flex-col">
+        <div className="bg-primary rounded-xl p-2 xl:p-6 shadow-xl flex flex-col">
           <div className="flex flex-col lg:flex-col xl:flex-row items-center gap-4 w-full">
             <img
               src={game.headerImage}
@@ -88,7 +88,7 @@ const GamePage = ({ allAchievements }) => {
 
                 <div className="text-sm flex flex-col p-0">
                   <div className="">Achievements</div>
-                  <div className="text-success font-bold text-lg">
+                  <div className="text-accent font-bold text-lg">
                     {gameAchievements.filter((a) => a.achieved).length}/
                     {gameAchievements.length}
                   </div>
@@ -139,9 +139,9 @@ const GamePage = ({ allAchievements }) => {
           {gameAchievements.map((achievement) => (
             <div
               key={achievement.apiname || achievement.name}
-              className={`bg-base-100 rounded-xl p-4 shadow-xl ${
+              className={`bg-primary rounded-xl p-4 shadow-xl ${
                 achievement.achieved
-                  ? "border-l-4 border-success"
+                  ? "border-l-4 border-accent"
                   : "border-l-4 border-gray-500 opacity-70"
               }`}
             >
@@ -172,7 +172,7 @@ const GamePage = ({ allAchievements }) => {
                   </div>
                   <div className="text-sm mt-1 flex gap-2">
                     {achievement.achieved ? (
-                      <span className="text-success">
+                      <span className="text-accent">
                         Unlocked on{" "}
                         {new Date(
                           achievement.unlocktime * 1000
