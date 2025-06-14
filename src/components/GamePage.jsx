@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useSteamData } from "../hooks/useSteamData";
 

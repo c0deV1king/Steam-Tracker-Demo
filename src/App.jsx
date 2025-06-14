@@ -233,10 +233,6 @@ export default function App() {
     setCurrentPage(1);
   }, [searchTerm, setCurrentPage]);
 
-  useEffect(() => {
-    console.log("Most played game:", mostPlayedGame);
-  }, [mostPlayedGame]);
-
   const [advisorPage, setAdvisorPage] = useState(1);
 
   const [gamesData, setGamesData] = useState({});
