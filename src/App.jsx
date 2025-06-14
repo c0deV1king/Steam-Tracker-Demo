@@ -575,15 +575,29 @@ export default function App() {
 
   const renderTopBannerDemo = () => {
     return (
-      <div className="flex flex-col container mx-auto justify-center items-center m-5">
-        <div className="stats stats-vertical lg:stats-horizontal bg-transparent">
+      <div className="flex flex-col md:flex-row container mx-auto justify-center items-center m-5">
+        <div className="stats stats-horizontal bg-transparent">
           <div className="stat flex justify-center items-center">
             <div className="stat-title text-center"></div>
-            <div className="stat-value text-center text-info">27</div>
+            <img
+              src={JoystickSVG}
+              alt="joystick"
+              className="w-8 h-8 svg-accent"
+            />
+            <div className="stat-value text-center text-info text-white">
+              27
+            </div>
           </div>
 
           <div className="stat flex justify-center items-center">
-            <div className="stat-value text-center text-info">2683</div>
+            <img
+              src={TimeClockSVG}
+              alt="timeclock"
+              className="w-8 h-8 svg-accent"
+            />
+            <div className="stat-value text-center text-info text-white">
+              2683
+            </div>
           </div>
         </div>
       </div>
@@ -592,7 +606,7 @@ export default function App() {
 
   const renderDemoScreenshot = () => {
     return (
-      <div className="container mx-auto bg-black lg:w-[50%] sm:w-[90%] h-[300px] relative">
+      <div className="mx-auto bg-black p-0 m-0 h-[400px] w-full relative mb-10">
         {/* banner */}
         <img
           src={
@@ -613,8 +627,8 @@ export default function App() {
 
   const renderDemoWarningBanner = () => {
     return (
-      <div className="container mx-auto bg-warning lg:w-[50%] sm:w-[90%] h-[40px] relative rounded-3xl mt-2 mb-5">
-        <p className="text-black font-bold text-lg text-center absolute bottom-0 left-0 p-2 w-full">
+      <div className="container mx-auto bg-secondary lg:w-[90%] sm:w-[90%] md:w-[90%]  h-[85px] md:h-[40px] relative rounded-3xl mt-2 mb-5">
+        <p className="text-black font-bold text-lg text-center absolute bottom-0 left-0 p-2 w-full lg:whitespace-nowrap xs:whitespace-normal">
           - Demo mode is currently enabled, please login to Steam for full
           functionality -
         </p>

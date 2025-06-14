@@ -58,13 +58,13 @@ const AuthPage = ({ onLogin, onDemoLogin }) => {
         </div>
         <button
           onClick={handleDemoLogin}
-          className="w-full btn btn-accent mt-4"
+          className="w-full btn btn-secondary mt-4"
         >
           {" "}
           Try Demo Mode
         </button>
 
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col justify-center items-center svg-accent mt-6">
           <a
             href="https://github.com/c0dev1king"
             target="_blank"
